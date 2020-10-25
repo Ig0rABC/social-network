@@ -5,7 +5,7 @@ from settings import app, database
 def register():
     params = request.args.to_dict()
     data = database.users.register(**params)
-    user_id = data['user_id']
+    user_id = data['id']
     return jsonify({'userId': user_id})
 
 @app.route('/users/login', methods=['POST'])

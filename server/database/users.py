@@ -9,7 +9,7 @@ class Users(Table):
         (login, password)
         VALUES
         (%(login)s, %(password)s)
-        RETURNING ID
+        RETURNING id
         ''', kwargs)
 
     def login(self, **kwargs):

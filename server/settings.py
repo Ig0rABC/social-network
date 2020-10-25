@@ -1,4 +1,5 @@
 from collections import namedtuple
+from flask import Flask
 from database import *
 
 database = Database(dbname='socialnetwork')
@@ -13,3 +14,5 @@ database_tables = {
 }
 DatabaseTables = namedtuple('Database', database_tables.keys())
 database = DatabaseTables(**database_tables)
+
+app = Flask(__name__)

@@ -12,7 +12,9 @@ class Table:
         )
     
     def params_to_update(self, params):
-        return ', '.join(
+        if not params:
+            return ''
+        return 'SET ' + ', '.join(
             f'{key} = %({key})s'
             for key in params.keys()
         )
@@ -36,7 +38,7 @@ class UserInfoTable(Table):
     def update(self, **kwargs):
         self._database.execute_and_commit('''
         UPDATE {0}
-        SET {1}
+        {1}
         WHERE user_id = %(user_id)s
         '''.format(self.table, self.params_to_update(kwargs)), kwargs)
 
@@ -59,15 +61,15 @@ class AuthorContentTable(Table):
     
     def count(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT count(*) FROM {0}
+        SELECT count(*) AS total_count FROM {0}
         {1}
-        '''.format(self.table, self.params_to_condition(kwargs)), kwargs).get('count')
+        '''.format(self.table, self.params_to_condition(kwargs)), kwargs)
 
     def get_author_id(self, **kwargs):
         return self._database.fetch_one('''
         SELECT author_id FROM {0}
         WHERE id = %(id)s
-        '''.format(self.table), kwargs).get('author_id')
+        '''.format(self.table), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
@@ -75,14 +77,15 @@ class AuthorContentTable(Table):
         (author_id, {1}, content)
         VALUES
         (%(author_id)s, %({1})s, %(content)s)
-        RETURNING id
-        '''.format(self.table, self.foreign_key), kwargs).get('id')
+        RETURNING *
+        '''.format(self.table, self.foreign_key), kwargs)
     
     def update(self, **kwargs):
         self._database.execute_and_commit('''
         UPDATE {0}
         SET content = %(content)s
         WHERE id = %(id)s
+        RETURNING *
         '''.format(self.table), kwargs)
 
     def delete(self, **kwargs):
@@ -108,6 +111,6 @@ class AuthorContentTable(Table):
     
     def count_likes(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT count(*) FROM {0}_likes
+        SELECT count(*) AS likes_count FROM {0}_likes
         WHERE {0}_id = %({0}_id)s
-        '''.format(self.model), kwargs).get('count')
+        '''.format(self.model), kwargs)

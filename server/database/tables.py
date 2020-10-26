@@ -6,7 +6,7 @@ class Table:
     def params_to_condition(self, params):
         if not params:
             return ''
-        return 'WHERE' + ' AND '.join(
+        return 'WHERE ' + ' AND '.join(
             f'{key} = %({key})s'
             for key in params.keys()
         )
@@ -76,7 +76,7 @@ class AuthorContentTable(Table):
         VALUES
         (%(author_id)s, %({1})s, %(content)s)
         RETURNING id
-        '''.format(self.table, self.foreign_key), kwargs)
+        '''.format(self.table, self.foreign_key), kwargs).get('id')
     
     def update(self, **kwargs):
         self._database.execute_and_commit('''

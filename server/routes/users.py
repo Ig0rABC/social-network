@@ -5,17 +5,19 @@ from settings import app, database
 @app.route('/users/register', methods=['POST'])
 def register():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not (params.get('login') and params.get('password')):
+        return jsonify({'message': 'No login or password'}), 401
     data = database.users.register(**params)
     if not data:
-        return jsonify({'message': 'User with this login already exists'})
-    return jsonify(converts_keys(data, case='camel'))
+        return jsonify({'message': 'User with this login already exists'}), 401
+    return jsonify(converts_keys(data, case='camel')), 201
 
 @app.route('/users/login', methods=['POST'])
 def login():
     params = request.args.to_dict()
     data = database.users.login(**params)
     if not data:
-        return jsonify({'message': 'User already logged'})
+        return jsonify({'message': 'Authorization error'}), 401
     response = make_response('Cookies', 200)
     response.set_cookie('token', value=data['token'])
     return response

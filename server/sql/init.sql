@@ -5,13 +5,13 @@ CREATE EXTENSION "uuid-ossp";
 
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,
-    login VARCHAR(32) UNIQUE,
-    password VARCHAR(64)
+    login VARCHAR(32) NOT NULL UNIQUE,
+    password VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE tokens(
-    token UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id)
+    token UUID DEFAULT uuid_generate_v4() NOT NULL UNIQUE,
+    user_id INTEGER REFERENCES users(id) NOT NULL UNIQUE
 );
 
 CREATE TABLE profiles(
@@ -35,7 +35,7 @@ CREATE TABLE messages(
     id SERIAL PRIMARY KEY,
     sender_id INTEGER REFERENCES users(id),
     recipient_id INTEGER REFERENCES users(id),
-    content TEXT,
+    content TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -47,7 +47,7 @@ CREATE TABLE posts(
     id SERIAL PRIMARY KEY,
     author_id INTEGER REFERENCES users(id),
     category VARCHAR(16) REFERENCES categories(name),
-    content TEXT,
+    content TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -55,7 +55,7 @@ CREATE TABLE comments(
     id SERIAL PRIMARY KEY,
     author_id INTEGER REFERENCES users(id),
     post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
-    content TEXT,
+    content TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE answers(
     id SERIAL PRIMARY KEY,
     author_id INTEGER REFERENCES users(id),
     comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
-    content TEXT,
+    content TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

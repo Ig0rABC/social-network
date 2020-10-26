@@ -4,15 +4,13 @@ from settings import app, database
 @app.route('/users/register', methods=['POST'])
 def register():
     params = request.args.to_dict()
-    data = database.users.register(**params)
-    user_id = data['id']
+    user_id = database.users.register(**params)
     return jsonify({'userId': user_id})
 
 @app.route('/users/login', methods=['POST'])
 def login():
     params = request.args.to_dict()
-    data = database.users.login(**params)
-    token = data['token']
+    token = database.users.login(**params)
     response = make_response('Cookies', 200)
     response.set_cookie('token', value=token, path=request.path)
     return response

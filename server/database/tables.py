@@ -61,13 +61,13 @@ class AuthorContentTable(Table):
         return self._database.fetch_one('''
         SELECT count(*) FROM {0}
         {1}
-        '''.format(self.table, self.params_to_condition(kwargs)), kwargs)
+        '''.format(self.table, self.params_to_condition(kwargs)), kwargs).get('count')
 
     def get_author_id(self, **kwargs):
         return self._database.fetch_one('''
         SELECT author_id FROM {0}
         WHERE id = %(id)s
-        '''.format(self.table), kwargs)
+        '''.format(self.table), kwargs).get('author_id')
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
@@ -110,4 +110,4 @@ class AuthorContentTable(Table):
         return self._database.fetch_one('''
         SELECT count(*) FROM {0}_likes
         WHERE {0}_id = %({0}_id)s
-        '''.format(self.model), kwargs)
+        '''.format(self.model), kwargs).get('count')

@@ -81,7 +81,7 @@ class AuthorContentTable(Table):
         '''.format(self.table, self.foreign_key), kwargs)
     
     def update(self, **kwargs):
-        self._database.execute_and_commit('''
+        return self._database.execute_with_returning('''
         UPDATE {0}
         SET content = %(content)s
         WHERE id = %(id)s

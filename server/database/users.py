@@ -9,8 +9,8 @@ class Users(Table):
         (login, password)
         VALUES
         (%(login)s, %(password)s)
-        RETURNING id
-        ''', kwargs).get('id')
+        RETURNING id AS user_id
+        ''', kwargs)
 
     def login(self, **kwargs):
         return self._database.execute_with_returning('''
@@ -19,13 +19,13 @@ class Users(Table):
         WHERE login = %(login)s
         AND password = %(password)s
         RETURNING token
-        ''', kwargs).get('token')
+        ''', kwargs)
 
     def get_user_id(self, **kwargs):
         return self._database.fetch_one('''
         SELECT user_id FROM tokens
         WHERE token = %(token)s
-        ''', kwargs).get('user_id')
+        ''', kwargs)
 
     def logout(self, **kwargs):
         self._database.execute_and_commit('''

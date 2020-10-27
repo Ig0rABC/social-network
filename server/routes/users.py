@@ -14,7 +14,7 @@ def register():
 
 @app.route('/users/login', methods=['POST'])
 def login():
-    params = request.args.to_dict()
+    params = converts_keys(request.args.to_dict(), case='snake')
     data = database.users.login(**params)
     if not data:
         return jsonify({'message': 'Authorization error'}), 401
@@ -22,9 +22,9 @@ def login():
     response.set_cookie('token', value=data['token'])
     return response
 
-@app.route('/users/logout', methods=['DELETE'])
+@app.route('/users/login', methods=['DELETE'])
 def logout():
     database.users.logout(**request.cookies)
-    response = make_response('Cookie removed', 200)
+    response = make_response(jsonify({'message': 'Logout complete successfuly'}), 205)
     response.set_cookie('token', value='', max_age=0)
-    return jsonify({'message': 'Logout complete successfuly'})
+    return response

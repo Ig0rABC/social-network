@@ -15,7 +15,7 @@ class UserTests(unittest.TestCase):
         return session.post('http://localhost:5000/users/login', params=payload)
     
     def logout_user(self, session):
-        return session.delete('http://localhost:5000/users/login', cookies=session.cookies)
+        return session.delete('http://localhost:5000/users/login')
 
     def test_register_user(self):
         response = self.register_user({

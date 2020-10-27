@@ -1,4 +1,5 @@
 import requests
+import json
 import unittest
 from database import Database
 
@@ -13,8 +14,8 @@ class UserTests(unittest.TestCase):
     def login_user(self, session, payload):
         return session.post('http://localhost:5000/users/login', params=payload)
     
-    def logout_user(self, session, **kwargs):
-        return session.delete('http://localhost:5000/users/login', **kwargs)
+    def logout_user(self, session):
+        return session.delete('http://localhost:5000/users/login', cookies=session.cookies)
 
     def test_register_user(self):
         response = self.register_user({
@@ -22,7 +23,7 @@ class UserTests(unittest.TestCase):
             'password': 'testPassword1'
         })
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(response.content.decode().find('userId'))
+        self.assertTrue('userId' in json.loads(response.content))
     
     def test_register_two_users(self):
         self.register_user({
@@ -71,7 +72,7 @@ class UserTests(unittest.TestCase):
         session = requests.Session()
         response = self.login_user(session, payload)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(session.cookies.get('token'))
+        self.assertTrue('token' in session.cookies)
     
     def test_login_user_when_he_already_loged(self):
         payload = {
@@ -92,7 +93,7 @@ class UserTests(unittest.TestCase):
         self.register_user(payload)
         session = requests.Session()
         self.login_user(session, payload)
-        response = self.logout_user(session, cookies=session.cookies)
+        response = self.logout_user(session)
         self.assertEqual(response.status_code, 205)
         self.assertFalse(session.cookies)
     

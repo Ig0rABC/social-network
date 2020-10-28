@@ -86,6 +86,15 @@ class PostsDatabase(unittest.TestCase):
         self.assertEqual(len(posts), 1)
         self.assertEqual(posts[0]['author_id'], 1)
     
+    def test_get_post_total_count(self):
+        database.users.register(**self.USER_1)
+        database.posts.create(author_id=1, **self.POST_1)
+        database.posts.create(author_id=1, **self.POST_2)
+        database.posts.create(author_id=1, **self.POST_3)
+        database.posts.create(author_id=1, **self.POST_4)
+        data = database.posts.count(author_id=1, category=self.POST_1['category'])
+        self.assertEqual(data['total_count'], 2)
+    
     def test_delete_post(self):
         database.users.register(**self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)

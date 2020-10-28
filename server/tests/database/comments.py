@@ -78,6 +78,15 @@ class CommentsDatabase(unittest.TestCase):
         comments = database.comments.filter(post_id=2, author_id=1, limit=10, offset=0)
         self.assertEqual(len(comments), 1)
     
+    def test_get_post_total_count(self):
+        database.users.register(**self.USER_1)
+        database.posts.create(author_id=1, **self.POST_1)
+        database.posts.create(author_id=1, **self.COMMENT_1)
+        database.posts.create(author_id=1, **self.COMMENT_1)
+        database.posts.create(author_id=1, **self.COMMENT_1)
+        data = database.posts.count(author_id=1, post_id=self.COMMENT_1['post_id'])
+        self.assertEqual(data['total_count'], 4)
+    
     def test_update_comment(self):
         database.users.register(**self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)

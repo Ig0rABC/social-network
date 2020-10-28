@@ -117,7 +117,7 @@ class PostsDatabase(unittest.TestCase):
         data = database.posts.count_likes(post_id=1)
         self.assertEqual(data['likes_count'], 0)
 
-    def test_twice_like(self):
+    def test_twice_like_post(self):
         database.users.register(**self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.like(post_id=1, user_id=1)

@@ -44,73 +44,80 @@ class UserInfoTable(Table):
 
 class AuthorContentTable(Table):
 
-    table = None
-    model = None
-    foreign_key = None
+    metadata = {
+        'table': None,
+        'model': None,
+        'foreign_key': None
+    }
 
     def filter(self, **kwargs):
         params = kwargs.copy()
         params.pop('limit')
         params.pop('offset')
         return self._database.fetch_all('''
-        SELECT * FROM {0}
-        {1}
+        SELECT *, (
+            SELECT count(*) AS likes_count
+            FROM {model}_likes
+            WHERE id = user_id
+        ) FROM {table}
+        {condition}
+        ORDER BY created DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(self.table, self.params_to_condition(params)), kwargs)
+        '''.format(**self.metadata,condition=self.params_to_condition(params)), kwargs)
     
     def count(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT count(*) AS total_count FROM {0}
-        {1}
-        '''.format(self.table, self.params_to_condition(kwargs)), kwargs)
+        SELECT count(*) AS total_count FROM {table}
+        {condition}
+        '''.format(**self.metadata, condition=self.params_to_condition(kwargs)), kwargs)
 
     def get_author_id(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT author_id FROM {0}
+        SELECT author_id FROM {table}
         WHERE id = %(id)s
-        '''.format(self.table), kwargs)
+        '''.format(**self.metadata), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
-        INSERT INTO {0}
-        (author_id, {1}, content)
+        INSERT INTO {table}
+        (author_id, {foreign_key}, content)
         VALUES
-        (%(author_id)s, %({1})s, %(content)s)
-        RETURNING *
-        '''.format(self.table, self.foreign_key), kwargs)
+        (%(author_id)s, %({foreign_key})s, %(content)s)
+        RETURNING *, (SELECT 0 AS likes_count)
+        '''.format(**self.metadata), kwargs)
     
     def update(self, **kwargs):
         return self._database.execute_with_returning('''
-        UPDATE {0}
+        UPDATE {table}
         SET content = %(content)s
         WHERE id = %(id)s
         RETURNING *
-        '''.format(self.table), kwargs)
+        '''.format(**self.metadata), kwargs)
 
     def delete(self, **kwargs):
         return self._database.execute_and_commit('''
-        DELETE FROM {0}
+        DELETE FROM {table}
         WHERE id = %(id)s
-        '''.format(self.table), kwargs)
+        '''.format(**self.metadata), kwargs)
 
     def like(self, **kwargs):
         self._database.execute_and_commit('''
-        INSERT INTO {0}_likes
-        (user_id, {0}_id)
+        INSERT INTO {model}_likes
+        (user_id, {model}_id)
         VALUES
-        (%(user_id)s, %({0}_id)s)
-        '''.format(self.model), kwargs)
+        (%(user_id)s, %({model}_id)s)
+        '''.format(**self.metadata), kwargs)
     
     def unlike(self, **kwargs):
         self._database.execute_and_commit('''
-        DELETE FROM {0}_likes
+        DELETE FROM {model}_likes
         WHERE user_id = %(user_id)s
-        AND {0}_id = %({0}_id)s
-        '''.format(self.model), kwargs)
+        AND {model}_id = %({model}_id)s
+        '''.format(**self.metadata), kwargs)
     
     def count_likes(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT count(*) AS likes_count FROM {0}_likes
-        WHERE {0}_id = %({0}_id)s
-        '''.format(self.model), kwargs)
+        SELECT count(*) AS likes_count FROM {model}_likes
+        WHERE {model}_id = %({model}_id)s
+        '''.format(**self.metadata), kwargs)

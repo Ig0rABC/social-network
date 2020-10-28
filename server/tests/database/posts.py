@@ -94,3 +94,33 @@ class PostsDatabase(unittest.TestCase):
         database.posts.delete(id=1)
         posts = database.posts.filter(author_id=1, limit=10, offset=0)
         self.assertEqual(len(posts), 2)
+    
+    def test_like_post(self):
+        database.users.register(**self.USER_1)
+        database.users.register(**self.USER_2)
+        database.posts.create(author_id=1, **self.POST_1)
+        database.posts.create(author_id=2, **self.POST_2)
+        database.posts.like(post_id=1, user_id=1)
+        data = database.posts.count_likes(post_id=1)
+        self.assertEqual(data['likes_count'], 1)
+        database.posts.like(post_id=1, user_id=2)
+        data = database.posts.count_likes(post_id=1)
+        self.assertEqual(data['likes_count'], 2)
+        data = database.posts.count_likes(post_id=2)
+        self.assertEqual(data['likes_count'], 0)
+
+    def test_unlike_post(self):
+        database.users.register(**self.USER_1)
+        database.posts.create(author_id=1, **self.POST_1)
+        database.posts.like(post_id=1, user_id=1)
+        database.posts.unlike(post_id=1, user_id=1)
+        data = database.posts.count_likes(post_id=1)
+        self.assertEqual(data['likes_count'], 0)
+
+    def test_twice_like(self):
+        database.users.register(**self.USER_1)
+        database.posts.create(author_id=1, **self.POST_1)
+        database.posts.like(post_id=1, user_id=1)
+        database.posts.like(post_id=1, user_id=1)
+        data = database.posts.count_likes(post_id=1)
+        self.assertEqual(data['likes_count'], 1)

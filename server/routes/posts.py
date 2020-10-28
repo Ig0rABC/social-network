@@ -1,6 +1,10 @@
 from flask import jsonify, request, make_response
 from any_case import converts_keys
-from settings import app, database
+from settings import (
+    app, database,
+    DEFAULT_POST_LIMIT,
+    MAX_POST_LIMIT
+)
 
 @app.route('/posts/categories', methods=['GET'])
 def get_categories():
@@ -11,25 +15,32 @@ def get_categories():
 def create_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
     data = database.posts.create(**params, author_id=author_id)
-    return jsonify(converts_keys(data, case='camel'))
+    return jsonify(converts_keys(data, case='camel')), 201
 
 @app.route('/posts', methods=['GET'])
 def get_posts():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if params.setdefault('limit', DEFAULT_POST_LIMIT) > MAX_POST_LIMIT:
+        params['limit'] = MAX_POST_LIMIT
+    params.setdefault('offset', 0)
     posts = database.posts.filter(**params)
-    return jsonify({'posts': posts})
+    return jsonify(converts_keys({'posts': posts}, case='camel'))
 
 @app.route('/posts', methods=['PUT'])
 def update_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
     data = {}
     data.update(database.posts.get_author_id(**params))
     data.update(database.users.get_user_id(**cookies))
     if data['user_id'] != data['author_id']:
-        return jsonify({'messages': 'Access error'})
+        return jsonify({'messages': 'Access error'}), 401
     data = database.posts.update(**params)
     return jsonify(converts_keys(data, case='camel'))
 
@@ -37,18 +48,22 @@ def update_post():
 def delete_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
     data = {}
     data.update(database.posts.get_author_id(**params))
     data.update(database.users.get_user_id(**cookies))
     if data['user_id'] != data['author_id']:
-        return jsonify({'messages': 'Access error'})
+        return jsonify({'messages': 'Access error'}), 401
     database.posts.delete(**params)
-    return jsonify({'message': 'Post has been deleted'})
+    return jsonify({'message': 'Post has been deleted'}), 205
 
 @app.route('/posts/likes', methods=['POST'])
 def like_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
     data = database.users.get_user_id(**cookies)
     database.posts.like(**params, **data)
     return jsonify({'message': 'Post has been tagged "I like"'})
@@ -57,12 +72,8 @@ def like_post():
 def unlike_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
     data = database.users.get_user_id(**cookies)
     database.posts.unlike(**params, **data)
     return jsonify({'message': 'Mark "I like" has been deleted from the post'})
-
-@app.route('/posts/likes', methods=['GET'])
-def count_post_likes():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    data = database.posts.count_likes(**params)
-    return jsonify(converts_keys(data, case='camel'))

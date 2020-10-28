@@ -2,6 +2,9 @@ from collections import namedtuple
 from flask import Flask
 from database import *
 
+DEFAULT_POST_LIMIT = 4
+MAX_POST_LIMIT = 12
+
 database = Database(dbname='socialnetwork')
 database_tables = {
     'users': Users(database),

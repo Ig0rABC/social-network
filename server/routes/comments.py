@@ -66,7 +66,7 @@ def like_comment():
         return jsonify(), 401
     data = database.users.get_user_id(**cookies)
     database.comments.like(**params, **data)
-    return jsonify({'message': 'Post has been tagged "I like"'})
+    return jsonify({'message': 'Comment has been tagged "I like"'})
 
 @app.route('/comments/likes', methods=['DELETE'])
 def unlike_comment():
@@ -76,4 +76,4 @@ def unlike_comment():
         return jsonify(), 401
     data = database.users.get_user_id(**cookies)
     database.comments.unlike(**params, **data)
-    return jsonify({'message': 'Mark "I like" has been deleted from the post'})
+    return jsonify({'message': 'Mark "I like" has been deleted from the comment'})

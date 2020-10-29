@@ -30,8 +30,10 @@ def get_posts():
         params['limit'] = MAX_POST_LIMIT
     params.setdefault('offset', 0)
     params['offset'] = int(params['offset'])
-    posts = database.posts.filter(**params)
-    return jsonify(converts_keys({'posts': posts}, case='camel'))
+    return jsonify(converts_keys({
+        'posts': database.posts.filter(**params),
+        **database.posts.count(**params)
+    }, case='camel'))
 
 @app.route('/posts', methods=['PUT'])
 def update_post():

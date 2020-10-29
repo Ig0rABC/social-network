@@ -3,20 +3,22 @@ class Table:
     def __init__(self, database):
         self._database = database
     
-    def params_to_condition(self, params):
-        if not params:
+    def params_to_condition(self, **kwargs):
+        if not kwargs:
             return ''
+        kwargs.pop('limit', None)
+        kwargs.pop('offset', None)
         return 'WHERE ' + ' AND '.join(
             f'{key} = %({key})s'
-            for key in params.keys()
+            for key in kwargs.keys()
         )
     
-    def params_to_update(self, params):
-        if not params:
+    def params_to_update(self, **kwargs):
+        if not kwargs:
             return ''
         return 'SET ' + ', '.join(
             f'{key} = %({key})s'
-            for key in params.keys()
+            for key in kwargs.keys()
         )
 
 class UserInfoTable(Table):
@@ -40,7 +42,7 @@ class UserInfoTable(Table):
         UPDATE {0}
         {1}
         WHERE user_id = %(user_id)s
-        '''.format(self.table, self.params_to_update(kwargs)), kwargs)
+        '''.format(self.table, self.params_to_update(**kwargs)), kwargs)
 
 class AuthorContentTable(Table):
 
@@ -51,9 +53,6 @@ class AuthorContentTable(Table):
     }
 
     def filter(self, **kwargs):
-        params = kwargs.copy()
-        params.pop('limit')
-        params.pop('offset')
         return self._database.fetch_all('''
         SELECT *, (
             SELECT count(*) AS likes_count
@@ -64,13 +63,13 @@ class AuthorContentTable(Table):
         ORDER BY created DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(**self.metadata,condition=self.params_to_condition(params)), kwargs)
+        '''.format(**self.metadata, condition=self.params_to_condition(**kwargs)), kwargs)
     
     def count(self, **kwargs):
         return self._database.fetch_one('''
         SELECT count(*) AS total_count FROM {table}
         {condition}
-        '''.format(**self.metadata, condition=self.params_to_condition(kwargs)), kwargs)
+        '''.format(**self.metadata, condition=self.params_to_condition(**kwargs)), kwargs)
 
     def get_author_id(self, **kwargs):
         return self._database.fetch_one('''

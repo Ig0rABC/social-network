@@ -70,7 +70,17 @@ class UserTests(unittest.TestCase):
         session = requests.Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.login_user(session, self.USER_1_PAYLOAD)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_login_user_when_another_user_loged(self):
+        self.register_user(self.USER_1_PAYLOAD)
+        self.register_user(self.USER_2_PAYLOAD)
+        session = requests.Session()
+        self.login_user(session, self.USER_1_PAYLOAD)
+        response = self.login_user(session, self.USER_2_PAYLOAD)
+        self.assertEqual(response.status_code, 200)
+        response = self.login_user(session, self.USER_1_PAYLOAD)
+        self.assertEqual(response.status_code, 200)
     
     def test_logout_user(self):
         self.register_user(self.USER_1_PAYLOAD)

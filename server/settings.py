@@ -5,6 +5,9 @@ from database import *
 DEFAULT_POST_LIMIT = 4
 MAX_POST_LIMIT = 12
 
+DEFAULT_COMMENT_LIMIT = 8
+MAX_COMMENT_LIMIT = 20
+
 database = Database(dbname='socialnetwork')
 database_tables = {
     'users': Users(database),

@@ -24,9 +24,12 @@ def create_post():
 @app.route('/posts', methods=['GET'])
 def get_posts():
     params = converts_keys(request.args.to_dict(), case='snake')
-    if params.setdefault('limit', DEFAULT_POST_LIMIT) > MAX_POST_LIMIT:
+    params.setdefault('limit', DEFAULT_POST_LIMIT)
+    params['limit'] = int(params['limit'])
+    if params['limit'] > MAX_POST_LIMIT:
         params['limit'] = MAX_POST_LIMIT
     params.setdefault('offset', 0)
+    params['offset'] = int(params['offset'])
     posts = database.posts.filter(**params)
     return jsonify(converts_keys({'posts': posts}, case='camel'))
 

@@ -77,9 +77,3 @@ def unlike_comment():
     data = database.users.get_user_id(**cookies)
     database.comments.unlike(**params, **data)
     return jsonify({'message': 'Mark "I like" has been deleted from the post'})
-
-@app.route('/comments/likes', methods=['GET'])
-def count_comment_likes():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    data = database.comments.count_likes(**params)
-    return jsonify(converts_keys(data, case='camel'))

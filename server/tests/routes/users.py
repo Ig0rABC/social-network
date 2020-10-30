@@ -1,30 +1,8 @@
-import requests
 import json
-import unittest
-from database import Database
+from requests import Session
+from .test_cases import UsersTestCase
 
-class UserTests(unittest.TestCase):
-
-    USER_1_PAYLOAD = {
-        'login': 'testUser1',
-        'password': 'testPassword1'
-    }
-    USER_2_PAYLOAD = {
-        'login': 'testUser2',
-        'password': 'testPassword2'
-    }
-
-    def tearDown(self):
-        Database(dbname='socialnetwork').clear()
-
-    def register_user(self, payload):
-        return requests.post('http://localhost:5000/users/register', params=payload)
-    
-    def login_user(self, session, payload):
-        return session.post('http://localhost:5000/users/login', params=payload)
-    
-    def logout_user(self, session):
-        return session.delete('http://localhost:5000/users/login')
+class UserTests(UsersTestCase):
 
     def test_register_user(self):
         response = self.register_user(self.USER_1_PAYLOAD)
@@ -60,14 +38,14 @@ class UserTests(unittest.TestCase):
 
     def test_login_user(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         response = self.login_user(session, self.USER_1_PAYLOAD)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in session.cookies)
     
     def test_login_user_when_he_already_loged(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.login_user(session, self.USER_1_PAYLOAD)
         self.assertEqual(response.status_code, 200)
@@ -75,7 +53,7 @@ class UserTests(unittest.TestCase):
     def test_login_user_when_another_user_loged(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.login_user(session, self.USER_2_PAYLOAD)
         self.assertEqual(response.status_code, 200)
@@ -84,7 +62,7 @@ class UserTests(unittest.TestCase):
     
     def test_logout_user(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.logout_user(session)
         self.assertEqual(response.status_code, 205)
@@ -92,7 +70,7 @@ class UserTests(unittest.TestCase):
     
     def test_login_user_with_wrong_login(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         payload = self.USER_1_PAYLOAD.copy()
         payload['login'] = 'tjwoejfksfd'
         response = self.login_user(session, payload)
@@ -101,7 +79,7 @@ class UserTests(unittest.TestCase):
     
     def test_login_user_with_wrong_password(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         payload = self.USER_1_PAYLOAD.copy()
         payload['password'] = 'dkfdfsfeptkeop'
         response = self.login_user(session, payload)

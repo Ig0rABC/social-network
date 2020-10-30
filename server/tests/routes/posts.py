@@ -1,75 +1,12 @@
-import requests
 import json
-import unittest
-from database import Database
+from requests import Session
+from .test_cases import PostsTestCase
 
-class PostTests(unittest.TestCase):
-
-    USER_1_PAYLOAD = {
-        'login': 'testUser1',
-        'password': 'testPassword1'
-    }
-    USER_2_PAYLOAD = {
-        'login': 'testUser2',
-        'password': 'testPassword2'
-    }
-    POST_1_PAYLOAD = {
-        'category': 'Programming',
-        'content': 'python'
-    }
-    POST_2_PAYLOAD = {
-        'category': 'Travels',
-        'content': 'New Zealand'
-    }
-    POST_3_PAYLOAD = {
-        'category': 'No category',
-        'content': 'dajdajpkopewkt['
-    }
-    POST_4_PAYLOAD = {
-        'category': 'Programming',
-        'content': 'JavaScript'
-    }
-
-    def tearDown(self):
-        Database(dbname='socialnetwork').clear()
-
-    def register_user(self, payload):
-        return requests.post('http://localhost:5000/users/register', params=payload)
-    
-    def login_user(self, session, payload):
-        return session.post('http://localhost:5000/users/login', params=payload)
-    
-    def logout_user(self, session):
-        return session.delete('http://localhost:5000/users/login')
-    
-    def create_post(self, session, payload):
-        return session.post('http://localhost:5000/posts', params=payload)
-    
-    def update_post(self, session, payload):
-        return session.put('http://localhost:5000/posts', params=payload)
-    
-    def get_posts(self, payload):
-        return requests.get('http://localhost:5000/posts', params=payload)
-    
-    def delete_post(self, session, payload):
-        return session.delete('http://localhost:5000/posts', params=payload)
-    
-    def like_post(self, session, payload):
-        return session.post('http://localhost:5000/posts/likes', params=payload)
-    
-    def unlike_post(self, session, payload):
-        return session.delete('http://localhost:5000/posts/likes', params=payload)
-    
-    def count_post_likes(self, payload):
-        return requests.get('http://localhost:5000/posts/likes', params=payload)
-
-    def test_get_categories(self):
-        response = requests.get('http://localhost:5000/posts/categories')
-        self.assertEqual(response.status_code, 200)
+class PostTests(PostsTestCase):
 
     def test_create_post(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         self.assertEqual(response.status_code, 201)
@@ -83,14 +20,14 @@ class PostTests(unittest.TestCase):
     
     def test_create_post_not_logged(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         response = self.create_post(session, self.POST_1_PAYLOAD)
         self.assertEqual(response.status_code, 401)
 
     def test_get_posts_by_author_id(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.create_post(session, self.POST_2_PAYLOAD)
@@ -108,7 +45,7 @@ class PostTests(unittest.TestCase):
     def test_get_posts_by_category(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.create_post(session, self.POST_2_PAYLOAD)
@@ -134,7 +71,7 @@ class PostTests(unittest.TestCase):
     def test_get_posts_by_category_and_author_id(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.create_post(session, self.POST_4_PAYLOAD)
@@ -159,7 +96,7 @@ class PostTests(unittest.TestCase):
 
     def test_update_post_by_author(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         post_payload = self.POST_2_PAYLOAD.copy()
@@ -172,7 +109,7 @@ class PostTests(unittest.TestCase):
 
     def test_update_post_not_by_author(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.logout_user(session)
@@ -185,7 +122,7 @@ class PostTests(unittest.TestCase):
 
     def test_update_post_not_logged(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.logout_user(session)
@@ -196,7 +133,7 @@ class PostTests(unittest.TestCase):
     
     def test_delete_post_by_author(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post_data = json.loads(response.content)
@@ -206,7 +143,7 @@ class PostTests(unittest.TestCase):
     def test_delete_post_not_by_author(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post_data = json.loads(response.content)
@@ -217,7 +154,7 @@ class PostTests(unittest.TestCase):
 
     def test_delete_post_not_logged(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post_data = json.loads(response.content)
@@ -227,27 +164,27 @@ class PostTests(unittest.TestCase):
 
     def test_like_post(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post_data = json.loads(response.content)
-        response = self.like_post(session, {'post_id': post_data['id']})
+        response = self.like(session, {'post_id': post_data['id']})
         self.assertEqual(response.status_code, 200)
     
     def test_like_post_not_logged(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post_data = json.loads(response.content)
         self.logout_user(session)
-        response = self.like_post(session, {'post_id': post_data['id']})
+        response = self.like(session, {'post_id': post_data['id']})
         self.assertEqual(response.status_code, 401)
 '''
     def test_count_post_likes(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         data = json.loads(response.content)
@@ -266,7 +203,7 @@ class PostTests(unittest.TestCase):
 
     def test_unlike_post(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post = json.loads(response.content)

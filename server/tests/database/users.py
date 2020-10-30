@@ -1,9 +1,8 @@
-import unittest
-from database import Database
+from ..test_case import TestCaseWithDBClear
 from settings import database
 
-class UsersDatabase(unittest.TestCase):
-
+class UsersDatabase(TestCaseWithDBClear):
+    
     USER_1 = {
         'login': 'testUser1',
         'password': 'testPassword1'
@@ -12,9 +11,6 @@ class UsersDatabase(unittest.TestCase):
         'login': 'testUser2',
         'password': 'testPassword2'
     }
-
-    def tearDown(self):
-        Database(dbname='socialnetwork').clear()
     
     def test_register_user(self):
         data = database.users.register(**self.USER_1)

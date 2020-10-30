@@ -1,8 +1,7 @@
-import unittest
-from database import Database
+from ..test_case import TestCaseWithDBClear
 from settings import database
 
-class PostsDatabase(unittest.TestCase):
+class PostsDatabase(TestCaseWithDBClear):
 
     USER_1 = {
         'login': 'testUser1',
@@ -28,9 +27,6 @@ class PostsDatabase(unittest.TestCase):
         'category': 'Programming',
         'content': 'JavaScript'
     }
-
-    def tearDown(self):
-        Database(dbname='socialnetwork').clear()
     
     def test_create_post(self):
         data = database.users.register(**self.USER_1)

@@ -1,8 +1,7 @@
-import unittest
-from database import Database
+from ..test_case import TestCaseWithDBClear
 from settings import database
 
-class CommentsDatabase(unittest.TestCase):
+class CommentsDatabase(TestCaseWithDBClear):
 
     USER_1 = {
         'login': 'testUser1',
@@ -28,9 +27,6 @@ class CommentsDatabase(unittest.TestCase):
         'post_id': 2,
         'content': 'fsdfdmfr'
     }
-
-    def tearDown(self):
-        Database(dbname='socialnetwork').clear()
     
     def test_create_comment(self):
         database.users.register(**self.USER_1)

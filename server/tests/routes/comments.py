@@ -1,68 +1,12 @@
-import requests
 import json
-import unittest
-from database import Database
+from requests import Session
+from .test_cases import CommentsTestCase
 
-class CommentsTests(unittest.TestCase):
-    
-    USER_1_PAYLOAD = {
-        'login': 'testUser1',
-        'password': 'testPassword1'
-    }
-    USER_2_PAYLOAD = {
-        'login': 'testUser2',
-        'password': 'testPassword2'
-    }
-    POST_1_PAYLOAD = {
-        'category': 'Programming',
-        'content': 'python'
-    }
-    POST_2_PAYLOAD = {
-        'category': 'Travels',
-        'content': 'New Zealand'
-    }
-    COMMENT_1_PAYLOAD = {
-        'post_id': 1,
-        'content': 'fjidsjf'
-    }
-    COMMENT_2_PAYLOAD = {
-        'post_id': 2,
-        'content': 'ggj;jsfk'
-    }
-
-    def tearDown(self):
-        Database(dbname='socialnetwork').clear()
-
-    def register_user(self, payload):
-        return requests.post('http://localhost:5000/users/register', params=payload)
-    
-    def login_user(self, session, payload):
-        return session.post('http://localhost:5000/users/login', params=payload)
-    
-    def logout_user(self, session):
-        return session.delete('http://localhost:5000/users/login')
-    
-    def create_post(self, session, payload):
-        return session.post('http://localhost:5000/posts', params=payload)
-    
-    def update_post(self, session, payload):
-        return session.put('http://localhost:5000/posts', params=payload)
-    
-    def get_posts(self, payload):
-        return requests.get('http://localhost:5000/posts', params=payload)
-    
-    def delete_post(self, session, payload):
-        return session.delete('http://localhost:5000/posts', params=payload)
-    
-    def create_comment(self, session, payload):
-        return session.post('http://localhost:5000/comments', params=payload)
-    
-    def get_comments(self, payload):
-        return requests.get('http://localhost:5000/comments', params=payload)
+class CommentsTests(CommentsTestCase):
 
     def test_create_comment(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         response = self.create_comment(session, self.COMMENT_1_PAYLOAD)
@@ -75,7 +19,7 @@ class CommentsTests(unittest.TestCase):
     
     def test_create_comment_not_logged(self):
         self.register_user(self.USER_1_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.logout_user(session)
@@ -85,7 +29,7 @@ class CommentsTests(unittest.TestCase):
     def test_get_comments_by_author_id(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.create_comment(session, self.COMMENT_1_PAYLOAD)
@@ -107,7 +51,7 @@ class CommentsTests(unittest.TestCase):
     def test_get_comments_by_post_id(self):
         self.register_user(self.USER_1_PAYLOAD)
         self.register_user(self.USER_2_PAYLOAD)
-        session = requests.Session()
+        session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.create_comment(session, self.COMMENT_1_PAYLOAD)

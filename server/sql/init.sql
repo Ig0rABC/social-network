@@ -2,6 +2,7 @@ CREATE DATABASE socialnetwork;
 \c socialnetwork
 
 CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION pgcrypto;
 
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,

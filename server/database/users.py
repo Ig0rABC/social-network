@@ -8,7 +8,7 @@ class Users(Table):
         INSERT INTO users
         (login, password)
         VALUES
-        (%(login)s, %(password)s)
+        (%(login)s, crypt(%(password)s, gen_salt('bf', 4)))
         RETURNING id AS user_id
         ''', kwargs)
 
@@ -17,7 +17,7 @@ class Users(Table):
         INSERT INTO tokens(user_id)
         SELECT id FROM users
         WHERE login = %(login)s
-        AND password = %(password)s
+        AND password = crypt(%(password)s, password)
         RETURNING token
         ''', kwargs)
 

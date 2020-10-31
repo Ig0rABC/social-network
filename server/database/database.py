@@ -49,6 +49,7 @@ class Database:
             'contacts',
             'profiles',
             'messages',
+            'followings',
             'users',
         ]
         for table in tables:

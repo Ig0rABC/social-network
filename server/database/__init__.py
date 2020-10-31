@@ -6,3 +6,4 @@ from .messages import Messages
 from .posts import Posts
 from .profiles import Profiles
 from .users import Users
+from .followings import Followings

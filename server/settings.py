@@ -19,7 +19,8 @@ database_tables = {
     'messages': Messages(database),
     'posts': Posts(database),
     'comments': Comments(database),
-    'answers': Answers(database)
+    'answers': Answers(database),
+    'followings': Followings(database)
 }
 DatabaseTables = namedtuple('Database', database_tables.keys())
 database = DatabaseTables(**database_tables)

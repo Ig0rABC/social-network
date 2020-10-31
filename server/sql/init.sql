@@ -15,6 +15,12 @@ CREATE TABLE tokens(
     user_id INTEGER REFERENCES users(id) NOT NULL UNIQUE
 );
 
+CREATE TABLE followings(
+    follower_id INTEGER REFERENCES users(id),
+    followed_id INTEGER REFERENCES users(id),
+    PRIMARY KEY (follower_id, followed_id)
+);
+
 CREATE TABLE profiles(
     user_id INTEGER REFERENCES users(id),
     first_name VARCHAR(64) DEFAULT '',

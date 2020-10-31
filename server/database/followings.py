@@ -45,10 +45,13 @@ class Followings(Table):
         ''', kwargs)
 
     def get_followings(self, **kwargs):
-        return [
-            row['followed_id']
-            for row in self._database.fetch_all('''
-            SELECT followed_id FROM followings
+        return self._database.fetch_all('''
+            SELECT followed_id, u.login, p.first_name, p.last_name, p.photo_url
+            FROM followings
+            INNER JOIN users AS u
+            ON followed_id = u.id
+            INNER JOIN profiles AS p
+            ON followed_id = p.user_id
             WHERE follower_id = %(follower_id)s
             ''', kwargs)
-        ]
+        

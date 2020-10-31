@@ -55,46 +55,6 @@ class AuthorContentTable(Table):
         'dependent_table': None
     }
 
-    @property
-    def dependent_objects(self):
-        if not self.metadata.get('dependent_table'):
-            return ''
-        return ''', (
-            SELECT count(*) AS {dependent_table}_count
-            FROM {dependent_table}
-            WHERE {model}_id = id
-        )'''.format(**self.metadata)
-
-    @property
-    def count_likes(self):
-        return ''', (
-            SELECT count(*) AS likes_count
-            FROM {model}_likes
-            WHERE id = {model}_id
-        )'''.format(**self.metadata)
-
-    def get(self, **kwargs):
-        return self._database.fetch_one('''
-        SELECT *{count_likes}{dependent_objects} FROM {table}
-        WHERE id = %(id)s
-        '''.format(**self.metadata,
-                   count_likes=self.count_likes,
-                   dependent_objects=self.dependent_objects
-                   ), kwargs)
-
-    def filter(self, **kwargs):
-        return self._database.fetch_all('''
-        SELECT *{count_likes}{dependent_objects} FROM {table}
-        {condition}
-        ORDER BY created DESC
-        LIMIT %(limit)s
-        OFFSET %(offset)s
-        '''.format(**self.metadata,
-                   count_likes=self.count_likes,
-                   dependent_objects=self.dependent_objects,
-                   condition=self.params_to_condition(**kwargs)
-                   ), kwargs)
-
     def count(self, **kwargs):
         return self._database.fetch_one('''
         SELECT count(*) AS total_count FROM {table}
@@ -105,15 +65,6 @@ class AuthorContentTable(Table):
         return self._database.fetch_one('''
         SELECT author_id FROM {table}
         WHERE id = %(id)s
-        '''.format(**self.metadata), kwargs)
-
-    def create(self, **kwargs):
-        return self._database.execute_with_returning('''
-        INSERT INTO {table}
-        (author_id, {foreign_key}, content)
-        VALUES
-        (%(author_id)s, %({foreign_key})s, %(content)s)
-        RETURNING *, (SELECT 0 AS likes_count)
         '''.format(**self.metadata), kwargs)
 
     def update(self, **kwargs):

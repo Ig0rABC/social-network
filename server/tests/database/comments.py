@@ -1,7 +1,7 @@
-from ..test_case import TestCaseWithDBClear
+from ..test_cases import TestCaseWithUsers
 from settings import database
 
-class CommentsDatabase(TestCaseWithDBClear):
+class CommentsDatabase(TestCaseWithUsers):
 
     USER_1 = {
         'login': 'testUser1',
@@ -29,7 +29,7 @@ class CommentsDatabase(TestCaseWithDBClear):
     }
     
     def test_create_comment(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         comment = database.comments.create(author_id=1, **self.COMMENT_1)
         self.assertEqual(comment['id'], 1)
@@ -39,8 +39,8 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(comment['likes_count'], 0)
 
     def test_get_comments_by_author(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
@@ -51,8 +51,8 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(len(comments), 1)
 
     def test_get_comments_by_post(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=2, **self.POST_2)
         database.comments.create(author_id=1, **self.COMMENT_2)
@@ -64,8 +64,8 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(len(comments), 2)
     
     def test_get_comments_by_post_and_author(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=2, **self.POST_2)
         database.comments.create(author_id=1, **self.COMMENT_2)
@@ -75,7 +75,7 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(len(comments), 1)
     
     def test_get_post_total_count(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=1, **self.COMMENT_1)
         database.posts.create(author_id=1, **self.COMMENT_1)
@@ -84,7 +84,7 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['total_count'], 4)
     
     def test_update_comment(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
         comment = database.comments.update(id=1, **self.COMMENT_2)
@@ -92,7 +92,7 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(comment['content'], self.COMMENT_2['content'])
 
     def test_delete_comment(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.delete(id=1)
@@ -100,8 +100,8 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(len(comments), 0)
     
     def test_like_comment(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.create(author_id=2, **self.COMMENT_1)
@@ -115,7 +115,7 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['likes_count'], 0)
 
     def test_unlike_comment(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.like(comment_id=1, user_id=1)
@@ -124,7 +124,7 @@ class CommentsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['likes_count'], 0)
 
     def test_twice_like_comment(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.like(comment_id=1, user_id=1)

@@ -1,7 +1,7 @@
-from ..test_case import TestCaseWithDBClear
+from ..test_cases import TestCaseWithUsers
 from settings import database
 
-class UsersDatabase(TestCaseWithDBClear):
+class UsersDatabase(TestCaseWithUsers):
     
     USER_1 = {
         'login': 'testUser1',
@@ -13,21 +13,21 @@ class UsersDatabase(TestCaseWithDBClear):
     }
     
     def test_register_user(self):
-        data = database.users.register(**self.USER_1)
+        data = self.register_user(self.USER_1)
         self.assertIn('user_id', data)
 
     def test_login_user(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         data = database.users.login(**self.USER_1)
         self.assertIsInstance(data['token'], str)
     
     def test_login_user_failed(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         data = database.users.login(**self.USER_2)
         self.assertIsNone(data)
 
     def test_logout_user(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         data = database.users.login(**self.USER_1)
         data = database.users.logout(**data)
         self.assertIsNone(data)

@@ -1,7 +1,7 @@
-from ..test_case import TestCaseWithDBClear
+from ..test_cases import TestCaseWithUsers
 from settings import database
 
-class FollowingsDatabase(TestCaseWithDBClear):
+class FollowingsDatabase(TestCaseWithUsers):
 
     USER_1 = {
         'login': 'testUser1',
@@ -33,12 +33,11 @@ class FollowingsDatabase(TestCaseWithDBClear):
     }
     
     def test_follow_user(self):
-        follower_id = database.users.register(**self.USER_1)['user_id']
-        followed_id = database.users.register(**self.USER_2)['user_id']
+        follower_id = self.register_user(self.USER_1)['user_id']
+        followed_id = self.register_user(self.USER_2)['user_id']
         database.followings.follow(follower_id=follower_id, followed_id=followed_id)
         followings = database.followings.get_followings(follower_id=follower_id)
         self.assertEqual(len(followings), 1)
-        self.assertIn(2, followings)
     
     def test_unfollow_user(self):
         follower_id = database.users.register(**self.USER_1)['user_id']

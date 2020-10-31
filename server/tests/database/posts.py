@@ -1,7 +1,7 @@
-from ..test_case import TestCaseWithDBClear
+from ..test_cases import TestCaseWithUsers
 from settings import database
 
-class PostsDatabase(TestCaseWithDBClear):
+class PostsDatabase(TestCaseWithUsers):
 
     USER_1 = {
         'login': 'testUser1',
@@ -29,7 +29,7 @@ class PostsDatabase(TestCaseWithDBClear):
     }
     
     def test_create_post(self):
-        data = database.users.register(**self.USER_1)
+        data = self.register_user(self.USER_1)
         user_id = data['user_id']
         post = database.posts.create(author_id=user_id, **self.POST_1)
         self.assertEqual(post['id'], 1)
@@ -38,7 +38,7 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(post['likes_count'], 0)
     
     def test_update_post(self):
-        data = database.users.register(**self.USER_1)
+        data = self.register_user(self.USER_1)
         user_id = data['user_id']
         data = database.posts.create(author_id=user_id, **self.POST_1)
         data = database.posts.update(id=data['id'], **self.POST_2)
@@ -46,8 +46,8 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['content'], self.POST_2['content'])
     
     def test_filter_posts_by_author(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=1, **self.POST_2)
         database.posts.create(author_id=1, **self.POST_3)
@@ -60,8 +60,8 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(len(posts), 1)
     
     def test_filter_posts_by_category(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=1, **self.POST_2)
         database.posts.create(author_id=1, **self.POST_3)
@@ -72,8 +72,8 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(posts[1]['author_id'], 1)
 
     def test_filter_posts_by_category_and_author(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=1, **self.POST_2)
         database.posts.create(author_id=1, **self.POST_3)
@@ -83,7 +83,7 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(posts[0]['author_id'], 1)
     
     def test_get_post_total_count(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=1, **self.POST_2)
         database.posts.create(author_id=1, **self.POST_3)
@@ -92,7 +92,7 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['total_count'], 2)
     
     def test_delete_post(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=1, **self.POST_2)
         database.posts.create(author_id=1, **self.POST_3)
@@ -101,8 +101,8 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(len(posts), 2)
     
     def test_like_post(self):
-        database.users.register(**self.USER_1)
-        database.users.register(**self.USER_2)
+        self.register_user(self.USER_1)
+        self.register_user(self.USER_2)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.create(author_id=2, **self.POST_1)
         database.posts.like(post_id=1, user_id=1)
@@ -115,7 +115,7 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['likes_count'], 0)
 
     def test_unlike_post(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.like(post_id=1, user_id=1)
         database.posts.unlike(post_id=1, user_id=1)
@@ -123,7 +123,7 @@ class PostsDatabase(TestCaseWithDBClear):
         self.assertEqual(data['likes_count'], 0)
 
     def test_twice_like_post(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         database.posts.like(post_id=1, user_id=1)
         database.posts.like(post_id=1, user_id=1)

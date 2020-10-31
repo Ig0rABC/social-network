@@ -1,5 +1,5 @@
 import requests
-from ..test_case import TestCaseWithDBClear
+from ..test_cases import TestCaseWithDBClear
 
 BASE_URL = 'http://localhost:5000/'
 

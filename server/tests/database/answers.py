@@ -1,7 +1,7 @@
-from ..test_case import TestCaseWithDBClear
+from ..test_cases import TestCaseWithUsers
 from settings import database
 
-class CommentsDatabase(TestCaseWithDBClear):
+class CommentsDatabase(TestCaseWithUsers):
 
     USER_1 = {
         'login': 'testUser1',
@@ -33,7 +33,7 @@ class CommentsDatabase(TestCaseWithDBClear):
     }
     
     def test_create_answer(self):
-        database.users.register(**self.USER_1)
+        self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         comment = database.comments.create(author_id=1, **self.COMMENT_1)
         answer = database.answers.create(author_id=1, **self.ANSWER_1)

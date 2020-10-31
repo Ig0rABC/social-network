@@ -8,6 +8,8 @@ def register():
     if not (params.get('login') and params.get('password')):
         return jsonify({'message': 'No login or password'}), 401
     data = database.users.register(**params)
+    database.profiles.create(**data)
+    database.contacts.create(**data)
     if not data:
         return jsonify({'message': 'User with this login already exists'}), 401
     return jsonify(converts_keys(data, case='camel')), 201

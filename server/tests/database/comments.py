@@ -106,12 +106,12 @@ class CommentsDatabase(TestCaseWithDBClear):
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.create(author_id=2, **self.COMMENT_1)
         database.comments.like(comment_id=1, user_id=1)
-        data = database.comments.count_likes(comment_id=1)
+        data = database.comments.get(id=1)
         self.assertEqual(data['likes_count'], 1)
         database.comments.like(comment_id=1, user_id=2)
-        data = database.comments.count_likes(comment_id=1)
+        data = database.comments.get(id=1)
         self.assertEqual(data['likes_count'], 2)
-        data = database.comments.count_likes(comment_id=2)
+        data = database.comments.get(id=2)
         self.assertEqual(data['likes_count'], 0)
 
     def test_unlike_comment(self):
@@ -120,7 +120,7 @@ class CommentsDatabase(TestCaseWithDBClear):
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.like(comment_id=1, user_id=1)
         database.comments.unlike(comment_id=1, user_id=1)
-        data = database.comments.count_likes(comment_id=1)
+        data = database.comments.get(id=1)
         self.assertEqual(data['likes_count'], 0)
 
     def test_twice_like_comment(self):
@@ -129,5 +129,5 @@ class CommentsDatabase(TestCaseWithDBClear):
         database.comments.create(author_id=1, **self.COMMENT_1)
         database.comments.like(comment_id=1, user_id=1)
         database.comments.like(comment_id=1, user_id=1)
-        data = database.comments.count_likes(comment_id=1)
+        data = database.comments.get(id=1)
         self.assertEqual(data['likes_count'], 1)

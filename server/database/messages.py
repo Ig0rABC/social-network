@@ -25,11 +25,32 @@ class Messages(Table):
         DELETE FROM messages
         WHERE id = %(id)s
         ''', kwargs)
+    
+    def get(self, **kwargs):
+        return self._database.fetch_one('''
+        SELECT * FROM messages
+        WHERE id = %(id)s
+        ''', kwargs)
+    
+    def filter(self, **kwargs):
+        return self._database.fetch_all('''
+        SELECT * FROM messages
+        INNER JOIN users
+        ON author_id = users.id
+        {condition}
+        LIMIT %(limit)s
+        OFFSET %(offset)s
+        '''.format(condition=self.params_to_update(**kwargs)), kwargs)
 
     def get_last_messages(self, **kwargs):
         return self._database.fetch_all('''
-        SELECT * FROM messages AS m
-        INNER JOIN users_in_chats AS um
-        ON um.chat_id = m.chat_id
-        WHERE um.user_id = %(user_id)s
+        SELECT * FROM messages AS m 
+        INNER JOIN users_in_chats AS u 
+        ON m.chat_id = u.chat_id 
+        WHERE (
+            m.chat_id, created) IN (
+            SELECT m.chat_id, max(created) 
+            FROM messages
+            GROUP BY id
+        ) AND user_id = %(user_id)s
         ''', kwargs)

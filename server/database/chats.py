@@ -34,6 +34,12 @@ class Chats(Table):
         RETURNING *
         '''.format(self.params_to_update(**kwargs)), kwargs)
     
+    def get(self, **kwargs):
+        return self._database.fetch_one('''
+        SELECT * FROM chats
+        WHERE id = %(id)s
+        ''', kwargs)
+    
     def filter(self, **kwargs):
         return self._database.fetch_all('''
         SELECT * FROM chats

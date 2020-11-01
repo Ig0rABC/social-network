@@ -7,3 +7,4 @@ from .posts import Posts
 from .profiles import Profiles
 from .users import Users
 from .followings import Followings
+from .chats import Chats

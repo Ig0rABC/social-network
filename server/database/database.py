@@ -50,6 +50,8 @@ class Database:
             'profiles',
             'messages',
             'followings',
+            'users_in_chats',
+            'chats',
             'users',
         ]
         for table in tables:
@@ -59,6 +61,7 @@ class Database:
             'comments',
             'posts',
             'messages',
+            'chats',
             'users',
         ]
         for seq in sequences:

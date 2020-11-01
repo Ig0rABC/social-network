@@ -38,11 +38,25 @@ CREATE TABLE contacts(
     instagram VARCHAR(64) DEFAULT ''
 );
 
+CREATE TABLE chats(
+    id SERIAL PRIMARY KEY,
+    owner_id INTEGER REFERENCES users(id),
+    title VARCHAR(128),
+    created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE users_in_chats(
+    user_id INTEGER REFERENCES users(id),
+    chat_id INTEGER REFERENCES chats(id) ON DELETE CASCADE,
+    joined TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, chat_id)
+);
+
 CREATE TABLE messages(
     id SERIAL PRIMARY KEY,
-    sender_id INTEGER REFERENCES users(id),
-    recipient_id INTEGER REFERENCES users(id),
-    content TEXT NOT NULL,
+    author_id INTEGER REFERENCES users(id),
+    chat_id INTEGER REFERENCES chats(id) ON DELETE CASCADE,
+    content TEXT,
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

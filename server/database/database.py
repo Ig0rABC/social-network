@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from psycopg2.errors import UniqueViolation, ProgrammingError
+from psycopg2.errors import ProgrammingError
 
 
 class Database:
@@ -17,7 +17,7 @@ class Database:
     def execute(self, query, params={}):
         try:
             self._cursor.execute(query, params)
-        except UniqueViolation:
+        except:
             self.rollback()
 
     def execute_and_commit(self, query, params={}):
@@ -33,7 +33,10 @@ class Database:
 
     def fetch_all(self, query, params={}):
         self.execute(query, params)
-        return self._cursor.fetchall()
+        try:
+            return self._cursor.fetchall()
+        except ProgrammingError:
+            return []
 
     def execute_with_returning(self, query, params={}):
         value = self.fetch_one(query, params)

@@ -5,6 +5,7 @@ from settings import (
     DEFAULT_COMMENT_LIMIT,
     MAX_COMMENT_LIMIT
 )
+from .utils import set_filter_params
 
 @app.route('/comments', methods=['POST'])
 def create_comment():
@@ -19,12 +20,7 @@ def create_comment():
 @app.route('/comments', methods=['GET'])
 def get_comments():
     params = converts_keys(request.args.to_dict(), case='snake')
-    params.setdefault('limit', DEFAULT_COMMENT_LIMIT)
-    params['limit'] = int(params['limit'])
-    if params['limit'] > MAX_COMMENT_LIMIT:
-        params['limit'] = MAX_COMMENT_LIMIT
-    params.setdefault('offset', 0)
-    params['offset'] = int(params['offset'])
+    set_filter_params(DEFAULT_COMMENT_LIMIT, MAX_COMMENT_LIMIT, params)
     return jsonify(converts_keys({
         'comments': database.comments.filter(**params),
         **database.comments.count(**params)

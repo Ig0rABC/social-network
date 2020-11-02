@@ -38,6 +38,7 @@ class Messages(Table):
         INNER JOIN users
         ON author_id = users.id
         {condition}
+        ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
         '''.format(condition=self.params_to_update(**kwargs)), kwargs)

@@ -9,11 +9,11 @@ def get_chats():
     chats = database.chats.filter(**data)
     return jsonify(converts_keys(chats, case='camel'))
 
-@app.route('/chats/own', methods=['GET'])
+@app.route('/own-chats', methods=['GET'])
 def get_own_chats():
     cookies = request.cookies
     owner_id = database.users.get_user_id(**cookies)['user_id']
-    chats = database.chats.filter(owner_id=owner_id)
+    chats = database.chats.filter(owner_id=owner_id, user_id=owner_id)
     return jsonify(converts_keys(chats, case='camel'))
 
 @app.route('/chats', methods=['POST'])
@@ -31,7 +31,7 @@ def update_chat():
     user_id = database.users.get_user_id(**cookies)['user_id']
     owner_id = database.chats.get(id=params['id'])['owner_id']
     if user_id != owner_id:
-        return jsonify(), 401
+        return jsonify(), 403
     chat = database.chats.update(**params)
     return jsonify(chat, case='camel')
 
@@ -43,6 +43,50 @@ def delete_chat():
     chat = database.chats.get(id=params['id'])
     owner_id = chat['owner_id']
     if user_id != owner_id:
-        return jsonify(), 401
+        return jsonify(), 403
     database.chats.delete(**params)
     return jsonify(), 205
+
+@app.route('/chat-members', methods=['POST'])
+def add_chat_member():
+    params = converts_keys(request.args.to_dict(), case='snake')
+    cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    chat = database.chats.get(id=params['chat_id'])
+    owner_id = chat['owner_id']
+    if user_id != owner_id:
+        return jsonify(), 401
+    database.chats.add_member(**params)
+    return jsonify(), 201
+
+@app.route('/chat-members', methods=['DELETE'])
+def remove_chat_member():
+    params = converts_keys(request.args.to_dict(), case='snake')
+    cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    chat = database.chats.get(id=params['chat_id'])
+    owner_id = chat['owner_id']
+    if user_id != owner_id:
+        return jsonify(), 403
+    database.chats.remove_member(**params)
+    return jsonify(), 205
+
+@app.route('/chat-members', methods=['GET'])
+def get_chat_member():
+    params = converts_keys(request.args.to_dict(), case='snake')
+    cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    members = database.chats.get_members(**params)
+    for member in members:
+        if user_id == member['user_id']:
+            break
+    else:
+        return jsonify(), 403
+    members = database.chats.get_members(**params)
+    return jsonify(converts_keys({'members': members}, case='camel')), 205

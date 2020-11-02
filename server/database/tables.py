@@ -4,10 +4,10 @@ class Table:
         self._database = database
 
     def params_to_condition(self, **kwargs):
-        if not kwargs:
-            return ''
         kwargs.pop('limit', None)
         kwargs.pop('offset', None)
+        if not kwargs:
+            return ''
         return 'WHERE ' + ' AND '.join(
             f'{key} = %({key})s'
             for key in kwargs.keys()

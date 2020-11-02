@@ -1,6 +1,11 @@
 from flask import jsonify, request, make_response
 from any_case import converts_keys
-from settings import app, database
+from settings import (
+    app, database,
+    DEFAULT_MESSAGE_LIMIT,
+    MAX_MESSAGE_LIMIT
+)
+from .utils import set_filter_params
 
 @app.route('/messages', methods=['GET'])
 def get_messages():
@@ -8,8 +13,15 @@ def get_messages():
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    messages = database.messages.filter(**params, **data)
+    set_filter_params(DEFAULT_MESSAGE_LIMIT, MAX_MESSAGE_LIMIT, params)
+    author_id = database.users.get_user_id(**cookies)['user_id']
+    members = database.chats.get_members(**params)
+    for member in members:
+        if author_id == member['user_id']:
+            break
+    else:
+        return jsonify(), 403
+    messages = database.messages.filter(**params, author_id=author_id)
     return jsonify(converts_keys({'messages': messages}, case='camel'))
 
 @app.route('/messages', methods=['POST'])
@@ -20,6 +32,7 @@ def create_messages():
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
     message = database.messages.create(author_id=author_id, **params)
+    return jsonify(converts_keys({'message': message}, case='camel'))
 
 @app.route('/messages', methods=['PUT'])
 def update_message():

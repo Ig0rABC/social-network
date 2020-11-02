@@ -5,6 +5,7 @@ from settings import (
     DEFAULT_ANSWER_LIMIT,
     MAX_ANSWER_LIMIT
 )
+from .utils import set_filter_params
 
 @app.route('/answers', methods=['POST'])
 def create_answer():
@@ -19,12 +20,7 @@ def create_answer():
 @app.route('/answers', methods=['GET'])
 def get_answers():
     params = converts_keys(request.args.to_dict(), case='snake')
-    params.setdefault('limit', DEFAULT_ANSWER_LIMIT)
-    params['limit'] = int(params['limit'])
-    if params['limit'] > MAX_ANSWER_LIMIT:
-        params['limit'] = MAX_ANSWER_LIMIT
-    params.setdefault('offset', 0)
-    params['offset'] = int(params['offset'])
+    set_filter_params(DEFAULT_ANSWER_LIMIT, MAX_ANSWER_LIMIT, params)
     return jsonify(converts_keys({
         'answers': database.answers.filter(**params),
         **database.answers.count(**params)

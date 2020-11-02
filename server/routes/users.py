@@ -19,7 +19,7 @@ def register():
 @app.route('/users/login', methods=['POST'])
 def login():
     params = converts_keys(request.args.to_dict(), case='snake')
-    if request.cookies:
+    if 'token' in request.cookies:
         database.users.logout(**request.cookies)
     data = database.users.login(**params)
     if not data:

@@ -11,6 +11,9 @@ MAX_COMMENT_LIMIT = 20
 DEFAULT_ANSWER_LIMIT = 8
 MAX_ANSWER_LIMIT = 20
 
+DEFAULT_MESSAGE_LIMIT = 16
+MAX_MESSAGE_LIMIT = 32
+
 database = Database(dbname='socialnetwork')
 database_tables = {
     'users': Users(database),

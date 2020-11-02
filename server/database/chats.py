@@ -13,7 +13,7 @@ class Chats(Table):
         ''', kwargs)
         kwargs.update(data)
         self._database.execute_and_commit('''
-        INSERT INTO users_in_chats
+        INSERT INTO chats_members
         (chat_id, user_id)
         VALUES
         (%(id)s, %(owner_id)s)
@@ -43,22 +43,22 @@ class Chats(Table):
     def filter(self, **kwargs):
         return self._database.fetch_all('''
         SELECT * FROM chats
-        INNER JOIN users_in_chats
-        ON chats.id = users_in_chats.chat_id
+        INNER JOIN chats_members
+        ON chats.id = chats_members.chat_id
         {condition}
         '''.format(condition=self.params_to_condition(**kwargs)), kwargs)
     
     def get_members(self, **kwargs):
         return self._database.fetch_all('''
-        SELECT * FROM users 
-        INNER JOIN users_in_chats
+        SELECT id AS user_id, login FROM users
+        INNER JOIN chats_members
         ON user_id = id
         WHERE chat_id = %(chat_id)s
         ''', kwargs)
     
     def add_member(self, **kwargs):
         self._database.execute_and_commit('''
-        INSERT INTO users_in_chats
+        INSERT INTO chats_members
         (user_id, chat_id)
         VALUES
         (%(user_id)s, %(chat_id)s)
@@ -66,7 +66,7 @@ class Chats(Table):
     
     def remove_member(self, **kwargs):
         self._database.execute_and_commit('''
-        DELETE FROM users_in_chats
+        DELETE FROM chats_members
         WHERE user_id = %(user_id)s
         AND chat_id = %(chat_id)s
         ''', kwargs)

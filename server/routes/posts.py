@@ -5,6 +5,7 @@ from settings import (
     DEFAULT_POST_LIMIT,
     MAX_POST_LIMIT
 )
+from .utils import set_filter_params
 
 @app.route('/categories', methods=['GET'])
 def get_categories():
@@ -24,12 +25,7 @@ def create_post():
 @app.route('/posts', methods=['GET'])
 def get_posts():
     params = converts_keys(request.args.to_dict(), case='snake')
-    params.setdefault('limit', DEFAULT_POST_LIMIT)
-    params['limit'] = int(params['limit'])
-    if params['limit'] > MAX_POST_LIMIT:
-        params['limit'] = MAX_POST_LIMIT
-    params.setdefault('offset', 0)
-    params['offset'] = int(params['offset'])
+    set_filter_params(DEFAULT_POST_LIMIT, MAX_POST_LIMIT, params)
     return jsonify(converts_keys({
         'posts': database.posts.filter(**params),
         **database.posts.count(**params)

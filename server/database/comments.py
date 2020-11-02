@@ -10,43 +10,54 @@ class Comments(AuthorContentTable):
 
     def get(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT *, (
+        SELECT comments.*, (
             SELECT count(*) AS likes_count
-            FROM {model}_likes
-            WHERE id = {model}_id
+            FROM comment_likes
+            WHERE id = comment_id
         ), (
             SELECT count(*) AS answers_count
             FROM answers
-            WHERE {model}_id = id
-        )
-        FROM {table}
+            WHERE comment_id = id
+        ), (
+            SELECT login FROM users
+            WHERE author_id = users.id
+        ), (
+            SELECT photo_url FROM profiles
+            WHERE author_id = profiles.user_id
+        ) FROM comments
         WHERE id = %(id)s
-        '''.format(**self.metadata), kwargs)
+        ''', kwargs)
 
     def filter(self, **kwargs):
         return self._database.fetch_all('''
-        SELECT *, (
+        SELECT comments.*, (
             SELECT count(*) AS likes_count
-            FROM {model}_likes
-            WHERE id = {model}_id
+            FROM comment_likes
+            WHERE id = comment_id
         ), (
             SELECT count(*) AS answers_count
             FROM answers
-            WHERE {model}_id = id
-        ) FROM {table}
+            WHERE comment_id = id
+        ), (
+            SELECT login FROM users
+            WHERE author_id = users.id
+        ), (
+            SELECT photo_url FROM profiles
+            WHERE author_id = profiles.user_id
+        ) FROM comments
         {condition}
-        ORDER BY created DESC
+        ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(**self.metadata, condition=self.params_to_condition(**kwargs)), kwargs)
+        '''.format(condition=self.params_to_condition(**kwargs)), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
-        INSERT INTO {table}
-        (author_id, {foreign_key}, content)
+        INSERT INTO comments
+        (author_id, post_id, content)
         VALUES
-        (%(author_id)s, %({foreign_key})s, %(content)s)
+        (%(author_id)s, %(post_id)s, %(content)s)
         RETURNING *,
         (SELECT 0 AS likes_count),
         (SELECT 0 AS answers_count)
-        '''.format(**self.metadata), kwargs)
+        ''', kwargs)

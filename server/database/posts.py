@@ -13,7 +13,7 @@ class Posts(AuthorContentTable):
 
     def get(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT *, (
+        SELECT posts.*, (
             SELECT count(*) AS likes_count
             FROM post_likes
             WHERE post_id = posts.id
@@ -21,39 +21,46 @@ class Posts(AuthorContentTable):
             SELECT count(*) AS comments_count
             FROM comments
             WHERE post_id = posts.id
-        ), login, first_name, last_name, photo_url
-        FROM posts
-        INNER JOIN users
-        ON author_id = users.id
-        INNER JOIN profiles
-        ON author_id = profiles.user_id
+        ), (
+            SELECT login FROM users
+            WHERE author_id = users.id
+        ), (
+            SELECT photo_url FROM profiles
+            WHERE author_id = profiles.user_id
+        ) FROM posts
         WHERE posts.id = %(id)s
-        '''.format(**self.metadata), kwargs)
+        ''', kwargs)
 
     def filter(self, **kwargs):
         return self._database.fetch_all('''
-        SELECT *, (
+        SELECT posts.*, (
             SELECT count(*) AS likes_count
-            FROM {model}_likes
-            WHERE id = {model}_id
+            FROM post_likes
+            WHERE id = post_id
         ), (
             SELECT count(*) AS comments_count
             FROM comments
-            WHERE {model}_id = id
-        ) FROM {table}
+            WHERE post_id = id
+        ), (
+            SELECT login FROM users
+            WHERE author_id = users.id
+        ), (
+            SELECT photo_url FROM profiles
+            WHERE author_id = profiles.user_id
+        ) FROM posts
         {condition}
-        ORDER BY created DESC
+        ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(**self.metadata, condition=self.params_to_condition(**kwargs)), kwargs)
+        '''.format(condition=self.params_to_condition(**kwargs)), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
-        INSERT INTO {table}
-        (author_id, {foreign_key}, content)
+        INSERT INTO posts
+        (author_id, category, content)
         VALUES
-        (%(author_id)s, %({foreign_key})s, %(content)s)
+        (%(author_id)s, %(category)s, %(content)s)
         RETURNING *,
         (SELECT 0 AS likes_count),
         (SELECT 0 AS comments_count)
-        '''.format(**self.metadata), kwargs)
+        ''', kwargs)

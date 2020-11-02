@@ -27,11 +27,17 @@ class Followings(Table):
             SELECT count(*) AS comments_count
             FROM comments
             WHERE post_id = id
+        ), (
+            SELECT login FROM users
+            WHERE author_id = users.id
+        ), (
+            SELECT photo_url FROM profiles
+            WHERE author_id = profiles.user_id
         ) FROM posts
         INNER JOIN followings
         ON author_id = followed_id
         WHERE follower_id = %(follower_id)s
-        ORDER BY created DESC
+        ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
         ''', kwargs)
@@ -46,12 +52,12 @@ class Followings(Table):
 
     def get_followings(self, **kwargs):
         return self._database.fetch_all('''
-            SELECT followed_id, u.login, p.first_name, p.last_name, p.photo_url
-            FROM followings
-            INNER JOIN users AS u
-            ON followed_id = u.id
-            INNER JOIN profiles AS p
-            ON followed_id = p.user_id
-            WHERE follower_id = %(follower_id)s
-            ''', kwargs)
+        SELECT followed_id, u.login, p.photo_url
+        FROM followings
+        INNER JOIN users AS u
+        ON followed_id = u.id
+        INNER JOIN profiles AS p
+        ON followed_id = p.user_id
+        WHERE follower_id = %(follower_id)s
+        ''', kwargs)
         

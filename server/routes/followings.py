@@ -22,7 +22,7 @@ def follow():
     database.followings.follow(follower_id=follower_id, **cookies)
     return jsonify(), 201
 
-@app.route('followings', methods=['GET'])
+@app.route('/followings', methods=['GET'])
 def get_followings():
     cookies = request.cookies
     if 'token' not in cookies:

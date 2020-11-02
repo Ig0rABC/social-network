@@ -58,7 +58,7 @@ def delete_answer():
     database.answers.delete(**params)
     return jsonify({'message': 'Answer has been deleted'})
 
-@app.route('/answers/likes', methods=['POST'])
+@app.route('/answer-likes', methods=['POST'])
 def like_answer():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
@@ -68,7 +68,7 @@ def like_answer():
     database.answers.like(**params, **data)
     return jsonify({'message': 'Answer has been tagged "I like"'})
 
-@app.route('/answers/likes', methods=['DELETE'])
+@app.route('/answer-likes', methods=['DELETE'])
 def unlike_answer():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies

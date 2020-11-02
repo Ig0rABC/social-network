@@ -6,7 +6,7 @@ from settings import (
     MAX_POST_LIMIT
 )
 
-@app.route('/posts/categories', methods=['GET'])
+@app.route('/categories', methods=['GET'])
 def get_categories():
     categories = database.posts.get_categories()
     return jsonify({'categories': categories})
@@ -63,7 +63,7 @@ def delete_post():
     database.posts.delete(**params)
     return jsonify({'message': 'Post has been deleted'}), 205
 
-@app.route('/posts/likes', methods=['POST'])
+@app.route('/post-likes', methods=['POST'])
 def like_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
@@ -73,7 +73,7 @@ def like_post():
     database.posts.like(**params, **data)
     return jsonify({'message': 'Post has been tagged "I like"'})
 
-@app.route('/posts/likes', methods=['DELETE'])
+@app.route('/post-likes', methods=['DELETE'])
 def unlike_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies

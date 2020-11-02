@@ -58,7 +58,7 @@ def delete_comment():
     database.comments.delete(**params)
     return jsonify({'message': 'Comment has been deleted'})
 
-@app.route('/comments/likes', methods=['POST'])
+@app.route('/comment-likes', methods=['POST'])
 def like_comment():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
@@ -68,7 +68,7 @@ def like_comment():
     database.comments.like(**params, **data)
     return jsonify({'message': 'Comment has been tagged "I like"'})
 
-@app.route('/comments/likes', methods=['DELETE'])
+@app.route('/comment-likes', methods=['DELETE'])
 def unlike_comment():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies

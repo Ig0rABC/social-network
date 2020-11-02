@@ -48,3 +48,12 @@ def delete_message():
         return jsonify(), 401
     database.messages.delete(**params)
     return jsonify(), 205
+
+@app.route('/last-messages', methods=['GET'])
+def get_last_messages():
+    cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
+    data = database.users.get_user_id(**cookies)
+    messages = database.messages.get_last_messages(**data)
+    return jsonify(converts_keys({'messages': messages}, case='camel'))

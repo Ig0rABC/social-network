@@ -45,7 +45,7 @@ class PostsTestCase(UsersTestCase):
     }
 
     def test_get_categories(self):
-        response = requests.get(BASE_URL + '/posts/categories')
+        response = requests.get(BASE_URL + '/categories')
         self.assertEqual(response.status_code, 200)
     
     def create_post(self, session, payload):
@@ -61,13 +61,13 @@ class PostsTestCase(UsersTestCase):
         return session.delete(BASE_URL + '/posts', params=payload)
     
     def like(self, session, payload):
-        return session.post(self.URL + '/likes', params=payload)
+        return session.post(self.URL[:-1] + '-likes', params=payload)
     
     def unlike(self, session, payload):
-        return session.delete(self.URL + '/likes', params=payload)
+        return session.delete(self.URL[:-1] + '-likes', params=payload)
     
     def count_likes(self, payload):
-        return requests.get(self.URL + '/likes', params=payload)
+        return requests.get(self.URL[:-1] + '-likes', params=payload)
     
 class CommentsTestCase(PostsTestCase):
 

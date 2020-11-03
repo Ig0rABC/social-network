@@ -46,7 +46,7 @@ class Database:
     def clear(self):
         tables = [
             'tokens',
-            'answers',
+            'replies',
             'comments',
             'posts',
             'contacts',
@@ -60,7 +60,7 @@ class Database:
         for table in tables:
             self.execute_and_commit(f'DELETE FROM {table}')
         sequences = [
-            'answers',
+            'replies',
             'comments',
             'posts',
             'messages',

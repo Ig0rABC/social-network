@@ -14,8 +14,8 @@ def like():
         database.posts.like(**params, **data)
     elif 'comment_id' in params:
         database.comments.like(**params, **data)
-    elif 'answer_id' in params:
-        database.answers.like(**params, **data)
+    elif 'reply_id' in params:
+        database.replies.like(**params, **data)
     else:
         jsonify(), 400
     return jsonify({'message': 'Object has been tagged "I like"'})
@@ -32,8 +32,8 @@ def unlike():
         database.posts.unlike(**params, **data)
     elif 'comment_id' in params:
         database.comments.unlike(**params, **data)
-    elif 'answer_id' in params:
-        database.answers.unlike(**params, **data)
+    elif 'reply_id' in params:
+        database.replies.unlike(**params, **data)
     else:
         jsonify(), 400
     return jsonify({'message': 'Mark "I like" has been deleted from the object'})

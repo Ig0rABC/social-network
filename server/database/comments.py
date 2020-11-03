@@ -15,8 +15,8 @@ class Comments(AuthorContentTable):
             FROM comment_likes
             WHERE id = comment_id
         ), (
-            SELECT count(*) AS answers_count
-            FROM answers
+            SELECT count(*) AS replies_count
+            FROM replies
             WHERE comment_id = id
         ), (
             SELECT login FROM users
@@ -35,8 +35,8 @@ class Comments(AuthorContentTable):
             FROM comment_likes
             WHERE id = comment_id
         ), (
-            SELECT count(*) AS answers_count
-            FROM answers
+            SELECT count(*) AS replies_count
+            FROM replies
             WHERE comment_id = id
         ), (
             SELECT login FROM users
@@ -59,5 +59,5 @@ class Comments(AuthorContentTable):
         (%(author_id)s, %(post_id)s, %(content)s)
         RETURNING *,
         (SELECT 0 AS likes_count),
-        (SELECT 0 AS answers_count)
+        (SELECT 0 AS replies_count)
         ''', kwargs)

@@ -80,7 +80,7 @@ CREATE TABLE comments(
     created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE answers(
+CREATE TABLE replies(
     id SERIAL PRIMARY KEY,
     author_id INTEGER REFERENCES users(id),
     comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
@@ -100,10 +100,10 @@ CREATE TABLE comment_likes(
     PRIMARY KEY(user_id, comment_id)
 );
 
-CREATE TABLE answer_likes(
+CREATE TABLE reply_likes(
     user_id INTEGER REFERENCES users(id),
-    answer_id INTEGER REFERENCES answers(id),
-    PRIMARY KEY(user_id, answer_id)
+    reply_id INTEGER REFERENCES replies(id),
+    PRIMARY KEY(user_id, reply_id)
 );
 
 INSERT INTO categories VALUES

@@ -9,8 +9,8 @@ MAX_POST_LIMIT = 12
 DEFAULT_COMMENT_LIMIT = 8
 MAX_COMMENT_LIMIT = 20
 
-DEFAULT_ANSWER_LIMIT = 8
-MAX_ANSWER_LIMIT = 20
+DEFAULT_REPLY_LIMIT = 8
+MAX_REPLY_LIMIT = 20
 
 DEFAULT_MESSAGE_LIMIT = 16
 MAX_MESSAGE_LIMIT = 32
@@ -26,7 +26,7 @@ database_tables = {
     'messages': Messages(database),
     'posts': Posts(database),
     'comments': Comments(database),
-    'answers': Answers(database),
+    'replies': Replies(database),
     'followings': Followings(database),
     'chats': Chats(database)
 }

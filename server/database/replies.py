@@ -1,46 +1,46 @@
 from .tables import AuthorContentTable
 
-class Answers(AuthorContentTable):
+class Replies(AuthorContentTable):
 
     metadata = {
-        'table': 'answers',
-        'model': 'answer',
+        'table': 'replies',
+        'model': 'reply',
         'foreign_key': 'comment_id'
     }
 
     def get(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT answers.*, (
+        SELECT replies.*, (
             SELECT count(*) AS likes_count
-            FROM answer_likes
-            WHERE id = answer_id
+            FROM reply_likes
+            WHERE id = reply_id
         ), (
             SELECT login FROM users
             WHERE author_id = users.id
         ), (
             SELECT photo_url FROM profiles
             WHERE author_id = profiles.user_id
-        ) FROM answers
+        ) FROM replies
         INNER JOIN users
         ON author_id = users.id
         INNER JOIN profiles
         ON author_id = profiles.user_id
-        WHERE answers.id = %(id)s
+        WHERE replies.id = %(id)s
         '''.format(**self.metadata), kwargs)
 
     def filter(self, **kwargs):
         return self._database.fetch_all('''
-        SELECT answers.*, (
+        SELECT replies.*, (
             SELECT count(*) AS likes_count
-            FROM answer_likes
-            WHERE id = answer_id
+            FROM reply_likes
+            WHERE id = reply_id
         ), (
             SELECT login FROM users
             WHERE author_id = users.id
         ), (
             SELECT photo_url FROM profiles
             WHERE author_id = profiles.user_id
-        ) FROM answers
+        ) FROM replies
         {condition}
         ORDER BY id DESC
         LIMIT %(limit)s
@@ -49,7 +49,7 @@ class Answers(AuthorContentTable):
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
-        INSERT INTO answers
+        INSERT INTO replies
         (author_id, {foreign_key}, content)
         VALUES
         (%(author_id)s, %({foreign_key})s, %(content)s)

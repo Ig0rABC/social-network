@@ -23,22 +23,22 @@ class CommentsDatabase(TestCaseWithUsers):
         'post_id': 2,
         'content': 'fsdfdmfr'
     }
-    ANSWER_1 = {
+    REPLY_1 = {
         'comment_id': 1,
         'content': '523040'
     }
-    ANSWER_2 = {
+    REPLY_2 = {
         'comment_id': 2,
         'content': '98520'
     }
     
-    def test_create_answer(self):
+    def test_create_reply(self):
         self.register_user(self.USER_1)
         database.posts.create(author_id=1, **self.POST_1)
         comment = database.comments.create(author_id=1, **self.COMMENT_1)
-        answer = database.answers.create(author_id=1, **self.ANSWER_1)
-        self.assertEqual(answer['id'], 1)
-        self.assertEqual(answer['author_id'], 1)
-        self.assertEqual(answer['comment_id'], comment['id'])
-        self.assertEqual(answer['content'], self.ANSWER_1['content'])
-        self.assertEqual(answer['likes_count'], 0)
+        reply = database.replies.create(author_id=1, **self.REPLY_1)
+        self.assertEqual(reply['id'], 1)
+        self.assertEqual(reply['author_id'], 1)
+        self.assertEqual(reply['comment_id'], comment['id'])
+        self.assertEqual(reply['content'], self.REPLY_1['content'])
+        self.assertEqual(reply['likes_count'], 0)

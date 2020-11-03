@@ -63,27 +63,3 @@ def delete_comment():
         return jsonify({'messages': 'Access error'})
     database.comments.delete(**params)
     return jsonify({'message': 'Comment has been deleted'})
-
-@app.route('/comment-likes', methods=['POST'])
-def like_comment():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'comment_id'):
-        return only_required_params_error('comment_id')
-    cookies = request.cookies
-    if 'token' not in cookies:
-        return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    database.comments.like(**params, **data)
-    return jsonify({'message': 'Comment has been tagged "I like"'})
-
-@app.route('/comment-likes', methods=['DELETE'])
-def unlike_comment():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'comment_id'):
-        return only_required_params_error('comment_id')
-    cookies = request.cookies
-    if 'token' not in cookies:
-        return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    database.comments.unlike(**params, **data)
-    return jsonify({'message': 'Mark "I like" has been deleted from the comment'})

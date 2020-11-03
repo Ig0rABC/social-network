@@ -63,27 +63,3 @@ def delete_answer():
         return jsonify({'messages': 'Access error'})
     database.answers.delete(**params)
     return jsonify({'message': 'Answer has been deleted'})
-
-@app.route('/answer-likes', methods=['POST'])
-def like_answer():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'answer_id'):
-        return only_required_params_error('answer_id')
-    cookies = request.cookies
-    if 'token' not in cookies:
-        return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    database.answers.like(**params, **data)
-    return jsonify({'message': 'Answer has been tagged "I like"'})
-
-@app.route('/answer-likes', methods=['DELETE'])
-def unlike_answer():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'answer_id'):
-        return only_required_params_error('answer_id')
-    cookies = request.cookies
-    if 'token' not in cookies:
-        return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    database.answers.unlike(**params, **data)
-    return jsonify({'message': 'Mark "I like" has been deleted from the answer'})

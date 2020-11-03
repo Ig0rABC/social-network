@@ -68,27 +68,3 @@ def delete_post():
         return jsonify({'messages': 'Access error'}), 401
     database.posts.delete(**params)
     return jsonify({'message': 'Post has been deleted'}), 205
-
-@app.route('/post-likes', methods=['POST'])
-def like_post():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'post_id'):
-        return only_required_params_error('post_id')
-    cookies = request.cookies
-    if 'token' not in cookies:
-        return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    database.posts.like(**params, **data)
-    return jsonify({'message': 'Post has been tagged "I like"'})
-
-@app.route('/post-likes', methods=['DELETE'])
-def unlike_post():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'post_id'):
-        return only_required_params_error('post_id')
-    cookies = request.cookies
-    if 'token' not in cookies:
-        return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    database.posts.unlike(**params, **data)
-    return jsonify({'message': 'Mark "I like" has been deleted from the post'})

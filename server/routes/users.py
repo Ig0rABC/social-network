@@ -1,6 +1,10 @@
 from flask import jsonify, request, make_response
 from any_case import converts_keys
-from settings import app, database
+from settings import (
+    app, database,
+    LOGIN_VALIDATOR,
+    PASSWORD_VALIDATOR
+)
 from .utils import are_only_required_params
 
 @app.route('/users/register', methods=['POST'])
@@ -8,13 +12,15 @@ def register():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'login', 'password'):
         return jsonify(), 401
+    if not LOGIN_VALIDATOR.fullmatch(params['login']):
+        return jsonify({'message': 'Incorrect login'}), 401
+    if not PASSWORD_VALIDATOR.fullmatch(params['password']):
+        return jsonify({'message': 'Incorrect password'}), 401
     data = database.users.register(**params)
     if not data:
-        return jsonify(), 401
+        return jsonify({'message': 'User with this login already exists. Please, enter another'}), 401
     database.profiles.create(**data)
     database.contacts.create(**data)
-    if not data:
-        return jsonify({'message': 'User with this login already exists'}), 401
     return jsonify(converts_keys(data, case='camel')), 201
 
 @app.route('/users/login', methods=['POST'])

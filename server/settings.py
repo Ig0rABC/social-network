@@ -1,3 +1,4 @@
+import re
 from collections import namedtuple
 from flask import Flask
 from database import *
@@ -13,6 +14,9 @@ MAX_ANSWER_LIMIT = 20
 
 DEFAULT_MESSAGE_LIMIT = 16
 MAX_MESSAGE_LIMIT = 32
+
+LOGIN_VALIDATOR = re.compile(r'\w{6,}')
+PASSWORD_VALIDATOR = re.compile(r'\w{4,}')
 
 database = Database(dbname='socialnetwork')
 database_tables = {

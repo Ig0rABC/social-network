@@ -63,10 +63,10 @@ class PostsTestCase(UsersTestCase):
         return session.delete(BASE_URL + '/posts', params=payload)
 
     def like(self, session, payload):
-        return session.post('/likes', params=payload)
+        return session.post(BASE_URL + 'likes', params=payload)
 
     def unlike(self, session, payload):
-        return session.delete('/likes', params=payload)
+        return session.delete(BASE_URL + 'likes', params=payload)
 
 
 class CommentsTestCase(PostsTestCase):

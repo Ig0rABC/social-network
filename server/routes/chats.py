@@ -57,7 +57,7 @@ def add_chat_member():
     chat = database.chats.get(id=params['chat_id'])
     owner_id = chat['owner_id']
     if user_id != owner_id:
-        return jsonify(), 401
+        return jsonify(), 403
     database.chats.add_member(**params)
     return jsonify(), 201
 

@@ -11,3 +11,11 @@ def set_filter_params(default_limit, max_limit, params):
     if params['limit'] > max_limit:
         params['limit'] = max_limit
     params.setdefault('offset', 0)
+
+def are_only_required_params(params, *args):
+    params = params.copy()
+    for key in args:
+        value = params.pop(key, None)
+        if value is None:
+            return False
+    return not params

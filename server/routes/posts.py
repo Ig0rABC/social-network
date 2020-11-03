@@ -5,7 +5,10 @@ from settings import (
     DEFAULT_POST_LIMIT,
     MAX_POST_LIMIT
 )
-from .utils import set_filter_params
+from .utils import (
+    set_filter_params,
+    are_only_required_params
+)
 
 @app.route('/categories', methods=['GET'])
 def get_categories():
@@ -15,6 +18,8 @@ def get_categories():
 @app.route('/posts', methods=['POST'])
 def create_post():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'category', 'content'):
+        return jsonify(), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -34,6 +39,8 @@ def get_posts():
 @app.route('/posts', methods=['PUT'])
 def update_post():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'id', 'content'):
+        return jsonify(), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -49,6 +56,8 @@ def update_post():
 def delete_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
+    if not are_only_required_params(params, 'id'):
+        return jsonify(), 400
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
@@ -62,6 +71,8 @@ def delete_post():
 @app.route('/post-likes', methods=['POST'])
 def like_post():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'post_id'):
+        return jsonify(), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -72,6 +83,8 @@ def like_post():
 @app.route('/post-likes', methods=['DELETE'])
 def unlike_post():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'post_id'):
+        return jsonify(), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401

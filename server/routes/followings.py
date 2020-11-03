@@ -5,14 +5,19 @@ from settings import (
     DEFAULT_POST_LIMIT,
     MAX_POST_LIMIT
 )
-from .utils import set_filter_params
+from .utils import (
+    set_filter_params,
+    are_only_required_params
+)
 
 @app.route('/followings', methods=['POST'])
 def follow():
+    params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'user_id'):
+        return jsonify(), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    params = converts_keys(request.args.to_dict(), case='snake')
     try:
         params['followed_id'] = params.pop('user_id')
     except:
@@ -33,10 +38,12 @@ def get_followings():
 
 @app.route('/followings', methods=['DELETE'])
 def unfollow():
+    params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'user_id'):
+        return jsonify(), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    params = converts_keys(request.args.to_dict(), case='snake')
     try:
         params['followed_id'] = params.pop('user_id')
     except:

@@ -1,12 +1,13 @@
 from flask import jsonify, request, make_response
 from any_case import converts_keys
 from settings import app, database
+from .utils import are_only_required_params
 
 @app.route('/users/register', methods=['POST'])
 def register():
     params = converts_keys(request.args.to_dict(), case='snake')
-    if not (params.get('login') and params.get('password')):
-        return jsonify({'message': 'No login or password'}), 401
+    if not are_only_required_params(params, 'login', 'password'):
+        return jsonify(), 401
     data = database.users.register(**params)
     if not data:
         return jsonify(), 401
@@ -19,6 +20,8 @@ def register():
 @app.route('/users/login', methods=['POST'])
 def login():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'login', 'password'):
+        return jsonify(), 401
     if 'token' in request.cookies:
         database.users.logout(**request.cookies)
     data = database.users.login(**params)

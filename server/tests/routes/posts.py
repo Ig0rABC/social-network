@@ -180,31 +180,3 @@ class PostTests(PostsTestCase):
         self.logout_user(session)
         response = self.like(session, {'post_id': post_data['id']})
         self.assertEqual(response.status_code, 401)
-'''
-    def test_count_post_likes(self):
-        self.register_user(self.USER_1_PAYLOAD)
-        self.register_user(self.USER_2_PAYLOAD)
-        session = Session()
-        self.login_user(session, self.USER_1_PAYLOAD)
-        response = self.create_post(session, self.POST_1_PAYLOAD)
-        data = json.loads(response.content)
-        post_id = data['id']
-        payload = {'postId': post_id}
-        self.like_post(session, payload)
-        self.logout_user(session)
-        response = self.count_post_likes(payload)
-        data = json.loads(response.content)
-        self.assertEqual(data['likesCount'], 1)
-        self.login_user(session, self.USER_2_PAYLOAD)
-        self.like_post(session, payload)
-        response = self.count_post_likes(payload)
-        data = json.loads(response.content)
-        self.assertEqual(data['likesCount'], 2)
-
-    def test_unlike_post(self):
-        self.register_user(self.USER_1_PAYLOAD)
-        session = Session()
-        self.login_user(session, self.USER_1_PAYLOAD)
-        response = self.create_post(session, self.POST_1_PAYLOAD)
-        post = json.loads(response.content)
-'''

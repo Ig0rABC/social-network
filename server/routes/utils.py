@@ -1,4 +1,5 @@
-from any_case import converts_keys
+from flask import jsonify
+from any_case import converts_keys, to_camel_case
 
 def are_params_safe(params):
     if 'user_id' in converts_keys(params, case='snake'):
@@ -19,3 +20,7 @@ def are_only_required_params(params, *args):
         if value is None:
             return False
     return not params
+
+def only_required_params_error(*args):
+    params = to_camel_case(', '.join(args))
+    return jsonify({'message': f'Accepted only required params: {params}'}), 400

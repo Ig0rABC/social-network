@@ -7,7 +7,8 @@ from settings import (
 )
 from .utils import (
     set_filter_params,
-    are_only_required_params
+    are_only_required_params,
+    only_required_params_error
 )
 
 @app.route('/messages', methods=['GET'])
@@ -31,7 +32,7 @@ def get_messages():
 def create_messages():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'chat_id', 'content'):
-        return jsonify(), 400
+        return only_required_params_error('chat_id', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -43,7 +44,7 @@ def create_messages():
 def update_message():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'content'):
-        return jsonify(), 400
+        return only_required_params_error('content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -59,7 +60,7 @@ def update_message():
 def delete_message():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'id'):
-        return jsonify(), 400
+        return only_required_params_error('id')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401

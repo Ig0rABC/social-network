@@ -34,6 +34,6 @@ def login():
 @app.route('/users/login', methods=['DELETE'])
 def logout():
     database.users.logout(**request.cookies)
-    response = make_response(jsonify({'message': 'Logout complete successfuly'}), 205)
+    response = make_response(jsonify({'message': 'Logout has been completed successfully'}), 205)
     response.set_cookie('token', value='', max_age=0)
     return response

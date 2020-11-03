@@ -1,6 +1,10 @@
 from flask import jsonify, request, make_response
 from any_case import converts_keys
 from settings import app, database
+from .utils import (
+    are_only_required_params,
+    only_required_params_error
+)
 
 @app.route('/chats', methods=['GET'])
 def get_chats():
@@ -19,6 +23,8 @@ def get_own_chats():
 @app.route('/chats', methods=['POST'])
 def create_chat():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'title'):
+        return only_required_params_error('title')
     cookies = request.cookies
     owner_id = database.users.get_user_id(**cookies)['user_id']
     chat = database.chats.create(**params, owner_id=owner_id)
@@ -27,6 +33,8 @@ def create_chat():
 @app.route('/chats', methods=['PUT'])
 def update_chat():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'id', 'title'):
+        return only_required_params_error('id', 'title')
     cookies = request.cookies
     user_id = database.users.get_user_id(**cookies)['user_id']
     owner_id = database.chats.get(id=params['id'])['owner_id']
@@ -38,6 +46,8 @@ def update_chat():
 @app.route('/chats', methods=['DELETE'])
 def delete_chat():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'id'):
+        return only_required_params_error('id')
     cookies = request.cookies
     user_id = database.users.get_user_id(**cookies)['user_id']
     chat = database.chats.get(id=params['id'])
@@ -50,6 +60,8 @@ def delete_chat():
 @app.route('/chat-members', methods=['POST'])
 def add_chat_member():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'chat_id', 'user_id'):
+        return only_required_params_error('chat_id', 'user_id')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -64,6 +76,8 @@ def add_chat_member():
 @app.route('/chat-members', methods=['DELETE'])
 def remove_chat_member():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'chat_id', 'user_id'):
+        return only_required_params_error('chat_id', 'user_id')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -78,6 +92,8 @@ def remove_chat_member():
 @app.route('/chat-members', methods=['GET'])
 def get_chat_member():
     params = converts_keys(request.args.to_dict(), case='snake')
+    if not are_only_required_params(params, 'chat_id'):
+        return only_required_params_error('chat_id')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401

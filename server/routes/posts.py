@@ -7,7 +7,8 @@ from settings import (
 )
 from .utils import (
     set_filter_params,
-    are_only_required_params
+    are_only_required_params,
+    only_required_params_error
 )
 
 @app.route('/categories', methods=['GET'])
@@ -19,7 +20,7 @@ def get_categories():
 def create_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'category', 'content'):
-        return jsonify(), 400
+        return only_required_params_error('category', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -40,7 +41,7 @@ def get_posts():
 def update_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'id', 'content'):
-        return jsonify(), 400
+        return only_required_params_error('id', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -57,7 +58,7 @@ def delete_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     cookies = request.cookies
     if not are_only_required_params(params, 'id'):
-        return jsonify(), 400
+        return only_required_params_error('id')
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
@@ -72,7 +73,7 @@ def delete_post():
 def like_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'post_id'):
-        return jsonify(), 400
+        return only_required_params_error('post_id')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -84,7 +85,7 @@ def like_post():
 def unlike_post():
     params = converts_keys(request.args.to_dict(), case='snake')
     if not are_only_required_params(params, 'post_id'):
-        return jsonify(), 400
+        return only_required_params_error('post_id')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401

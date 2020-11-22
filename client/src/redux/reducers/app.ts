@@ -1,7 +1,9 @@
 type Theme = "light" | "dark";
+type Language = "en" | "ru";
 
 const initialState = {
-  theme: "dark" as Theme
+  theme: "dark" as Theme,
+  language: "ru" as Language
 }
 
 type InitialState = typeof initialState;

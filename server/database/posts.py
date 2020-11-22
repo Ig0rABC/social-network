@@ -60,7 +60,21 @@ class Posts(AuthorContentTable):
         (author_id, category, content)
         VALUES
         (%(author_id)s, %(category)s, %(content)s)
-        RETURNING *,
+        RETURNING posts.*,
+        (SELECT login FROM users WHERE users.id = %(author_id)s),
+        (SELECT photo_url FROM profiles WHERE user_id = %(author_id)s),
         (SELECT 0 AS likes_count),
         (SELECT 0 AS comments_count)
         ''', kwargs)
+
+    def update(self, **kwargs):
+        return self._database.execute_with_returning('''
+        UPDATE {table}
+        SET content = %(content)s
+        WHERE id = %(id)s
+        RETURNING posts.*,
+        (SELECT login FROM users WHERE users.id = %(author_id)s),
+        (SELECT photo_url FROM profiles WHERE user_id = %(author_id)s),
+        (SELECT 0 AS likes_count),
+        (SELECT 0 AS comments_count)
+        '''.format(**self.metadata), kwargs)

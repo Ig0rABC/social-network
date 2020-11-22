@@ -10,6 +10,7 @@ from .utils import (
     are_only_required_params,
     only_required_params_error
 )
+from .utils import put_out_author
 
 @app.route('/comments', methods=['POST'])
 def create_comment():
@@ -21,14 +22,18 @@ def create_comment():
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
     data = database.comments.create(**params, author_id=author_id)
+    put_out_author(data)
     return jsonify(converts_keys(data, case='camel')), 201
 
 @app.route('/comments', methods=['GET'])
 def get_comments():
     params = converts_keys(request.args.to_dict(), case='snake')
     set_filter_params(DEFAULT_COMMENT_LIMIT, MAX_COMMENT_LIMIT, params)
+    comments = database.comments.filter(**params)
+    for comment in comments:
+        put_out_author(comment)
     return jsonify(converts_keys({
-        'comments': database.comments.filter(**params),
+        'comments': comments,
         **database.comments.count(**params)
     }, case='camel'))
 
@@ -45,7 +50,7 @@ def update_comment():
     data.update(database.comments.get_author_id(**params))
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'})
-    data = database.comments.update(**params)
+    data = database.comments.update(**params, **data)
     return jsonify(converts_keys(data, case='camel'))
 
 @app.route('/comments', methods=['DELETE'])

@@ -24,3 +24,11 @@ def are_only_required_params(params, *args):
 def only_required_params_error(*args):
     params = to_camel_case(', '.join(args))
     return jsonify({'message': f'Accepted only required params: {params}'}), 400
+
+def put_out_author(object):
+    author = {
+        'id': object.pop('author_id'),
+        'login': object.pop('login'),
+        'photo_url': object.pop('photo_url')
+    }
+    object['author'] = author

@@ -10,6 +10,7 @@ from .utils import (
     are_only_required_params,
     only_required_params_error
 )
+from .utils import put_out_author
 
 @app.route('/categories', methods=['GET'])
 def get_categories():
@@ -26,14 +27,18 @@ def create_post():
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
     data = database.posts.create(**params, author_id=author_id)
+    put_out_author(data)
     return jsonify(converts_keys(data, case='camel')), 201
 
 @app.route('/posts', methods=['GET'])
 def get_posts():
     params = converts_keys(request.args.to_dict(), case='snake')
     set_filter_params(DEFAULT_POST_LIMIT, MAX_POST_LIMIT, params)
+    posts = database.posts.filter(**params)
+    for post in posts:
+        put_out_author(post)
     return jsonify(converts_keys({
-        'posts': database.posts.filter(**params),
+        'posts': posts,
         **database.posts.count(**params)
     }, case='camel'))
 
@@ -50,7 +55,7 @@ def update_post():
     data.update(database.users.get_user_id(**cookies))
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'}), 401
-    data = database.posts.update(**params)
+    data = database.posts.update(**params, **data)
     return jsonify(converts_keys(data, case='camel'))
 
 @app.route('/posts', methods=['DELETE'])

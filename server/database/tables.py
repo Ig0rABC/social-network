@@ -67,14 +67,6 @@ class AuthorContentTable(Table):
         WHERE id = %(id)s
         '''.format(**self.metadata), kwargs)
 
-    def update(self, **kwargs):
-        return self._database.execute_with_returning('''
-        UPDATE {table}
-        SET content = %(content)s
-        WHERE id = %(id)s
-        RETURNING *
-        '''.format(**self.metadata), kwargs)
-
     def delete(self, **kwargs):
         return self._database.execute_and_commit('''
         DELETE FROM {table}

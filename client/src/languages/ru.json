@@ -2,5 +2,10 @@
   "registration": "Регистрация",
   "sign-up": "Зарегистрироваться",
   "login": "Логин",
-  "password": "Пароль"
+  "password": "Пароль",
+  "authorization": "Авторизация",
+  "sign-in": "Войти",
+  "loading": "Загрузка",
+  "dark": "Темная",
+  "light": "Светлая"
 }

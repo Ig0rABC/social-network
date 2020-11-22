@@ -1,0 +1,1 @@
+export type InferActions<T> = T extends { [key: string]: (...args: any[]) => infer U } ? U : never;

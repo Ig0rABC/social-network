@@ -5,6 +5,7 @@ import { selectLanguage } from "./redux/selectors/app";
 import { IntlProvider } from "react-intl";
 import Preloader from "./components/common/Preloader";
 import languages from "./languages";
+import Home from "./components/Home/Home";
 
 const Register = React.lazy(() => import("./components/Register/Register"));
 
@@ -14,15 +15,14 @@ const App: React.FC = () => {
   const messages = languages[locale];
 
   return <IntlProvider key={locale} locale={locale} messages={messages}>
-    <div className="App">
-      <BrowserRouter>
-        <React.Suspense fallback={<Preloader />}>
-          <Switch>
-            <Route exact path="/register" component={Register} />
-          </Switch>
-        </React.Suspense>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <React.Suspense fallback={<Preloader />}>
+        <Switch>
+          <Route exact path="/register" component={Register} />
+          <Route exact path="/" component={Home} />
+        </Switch>
+      </React.Suspense>
+    </BrowserRouter>
   </IntlProvider>
 }
 

@@ -1,13 +1,34 @@
+import { InferActions } from "../../types/flux";
+
 const initialState = {
   userId: null as number | null,
   login: null as string | null,
   photoUrl: null as string | null
 }
 
-type InitialState = typeof initialState;
+export const actions = {
+  setUserData: (userId: number, login: string, photoUrl: string) => ({
+    type: "users/SET-USER-DATA",
+    payload: {
+      userId,
+      login,
+      photoUrl
+    }
+  } as const)
+}
 
-export default (state = initialState, action: any): InitialState => {
+type InitialState = typeof initialState;
+type Action = InferActions<typeof actions>;
+
+export default (state = initialState, action: Action): InitialState => {
   switch (action.type) {
+    case "users/SET-USER-DATA":
+      return {
+        ...state,
+        userId: action.payload.userId,
+        login: action.payload.login,
+        photoUrl: action.payload.photoUrl
+      }
     default:
       return state;
   }

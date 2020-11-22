@@ -2,5 +2,10 @@
   "registration": "Registration",
   "sign-up": "Sign Up",
   "login": "Login",
-  "password": "Password"
+  "password": "Password",
+  "authorization": "Authorization",
+  "sign-in": "Sign In",
+  "loading": "Loading",
+  "dark": "Dark",
+  "light": "Light"
 }

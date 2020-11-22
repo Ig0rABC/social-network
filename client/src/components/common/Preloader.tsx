@@ -1,7 +1,12 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 
 export default () => {
-  return <div>
-    loading..
-  </div>
+  return <>
+    <FormattedMessage
+      id="loading"
+      defaultMessage="loading"
+      description="loading on preloader"
+    />..
+  </>
 }

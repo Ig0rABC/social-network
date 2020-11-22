@@ -1,15 +1,37 @@
-type Theme = "light" | "dark";
-type Language = "en" | "ru";
+import { Language, Theme } from "../../types/app";
+import { InferActions } from "../../types/flux";
 
 const initialState = {
   theme: "dark" as Theme,
-  language: "ru" as Language
+  language: "en" as Language
 }
 
 type InitialState = typeof initialState;
+type Action = InferActions<typeof actions>;
 
-export default (state = initialState, action: any): InitialState => {
+export const actions = {
+  switchLanguage: (language: Language) => ({
+    type: "app/SWITCH-LANGUAGE",
+    payload: language
+  } as const),
+  switchTheme: (theme: Theme) => ({
+    type: "app/SWITCH-THEME",
+    payload: theme
+  } as const)
+}
+
+export default (state = initialState, action: Action): InitialState => {
   switch (action.type) {
+    case "app/SWITCH-LANGUAGE":
+      return {
+        ...state,
+        language: action.payload
+      }
+    case "app/SWITCH-THEME":
+      return {
+        ...state,
+        theme: action.payload
+      }
     default:
       return state;
   }

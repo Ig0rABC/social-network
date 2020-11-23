@@ -1,4 +1,5 @@
-from flask import jsonify, request, make_response
+from json import loads
+from flask import jsonify, request
 from any_case import converts_keys
 from settings import (
     app, database,
@@ -7,26 +8,25 @@ from settings import (
 )
 from .utils import (
     set_filter_params,
-    are_only_required_params,
-    only_required_params_error,
+    check_only_required_payload_props,
     put_out_author
 )
 
-@app.route('/categories', methods=['GET'])
-def get_categories():
-    categories = database.posts.get_categories()
-    return jsonify({'categories': categories})
-
 @app.route('/posts', methods=['POST'])
 def create_post():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'category', 'content'):
-        return only_required_params_error('category', 'content')
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'category', 'content')
+    categories = [c['name'] for c in database.posts.get_categories()]
+    if payload['category'] not in categories:
+        return jsonify({
+            'message': 'You can send only categories, which specified in this response',
+            'categories': categories
+        }), 400
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
-    data = database.posts.create(**params, author_id=author_id)
+    data = database.posts.create(**payload, author_id=author_id)
     put_out_author(data)
     return jsonify(converts_keys(data, case='camel')), 201
 
@@ -42,34 +42,30 @@ def get_posts():
         **database.posts.count(**params)
     }, case='camel'))
 
-@app.route('/posts', methods=['PUT'])
-def update_post():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'id', 'content'):
-        return only_required_params_error('id', 'content')
+@app.route('/posts/<int:post_id>', methods=['PUT'])
+def update_post(post_id):
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
-    data.update(database.posts.get_author_id(**params))
+    data.update(database.posts.get_author_id(id=post_id))
     data.update(database.users.get_user_id(**cookies))
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'}), 401
-    data = database.posts.update(**params, **data)
+    data = database.posts.update(id=post_id, **payload)
     return jsonify(converts_keys(data, case='camel'))
 
-@app.route('/posts', methods=['DELETE'])
-def delete_post():
-    params = converts_keys(request.args.to_dict(), case='snake')
+@app.route('/posts/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
     cookies = request.cookies
-    if not are_only_required_params(params, 'id'):
-        return only_required_params_error('id')
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
-    data.update(database.posts.get_author_id(**params))
+    data.update(database.posts.get_author_id(id=post_id))
     data.update(database.users.get_user_id(**cookies))
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'}), 401
-    database.posts.delete(**params)
+    database.posts.delete(id=post_id)
     return jsonify({'message': 'Post has been deleted'}), 205

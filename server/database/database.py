@@ -17,7 +17,8 @@ class Database:
     def execute(self, query, params={}):
         try:
             self._cursor.execute(query, params)
-        except:
+        except Exception as e:
+            print('Database Error:', e)
             self.rollback()
 
     def execute_and_commit(self, query, params={}):
@@ -28,14 +29,16 @@ class Database:
         self.execute(query, params)
         try:
             return self._cursor.fetchone()
-        except ProgrammingError:
+        except ProgrammingError as e:
+            print('Database Programming Error:', e)
             return {}
 
     def fetch_all(self, query, params={}):
         self.execute(query, params)
         try:
             return self._cursor.fetchall()
-        except ProgrammingError:
+        except ProgrammingError as e:
+            print('Database Programming Error:', e)
             return []
 
     def execute_with_returning(self, query, params={}):

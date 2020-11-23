@@ -7,25 +7,17 @@ from settings import (
 )
 from .utils import (
     set_filter_params,
-    are_only_required_params,
-    only_required_params_error
+    check_only_required_payload_props,
+    check_only_required_query_params
 )
 
-@app.route('/followings', methods=['POST'])
-def follow():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'user_id'):
-        return only_required_params_error('user_id')
+@app.route('/followings/<int:user_id>', methods=['POST'])
+def follow(user_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    try:
-        params['followed_id'] = params.pop('user_id')
-    except:
-        return jsonify({'message': 'userId parameter is not specifed'}), 400
-    set_filter_params(DEFAULT_POST_LIMIT, MAX_POST_LIMIT, params)
     follower_id = database.users.get_user_id(**cookies)['user_id']
-    database.followings.follow(follower_id=follower_id, **cookies)
+    database.followings.follow(follower_id=follower_id, followed_id=user_id)
     return jsonify(), 201
 
 @app.route('/followings', methods=['GET'])
@@ -37,20 +29,13 @@ def get_followings():
     followings = database.followings.get_followings(**data)
     return jsonify(converts_keys({'folllowings': followings}, case='camel'))
 
-@app.route('/followings', methods=['DELETE'])
-def unfollow():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'user_id'):
-        return only_required_params_error('user_id')
+@app.route('/followings/<int:user_id>', methods=['DELETE'])
+def unfollow(user_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    try:
-        params['followed_id'] = params.pop('user_id')
-    except:
-        return jsonify({'message': 'userId parameter is not specifed'}), 400
     follower_id = database.users.get_user_id(**cookies)['user_id']
-    database.followings.unfollow(follower_id=follower_id, **params)
+    database.followings.unfollow(follower_id=follower_id, followed_id=user_id)
     return jsonify(), 204
 
 @app.route('/followings/feed', methods=['GET'])

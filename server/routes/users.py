@@ -6,18 +6,17 @@ from settings import (
     LOGIN_VALIDATOR,
     PASSWORD_VALIDATOR
 )
-from .utils import are_only_required_params
+from .utils import check_only_required_payload_props
 
 @app.route('/users/register', methods=['POST'])
 def register():
-    params = converts_keys(loads(request.data), case='snake')
-    if not are_only_required_params(params, 'login', 'password'):
-        return jsonify(), 401
-    if not LOGIN_VALIDATOR.fullmatch(params['login']):
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'login', 'password')
+    if not LOGIN_VALIDATOR.fullmatch(payload['login']):
         return jsonify({'message': 'Incorrect login'}), 401
-    if not PASSWORD_VALIDATOR.fullmatch(params['password']):
+    if not PASSWORD_VALIDATOR.fullmatch(payload['password']):
         return jsonify({'message': 'Incorrect password'}), 401
-    data = database.users.register(**params)
+    data = database.users.register(**payload)
     if not data:
         return jsonify({'message': 'User with this login already exists. Please, enter another'}), 401
     database.profiles.create(**data)
@@ -26,12 +25,11 @@ def register():
 
 @app.route('/users/login', methods=['POST'])
 def login():
-    params = converts_keys(loads(request.data), case='snake')
-    if not are_only_required_params(params, 'login', 'password'):
-        return jsonify(), 401
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'login', 'password')
     if 'token' in request.cookies:
         database.users.logout(**request.cookies)
-    data = database.users.login(**params)
+    data = database.users.login(**payload)
     if not data:
         return jsonify({'message': 'Authorization error'}), 401
     response = make_response('Cookies', 200)

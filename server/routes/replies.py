@@ -1,4 +1,5 @@
-from flask import jsonify, request, make_response
+from json import loads
+from flask import jsonify, request
 from any_case import converts_keys
 from settings import (
     app, database,
@@ -7,21 +8,19 @@ from settings import (
 )
 from .utils import (
     set_filter_params,
-    are_only_required_params,
-    only_required_params_error,
+    check_only_required_payload_props,
     put_out_author
 )
 
 @app.route('/replies', methods=['POST'])
 def create_reply():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'comment_id', 'content'):
-        return only_required_params_error('comment_id', 'content')
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'comment_id', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
-    data = database.replies.create(**params, author_id=author_id)
+    data = database.replies.create(**payload, author_id=author_id)
     put_out_author(data)
     return jsonify(converts_keys(data, case='camel')), 201
 
@@ -37,34 +36,30 @@ def get_replies():
         **database.replies.count(**params)
     }, case='camel'))
 
-@app.route('/replies', methods=['PUT'])
-def update_reply():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'id', 'content'):
-        return only_required_params_error('id', 'content')
+@app.route('/replies/<int:reply_id>', methods=['PUT'])
+def update_reply(reply_id):
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
     data.update(database.users.get_user_id(**cookies))
-    data.update(database.replies.get_author_id(**params))
+    data.update(database.replies.get_author_id(id=reply_id))
     if data['user_id'] != ['author_id']:
         return jsonify({'messages': 'Access error'}), 401
-    data = database.replies.update(**params, **data)
+    data = database.replies.update(id=reply_id, **payload)
     put_out_author(data)
     return jsonify(converts_keys(data, case='camel'))
 
-@app.route('/replies', methods=['DELETE'])
-def delete_reply():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'id'):
-        return only_required_params_error('id')
+@app.route('/replies/<int:reply_id>', methods=['DELETE'])
+def delete_reply(reply_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     user_id = database.users.get_user_id(**cookies)['user_id']
-    author_id = database.replies.get_author_id(**params)
+    author_id = database.replies.get_author_id(id=reply_id)
     if user_id != author_id:
         return jsonify({'messages': 'Access error'}), 401
-    database.replies.delete(**params)
+    database.replies.delete(id=reply_id)
     return jsonify(), 205

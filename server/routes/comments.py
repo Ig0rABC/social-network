@@ -1,4 +1,5 @@
-from flask import jsonify, request, make_response
+from json import loads
+from flask import jsonify, request
 from any_case import converts_keys
 from settings import (
     app, database,
@@ -7,21 +8,19 @@ from settings import (
 )
 from .utils import (
     set_filter_params,
-    are_only_required_params,
-    only_required_params_error,
+    check_only_required_payload_props,
     put_out_author
 )
 
 @app.route('/comments', methods=['POST'])
 def create_comment():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'post_id', 'content'):
-        return only_required_params_error('post_id', 'content')
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'post_id', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
-    data = database.comments.create(**params, author_id=author_id)
+    data = database.comments.create(**payload, author_id=author_id)
     put_out_author(data)
     return jsonify(converts_keys(data, case='camel')), 201
 
@@ -37,34 +36,30 @@ def get_comments():
         **database.comments.count(**params)
     }, case='camel'))
 
-@app.route('/comments', methods=['PUT'])
-def update_comment():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'id', 'content'):
-        return only_required_params_error('id', 'content')
+@app.route('/comments/<int:comment_id>', methods=['PUT'])
+def update_comment(comment_id):
+    payload = converts_keys(loads(request.data), case='snake')
+    check_only_required_payload_props(payload, 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
     data.update(database.users.get_user_id(**cookies))
-    data.update(database.comments.get_author_id(**params))
+    data.update(database.comments.get_author_id(id=comment_id))
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'})
-    data = database.comments.update(**params, **data)
+    data = database.comments.update(id=comment_id, **payload)
     return jsonify(converts_keys(data, case='camel'))
 
-@app.route('/comments', methods=['DELETE'])
-def delete_comment():
-    params = converts_keys(request.args.to_dict(), case='snake')
-    if not are_only_required_params(params, 'id'):
-        return only_required_params_error('id')
+@app.route('/comments/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     data = {}
     data.update(database.users.get_user_id(**cookies))
-    data.update(database.comments.get_author_id(**params))
+    data.update(database.comments.get_author_id(id=comment_id))
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'})
-    database.comments.delete(**params)
+    database.comments.delete(id=comment_id)
     return jsonify({'message': 'Comment has been deleted'})

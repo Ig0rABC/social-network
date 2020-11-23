@@ -61,6 +61,7 @@ class Posts(AuthorContentTable):
         VALUES
         (%(author_id)s, %(category)s, %(content)s)
         RETURNING posts.*,
+        (SELECT %(author_id)s AS author_id),
         (SELECT login FROM users WHERE users.id = %(author_id)s),
         (SELECT photo_url FROM profiles WHERE user_id = %(author_id)s),
         (SELECT 0 AS likes_count),

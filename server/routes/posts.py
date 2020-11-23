@@ -8,9 +8,9 @@ from settings import (
 from .utils import (
     set_filter_params,
     are_only_required_params,
-    only_required_params_error
+    only_required_params_error,
+    put_out_author
 )
-from .utils import put_out_author
 
 @app.route('/categories', methods=['GET'])
 def get_categories():

@@ -1,3 +1,4 @@
+from json import loads
 from flask import jsonify, request, make_response
 from any_case import converts_keys
 from settings import (
@@ -9,7 +10,7 @@ from .utils import are_only_required_params
 
 @app.route('/users/register', methods=['POST'])
 def register():
-    params = converts_keys(request.args.to_dict(), case='snake')
+    params = converts_keys(loads(request.data), case='snake')
     if not are_only_required_params(params, 'login', 'password'):
         return jsonify(), 401
     if not LOGIN_VALIDATOR.fullmatch(params['login']):
@@ -25,7 +26,7 @@ def register():
 
 @app.route('/users/login', methods=['POST'])
 def login():
-    params = converts_keys(request.args.to_dict(), case='snake')
+    params = converts_keys(loads(request.data), case='snake')
     if not are_only_required_params(params, 'login', 'password'):
         return jsonify(), 401
     if 'token' in request.cookies:

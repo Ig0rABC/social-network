@@ -5,13 +5,14 @@ import usersAPI from "../../api/users";
 
 type LoginFormValues = {
   login: string,
-  password: string
+  password: string,
+  rememberMe: boolean
 }
 
 const LoginForm: React.FC = () => {
 
   const onSubmit = async (values: LoginFormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
-    const data = await usersAPI.login(values.login, values.password);
+    const data = await usersAPI.login(values.login, values.password, values.rememberMe);
     console.log(data);
     setSubmitting(false);
   }
@@ -28,6 +29,11 @@ const LoginForm: React.FC = () => {
         defaultMessage="password"
         description="password input"
       />: <Field name="password" type="password" />
+      <FormattedMessage
+        id="remember-me"
+        defaultMessage="remember me"
+        description="rember me checkbox"
+      /><Field name="rememberMe" type="checkbox" />
       <button type="submit" disabled={isSubmitting}>
         <FormattedMessage
           id="sign-in"
@@ -40,7 +46,7 @@ const LoginForm: React.FC = () => {
 
   return <Formik
     enableReinitialize={true}
-    initialValues={{ login: "", password: "" }}
+    initialValues={{ login: "", password: "", rememberMe: false }}
     onSubmit={onSubmit}
   >{createForm}</Formik>
 }

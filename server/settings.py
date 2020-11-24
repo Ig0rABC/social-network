@@ -18,6 +18,8 @@ MAX_MESSAGE_LIMIT = 32
 LOGIN_VALIDATOR = re.compile(r'\w{6,}')
 PASSWORD_VALIDATOR = re.compile(r'\w{4,}')
 
+REMEMBER_ME_MAX_AGE = 60*60*24*7
+
 database = Database(dbname='socialnetwork')
 database_tables = {
     'users': Users(database),

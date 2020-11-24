@@ -7,6 +7,7 @@ from settings import (
     PASSWORD_VALIDATOR
 )
 from .utils import check_only_required_payload_props
+from settings import REMEMBER_ME_MAX_AGE
 
 @app.route('/users/register', methods=['POST'])
 def register():
@@ -26,14 +27,25 @@ def register():
 @app.route('/users/login', methods=['POST'])
 def login():
     payload = converts_keys(loads(request.data), case='snake')
-    check_only_required_payload_props(payload, 'login', 'password')
+    check_only_required_payload_props(payload, 'login', 'password', 'remember_me')
     if 'token' in request.cookies:
         database.users.logout(**request.cookies)
     data = database.users.login(**payload)
     if not data:
         return jsonify({'message': 'Authorization error'}), 401
+    if payload['remember_me']:
+        max_age = REMEMBER_ME_MAX_AGE
+    else:
+        max_age = None
     response = make_response('Cookies', 200)
-    response.set_cookie('token', value=data['token'])
+    response.set_cookie(
+        'token',
+        value=data['token'],
+        max_age=max_age,
+        samesite=None,
+        secure=False,
+        httponly=False
+    )
     return response
 
 @app.route('/users/login', methods=['DELETE'])

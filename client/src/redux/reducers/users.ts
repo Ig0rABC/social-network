@@ -20,7 +20,7 @@ export const actions = {
 type InitialState = typeof initialState;
 type Action = InferActions<typeof actions>;
 
-export default (state = initialState, action: Action): InitialState => {
+const usersReducer = (state = initialState, action: Action): InitialState => {
   switch (action.type) {
     case "users/SET-USER-DATA":
       return {
@@ -33,3 +33,5 @@ export default (state = initialState, action: Action): InitialState => {
       return state;
   }
 }
+
+export default usersReducer;

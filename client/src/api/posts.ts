@@ -2,7 +2,7 @@ import { Category } from "../types/models";
 import api from "./config";
 import { buildQueryString } from "./utils";
 
-export default {
+const postsAPI = {
   async createPost(category: Category, content: string) {
     const response = await api.post("posts", { category, content });
     return response.data;
@@ -22,3 +22,5 @@ export default {
     return response.data;
   }
 }
+
+export default postsAPI;

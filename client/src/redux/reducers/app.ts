@@ -20,7 +20,7 @@ export const actions = {
   } as const)
 }
 
-export default (state = initialState, action: Action): InitialState => {
+const appReducer = (state = initialState, action: Action): InitialState => {
   switch (action.type) {
     case "app/SWITCH-LANGUAGE":
       return {
@@ -36,3 +36,5 @@ export default (state = initialState, action: Action): InitialState => {
       return state;
   }
 }
+
+export default appReducer;

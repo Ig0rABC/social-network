@@ -1,7 +1,7 @@
 import api from "./config";
 import { buildQueryString } from "./utils";
 
-export default {
+const repliesAPI = {
   async createReply(commentId: number, content: string) {
     const response = await api.post("replies", { commentId, content });
     return response.data;
@@ -21,3 +21,5 @@ export default {
     return response.data;
   }
 }
+
+export default repliesAPI;

@@ -16,3 +16,7 @@ export const buildQueryString = (params: ToStringProps): string => {
   }
   return "?" + queryParams.toString();
 }
+
+export const sleep = (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

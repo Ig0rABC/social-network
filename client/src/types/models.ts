@@ -1,11 +1,18 @@
 export type User = {
+  id: number,
   login: string,
   photoUrl: string
 }
 
+export type Category = "programming" | "travels" | "countries"
+  | "languages" | "politics" | "news" | "blog" | "stories"
+  | "music" | "education" | "science" | "films" | "cinema"
+  | "theater" | "tourism" | "statistics" | "philosophy"
+  | "literature" | "psychology" | "other" | "no category";
+
 export type Post = {
   id: number,
-  category: string,
+  category: Category,
   content: string,
   author: User,
   created: Date,

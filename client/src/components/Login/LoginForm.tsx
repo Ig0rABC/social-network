@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Field, Form, Formik } from "formik";
-import { FormattedMessage } from "react-intl";
 import usersAPI from "../../api/users";
+import { FormattedMessage } from "react-intl";
+import { Form, Input, Button, Checkbox } from 'antd';
 
 type LoginFormValues = {
   login: string,
@@ -9,46 +9,65 @@ type LoginFormValues = {
   rememberMe: boolean
 }
 
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
+
 const LoginForm: React.FC = () => {
 
-  const onSubmit = async (values: LoginFormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
-    const data = await usersAPI.login(values.login, values.password, values.rememberMe);
-    console.log(data);
+  let [isSubmitting, setSubmitting] = useState(false);
+
+  const onFinish = async (values: LoginFormValues) => {
+    setSubmitting(true);
+    try {
+      const data = await usersAPI.login(values.login, values.password, values.rememberMe);
+      console.log(data);
+    } catch {}
     setSubmitting(false);
-  }
+  };
 
-  const createForm = ({ isSubmitting }: { isSubmitting: boolean }) => {
-    return <Form>
-      <FormattedMessage
-        id="login"
-        defaultMessage="login"
-        description="login input"
-      />: <Field name="login" type="text" />
-      <FormattedMessage
-        id="password"
-        defaultMessage="password"
-        description="password input"
-      />: <Field name="password" type="password" />
-      <FormattedMessage
-        id="remember-me"
-        defaultMessage="remember me"
-        description="rember me checkbox"
-      /><Field name="rememberMe" type="checkbox" />
-      <button type="submit" disabled={isSubmitting}>
-        <FormattedMessage
-          id="sign-in"
-          defaultMessage="sign in"
-          description="sign in button"
-        />
-      </button>
-    </Form>
-  }
+  return <Form
+    {...layout}
+    initialValues={{ login: "", password: "", rememberMe: true }}
+    onFinish={onFinish}
+  >
 
-  return <Formik
-    enableReinitialize={true}
-    initialValues={{ login: "", password: "", rememberMe: false }}
-    onSubmit={onSubmit}
-  >{createForm}</Formik>
+    <Form.Item name="login"
+      label={<FormattedMessage id="login" defaultMessage="login" />}
+      rules={[
+        {
+          required: true,
+          message: <FormattedMessage id="empty-login" defaultMessage="empty login" />
+        }
+      ]}
+    ><Input /></Form.Item>
+
+    <Form.Item name="password"
+      label={<FormattedMessage id="password" defaultMessage="password" />}
+      rules={[
+        {
+          required: true,
+          message: <FormattedMessage id="empty-password" defaultMessage="empty password" />
+        }
+      ]}
+    ><Input.Password /></Form.Item>
+
+    <Form.Item {...tailLayout} name="rememberMe" valuePropName="checked">
+      <Checkbox>
+        <FormattedMessage id="remember-me" defaultMessage="remember me" />
+      </Checkbox>
+    </Form.Item>
+
+    <Form.Item {...tailLayout}>
+      <Button type="primary" htmlType="submit" disabled={isSubmitting}>
+        <FormattedMessage id="buttons.sign-in" defaultMessage="sign in" />
+      </Button>
+    </Form.Item>
+  </Form>
 }
 
 export default React.memo(LoginForm);

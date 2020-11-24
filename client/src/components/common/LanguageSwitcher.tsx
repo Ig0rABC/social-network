@@ -1,23 +1,39 @@
-import React, { FormEvent } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectLanguage } from "../../redux/selectors/app";
+import { selectTheme } from "../../redux/selectors/app";
 import { Language } from "../../types/app";
 import { actions } from "../../redux/reducers/app";
+import { Menu, Dropdown } from "antd";
+import { TranslationOutlined } from "@ant-design/icons";
+import { FormattedMessage } from "react-intl";
 
 const LanguageSwitcher: React.FC = () => {
 
   const dispatch = useDispatch();
+  const theme = useSelector(selectTheme);
 
-  const language = useSelector(selectLanguage);
-
-  const onChange = (event: FormEvent<HTMLSelectElement>): void => {
-    dispatch(actions.switchLanguage(event.currentTarget.value as Language));
+  const handleMenuClick = (event: any): void => {
+    dispatch(actions.switchLanguage(event.key as Language));
   }
 
-  return <select onChange={onChange} value={language}>
-    <option value="en">English</option>
-    <option value="ru">Русский</option>
-  </select>
+  const menu = (
+    <Menu onClick={handleMenuClick} theme={theme}>
+      <Menu.Item key="en">
+        English
+      </Menu.Item>
+      <Menu.Item key="ru">
+        Русский
+      </Menu.Item>
+    </Menu>
+  )
+
+  return <Dropdown.Button overlay={menu} icon={<TranslationOutlined />}>
+    <FormattedMessage
+      id="choose-language"
+      defaultMessage="choose language"
+      description="choose language dropdown"
+    />
+  </Dropdown.Button>
 }
 
 export default LanguageSwitcher;

@@ -1,4 +1,5 @@
 import React from "react";
+import "antd/dist/antd.css";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectLanguage } from "./redux/selectors/app";

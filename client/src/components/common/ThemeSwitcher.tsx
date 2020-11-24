@@ -15,7 +15,7 @@ const ThemeSwitcher: React.FC = () => {
     dispatch(actions.switchTheme(event.currentTarget.value as Theme));
   }
 
-  return <select onChange={onChange} value={theme} defaultValue="">
+  return <select onChange={onChange} value={theme}>
     <FormattedMessage id="light" key="light">
       {(message) => <option value="light">{message}</option>}
     </FormattedMessage>

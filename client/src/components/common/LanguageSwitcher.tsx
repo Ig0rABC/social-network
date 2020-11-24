@@ -14,7 +14,7 @@ const LanguageSwitcher: React.FC = () => {
     dispatch(actions.switchLanguage(event.currentTarget.value as Language));
   }
 
-  return <select onChange={onChange} value={language} placeholder="choose theme">
+  return <select onChange={onChange} value={language}>
     <option value="en">English</option>
     <option value="ru">Русский</option>
   </select>

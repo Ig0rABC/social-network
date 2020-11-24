@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Field, Form, Formik } from "formik";
 import { FormattedMessage } from "react-intl";
+import usersAPI from "../../api/users";
 
 type RegisterFormValues = {
   login: string,
@@ -9,13 +10,9 @@ type RegisterFormValues = {
 
 const RegisterForm: React.FC = () => {
 
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-
-  const onSubmit = (values: RegisterFormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
-    setLogin(values.login);
-    setPassword(values.password);
-    console.log(values);
+  const onSubmit = async (values: RegisterFormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
+    const userData = await usersAPI.register(values.login, values.password);
+    console.log(userData);
     setSubmitting(false);
   }
 
@@ -30,7 +27,7 @@ const RegisterForm: React.FC = () => {
         id="password"
         defaultMessage="password"
         description="password input"
-      />: <Field name="password" type="text" />
+      />: <Field name="password" type="password" />
       <button type="submit" disabled={isSubmitting}>
         <FormattedMessage
           id="sign-up"
@@ -43,7 +40,7 @@ const RegisterForm: React.FC = () => {
 
   return <Formik
     enableReinitialize={true}
-    initialValues={{ login, password }}
+    initialValues={{ login: "", password: "" }}
     onSubmit={onSubmit}
   >{createForm}</Formik>
 }

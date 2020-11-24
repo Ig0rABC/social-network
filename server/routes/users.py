@@ -19,7 +19,7 @@ def register():
         return jsonify({'message': 'Incorrect password'}), 401
     data = database.users.register(**payload)
     if not data:
-        return jsonify({'message': 'User with this login already exists. Please, enter another'}), 401
+        return jsonify({'message': 'User with this login already exists'}), 401
     database.profiles.create(**data)
     database.contacts.create(**data)
     return jsonify(converts_keys(data, case='camel')), 201
@@ -32,7 +32,7 @@ def login():
         database.users.logout(**request.cookies)
     data = database.users.login(**payload)
     if not data:
-        return jsonify({'message': 'Authorization error'}), 401
+        return jsonify(), 401
     if payload['remember_me']:
         max_age = REMEMBER_ME_MAX_AGE
     else:
@@ -51,6 +51,6 @@ def login():
 @app.route('/users/login', methods=['DELETE'])
 def logout():
     database.users.logout(**request.cookies)
-    response = make_response(jsonify({'message': 'Logout has been completed successfully'}), 205)
+    response = make_response(jsonify(), 205)
     response.set_cookie('token', value='', max_age=0)
     return response

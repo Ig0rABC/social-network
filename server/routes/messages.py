@@ -37,7 +37,7 @@ def create_message():
         return jsonify(), 401
     author_id = database.users.get_user_id(**cookies)['user_id']
     message = database.messages.create(author_id=author_id, **payload)
-    return jsonify(converts_keys({'message': message}, case='camel'))
+    return jsonify(converts_keys({'message': message}, case='camel')), 201
 
 @app.route('/messages/<int:message_id>', methods=['PUT'])
 def update_message(message_id):

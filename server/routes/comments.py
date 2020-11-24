@@ -47,7 +47,7 @@ def update_comment(comment_id):
     data.update(database.users.get_user_id(**cookies))
     data.update(database.comments.get_author_id(id=comment_id))
     if data['user_id'] != data['author_id']:
-        return jsonify({'messages': 'Access error'})
+        return jsonify(), 401
     data = database.comments.update(id=comment_id, **payload)
     return jsonify(converts_keys(data, case='camel'))
 
@@ -60,6 +60,6 @@ def delete_comment(comment_id):
     data.update(database.users.get_user_id(**cookies))
     data.update(database.comments.get_author_id(id=comment_id))
     if data['user_id'] != data['author_id']:
-        return jsonify({'messages': 'Access error'})
+        return jsonify(), 401
     database.comments.delete(id=comment_id)
-    return jsonify({'message': 'Comment has been deleted'})
+    return jsonify(), 205

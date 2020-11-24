@@ -45,7 +45,7 @@ def get_posts():
 @app.route('/posts/<int:post_id>', methods=['PUT'])
 def update_post(post_id):
     payload = converts_keys(loads(request.data), case='snake')
-    check_only_required_payload_props(payload, 'content')
+    check_only_required_payload_props(payload, 'category', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
@@ -53,7 +53,7 @@ def update_post(post_id):
     data.update(database.posts.get_author_id(id=post_id))
     data.update(database.users.get_user_id(**cookies))
     if data['user_id'] != data['author_id']:
-        return jsonify({'messages': 'Access error'}), 401
+        return jsonify(), 401
     data = database.posts.update(id=post_id, **payload)
     return jsonify(converts_keys(data, case='camel'))
 
@@ -68,4 +68,4 @@ def delete_post(post_id):
     if data['user_id'] != data['author_id']:
         return jsonify({'messages': 'Access error'}), 401
     database.posts.delete(id=post_id)
-    return jsonify({'message': 'Post has been deleted'}), 205
+    return jsonify(), 205

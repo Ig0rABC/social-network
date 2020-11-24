@@ -71,7 +71,8 @@ class Posts(AuthorContentTable):
     def update(self, **kwargs):
         return self._database.execute_with_returning('''
         UPDATE {table}
-        SET content = %(content)s
+        SET content = %(content)s,
+        category = %(category)s
         WHERE id = %(id)s
         RETURNING posts.*,
         (SELECT login FROM users WHERE users.id = %(author_id)s),

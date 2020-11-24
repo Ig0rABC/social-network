@@ -47,7 +47,7 @@ def update_reply(reply_id):
     data.update(database.users.get_user_id(**cookies))
     data.update(database.replies.get_author_id(id=reply_id))
     if data['user_id'] != ['author_id']:
-        return jsonify({'messages': 'Access error'}), 401
+        return jsonify(), 401
     data = database.replies.update(id=reply_id, **payload)
     put_out_author(data)
     return jsonify(converts_keys(data, case='camel'))
@@ -60,6 +60,6 @@ def delete_reply(reply_id):
     user_id = database.users.get_user_id(**cookies)['user_id']
     author_id = database.replies.get_author_id(id=reply_id)
     if user_id != author_id:
-        return jsonify({'messages': 'Access error'}), 401
+        return jsonify(), 401
     database.replies.delete(id=reply_id)
     return jsonify(), 205

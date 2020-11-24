@@ -18,7 +18,7 @@ def like():
         database.replies.like(**params, **data)
     else:
         jsonify(), 400
-    return jsonify({'message': 'Object has been tagged "I like"'})
+    return jsonify(), 201
 
 
 @app.route('/likes', methods=['DELETE'])
@@ -36,4 +36,4 @@ def unlike():
         database.replies.unlike(**params, **data)
     else:
         jsonify(), 400
-    return jsonify({'message': 'Mark "I like" has been deleted from the object'})
+    return jsonify(), 205

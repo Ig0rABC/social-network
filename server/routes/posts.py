@@ -34,7 +34,12 @@ def create_post():
 def get_posts():
     params = converts_keys(request.args.to_dict(), case='snake')
     set_filter_params(DEFAULT_POST_LIMIT, MAX_POST_LIMIT, params)
-    posts = database.posts.filter(**params)
+    cookies = request.cookies
+    if 'token' in cookies:
+        user_id = database.users.get_user_id(**cookies)['user_id']
+    else:
+        user_id = 0
+    posts = database.posts.filter(user_id=user_id, **params)
     for post in posts:
         put_out_author(post)
     return jsonify(converts_keys({

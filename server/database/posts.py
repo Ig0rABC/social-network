@@ -32,6 +32,8 @@ class Posts(AuthorContentTable):
         ''', kwargs)
 
     def filter(self, **kwargs):
+        condition = kwargs.copy()
+        condition.pop('user_id')
         return self._database.fetch_all('''
         SELECT posts.*, (
             SELECT count(*) AS likes_count
@@ -47,12 +49,18 @@ class Posts(AuthorContentTable):
         ), (
             SELECT photo_url FROM profiles
             WHERE author_id = profiles.user_id
+        ), (
+            SELECT exists(
+                SELECT true FROM post_likes
+                WHERE post_likes.user_id = %(user_id)s
+                AND post_likes.post_id = posts.id
+            ) AS is_liked
         ) FROM posts
         {condition}
         ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(condition=self.params_to_condition(**kwargs)), kwargs)
+        '''.format(condition=self.params_to_condition(**condition)), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''

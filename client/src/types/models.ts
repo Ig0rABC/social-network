@@ -19,7 +19,8 @@ export type Post = {
   author: User,
   created: Date,
   commentsCount: number,
-  likesCount: number
+  likesCount: number,
+  isLiked: boolean
 }
 
 export type Comment = {
@@ -30,6 +31,7 @@ export type Comment = {
   created: Date,
   repliesCount: number,
   likesCount: number
+  isLiked: boolean
 }
 
 export type Reply = {
@@ -38,5 +40,6 @@ export type Reply = {
   content: string,
   author: User,
   created: Date,
-  likesCount: number
+  likesCount: number,
+  isLiked: boolean
 }

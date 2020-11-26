@@ -32,6 +32,10 @@ export const actions = {
     type: "posts/ADD-POST",
     payload: post
   } as const),
+  toggleIsLikedPost: (postId: number) => ({
+    type: "posts/TOGGLE-IS-LIKED-POST",
+    payload: postId
+  } as const),
   setFilter: (filter: Filter) => ({
     type: "post/SET-FILTER",
     payload: filter
@@ -56,6 +60,20 @@ const postsReducer = (state = initialState, action: Action): InitialState => {
       return {
         ...state,
         posts: [action.payload, ...state.posts]
+      }
+    case "posts/TOGGLE-IS-LIKED-POST":
+      return {
+        ...state,
+        posts: state.posts
+          .map(post => post.id === action.payload
+            ? {
+              ...post,
+              likesCount: post.isLiked
+                ? post.likesCount - 1
+                : post.likesCount + 1,
+              isLiked: !post.isLiked,
+            } : post
+          )
       }
     case "post/SET-FILTER":
       return {

@@ -17,21 +17,23 @@ const Posts: React.FC = () => {
   const totalPostsCount = useSelector(selectTotalPostsCount);
   let [isSubmitting, setSubmitting] = useState(false);
 
+  const requestPosts = async () => {
+    const data = await postsAPI.getPosts(filter)
+    dispatch(actions.setPosts(data.posts));
+    dispatch(actions.setTotalPostsCount(data.totalCount));
+  }
+
   useEffect(() => {
-    postsAPI.getPosts(filter).then((data) => {
-      dispatch(actions.setPosts(data.posts));
-      dispatch(actions.setTotalPostsCount(data.totalCount));
-    })
+    requestPosts();
   }, [])
+
+  useEffect(() => {
+    requestPosts();
+  }, [filter])
 
   const pagination = {
     onChange: async (page: number, pageSize: number | undefined) => {
-      setSubmitting(true);
       dispatch(actions.setFilter({ ...filter, page, pageSize: pageSize as number }));
-      const data = await postsAPI.getPosts(filter);
-      dispatch(actions.setPosts(data.posts));
-      dispatch(actions.setTotalPostsCount(data.totalCount));
-      setSubmitting(false);
     },
     showTotal: (total: number, range: number[]) => (
       <FormattedMessage id="total-posts-count"

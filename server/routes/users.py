@@ -19,7 +19,9 @@ def register():
         return jsonify({'message': 'Incorrect password'}), 401
     data = database.users.register(**payload)
     if not data:
-        return jsonify({'message': 'User with this login already exists'}), 401
+        return jsonify({
+            'message': 'User with this login already exists'
+        }), 401
     database.profiles.create(**data)
     database.contacts.create(**data)
     return jsonify(converts_keys(data, case='camel')), 201
@@ -27,20 +29,23 @@ def register():
 @app.route('/users/login', methods=['POST'])
 def login():
     payload = converts_keys(loads(request.data), case='snake')
-    check_only_required_payload_props(payload, 'login', 'password', 'remember_me')
+    check_only_required_payload_props(
+        payload, 'login', 'password', 'remember_me'
+    )
     if 'token' in request.cookies:
         database.users.logout(**request.cookies)
     data = database.users.login(**payload)
     if not data:
         return jsonify(), 401
+    token = data.pop('token')
     if payload['remember_me']:
         max_age = REMEMBER_ME_MAX_AGE
     else:
         max_age = None
-    response = make_response('Cookies', 200)
+    response = make_response(jsonify(converts_keys(data, case='snake')), 200)
     response.set_cookie(
         'token',
-        value=data['token'],
+        value=token,
         max_age=max_age,
         samesite=None,
         secure=False,
@@ -52,5 +57,12 @@ def login():
 def logout():
     database.users.logout(**request.cookies)
     response = make_response(jsonify(), 205)
-    response.set_cookie('token', value='', max_age=0)
+    response.set_cookie(
+        'token',
+        value='',
+        max_age=0,
+        samesite=None,
+        secure=False,
+        httponly=False
+    )
     return response

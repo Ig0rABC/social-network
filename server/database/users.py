@@ -18,7 +18,8 @@ class Users(Table):
         SELECT id FROM users
         WHERE login = %(login)s
         AND password = crypt(%(password)s, password)
-        RETURNING token
+        RETURNING token, id, login,
+        (SELECT photo_url FROM profiles WHERE user_id = id)
         ''', kwargs)
 
     def get_user_id(self, **kwargs):

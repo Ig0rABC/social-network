@@ -3,6 +3,9 @@ import { FormattedMessage } from "react-intl";
 import { Form, Input, Button, Select } from 'antd';
 import postsAPI from "../../api/posts";
 import { Category } from "../../types/models";
+import { TagOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/reducers/posts";
 
 type PostFormValues = {
   category: Category,
@@ -11,7 +14,7 @@ type PostFormValues = {
 
 const layout = {
   labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+  wrapperCol: { offset: 3, span: 16 },
 };
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
@@ -27,6 +30,8 @@ const OPTIONS = [
 
 const PostForm: React.FC = () => {
 
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
   let [isSubmitting, setSubmitting] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   // @ts-ignore
@@ -36,16 +41,19 @@ const PostForm: React.FC = () => {
     setSubmitting(true);
     try {
       const data = await postsAPI.createPost(values.category, values.content);
-      console.log(data);
-    } catch {}
+      dispatch(actions.addPost(data));
+    } catch { }
     setSubmitting(false);
+    form.resetFields();
   };
 
   const handleChange = (selectedItems: any) => {
     setSelectedItems(selectedItems);
   };
 
-  return <Form {...layout}
+
+  return <Form form={form}
+    {...layout}
     initialValues={{ category: "no category", content: "" }}
     onFinish={onFinish}
   >
@@ -53,9 +61,10 @@ const PostForm: React.FC = () => {
     <Form.Item name="category">
       <Select value={selectedItems}
         onChange={handleChange}
+        suffixIcon={<TagOutlined />}
       >
         {filteredOptions.map(item => (
-          <Select.Option key={item} value={item}>
+          <Select.Option key={item} value={item} >
             <FormattedMessage id={"categories." + item} defaultMessage={item} />
           </Select.Option>
         ))}
@@ -70,7 +79,7 @@ const PostForm: React.FC = () => {
         }
       ]}
     >
-      <Input.TextArea showCount maxLength={1000} minLength={10} />
+      <Input.TextArea value="dsads" showCount maxLength={1000} minLength={10} />
     </Form.Item>
 
     <Form.Item {...tailLayout}>

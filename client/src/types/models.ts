@@ -10,6 +10,8 @@ export type Category = "programming" | "travels" | "countries"
   | "theater" | "tourism" | "statistics" | "philosophy"
   | "literature" | "psychology" | "other" | "no category";
 
+export type PostOrder = "id" | "likesCount" | "commentsCount";
+
 export type Post = {
   id: number,
   category: Category,

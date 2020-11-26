@@ -1,8 +1,6 @@
 {
   "home": "Главная",
   "registration": "Регистрация",
-  "login": "Логин",
-  "password": "Пароль",
   "authorization": "Авторизация",
   "remember-me": "Запомнить меня",
   "empty-login": "Пожалуйста, введите свой логин",
@@ -17,9 +15,16 @@
   "profile": "Профиль",
   "news-feed": "Новости",
   "messages": "Сообщения",
+  "post-by": "Пост",
+  "total-posts-count": "{0}-{1} Из {total} Постов",
   "themes": {
     "dark": "Темная",
     "light": "Светлая"
+  },
+  "placeholders": {
+    "login": "Логин",
+    "password": "Пароль",
+    "search": "Поиск"
   },
   "buttons": {
     "sign-up": "Зарегистрироваться",

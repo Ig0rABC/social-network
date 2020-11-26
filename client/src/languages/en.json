@@ -1,8 +1,6 @@
 {
   "home": "Home",
   "registration": "Registration",
-  "login": "Login",
-  "password": "Password",
   "authorization": "Authorization",
   "remember-me": "Remember Me",
   "empty-login": "Please, enter your login",
@@ -17,9 +15,16 @@
   "profile": "Profile",
   "news-feed": "News Feed",
   "messages": "Messages",
+  "post-by": "Post by",
+  "total-posts-count": "{0}-{1} Of {total} Posts",
   "themes": {
     "dark": "Dark",
     "light": "Light"
+  },
+  "placeholders": {
+    "login": "Login",
+    "password": "Password",
+    "search": "Search"
   },
   "buttons": {
     "sign-up": "Sign Up",

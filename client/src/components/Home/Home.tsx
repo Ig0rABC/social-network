@@ -4,14 +4,16 @@ import LogoutButton from "../common/LogoutButton";
 import ThemeSwitcher from "../common/ThemeSwitcher";
 import Login from "../Login/Login";
 import PostForm from "../Posts/PostForm";
+import Posts from "../Posts/Posts";
 
 const Home: React.FC = () => {
   return <div>
-    <Login />
-    <LogoutButton />
     <LanguageSwitcher />
     <ThemeSwitcher />
+    <Login />
+    <LogoutButton />
     <PostForm />
+    <Posts />
   </div>
 }
 

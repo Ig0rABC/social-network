@@ -1,19 +1,22 @@
 import { InferActions } from "../../types/flux";
+import { User } from "../../types/models";
 
 const initialState = {
-  userId: null as number | null,
-  login: null as string | null,
-  photoUrl: null as string | null
+  isAuthorized: false,
+  currentUser: {
+    id: null as number | null,
+    login: null as string | null,
+    photoUrl: null as string | null
+  }
 }
 
 export const actions = {
-  setUserData: (userId: number, login: string, photoUrl: string) => ({
-    type: "users/SET-USER-DATA",
-    payload: {
-      userId,
-      login,
-      photoUrl
-    }
+  setCurrentUser: (currentUser: User) => ({
+    type: "users/SET-CURRENT-USER",
+    payload: currentUser
+  } as const),
+  resetCurrentUser: () => ({
+    type: "users/RESET-CURRENT-USER"
   } as const)
 }
 
@@ -22,12 +25,17 @@ type Action = InferActions<typeof actions>;
 
 const usersReducer = (state = initialState, action: Action): InitialState => {
   switch (action.type) {
-    case "users/SET-USER-DATA":
+    case "users/SET-CURRENT-USER":
       return {
         ...state,
-        userId: action.payload.userId,
-        login: action.payload.login,
-        photoUrl: action.payload.photoUrl
+        isAuthorized: true,
+        currentUser: action.payload
+      }
+    case "users/RESET-CURRENT-USER":
+      return {
+        ...state,
+        isAuthorized: false,
+        currentUser: initialState.currentUser
       }
     default:
       return state;

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import usersAPI from "../../api/users";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Button, Checkbox } from 'antd';
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/reducers/users";
 
 type LoginFormValues = {
   login: string,
@@ -19,13 +21,14 @@ const tailLayout = {
 
 const LoginForm: React.FC = () => {
 
+  const dispatch = useDispatch();
   let [isSubmitting, setSubmitting] = useState(false);
 
   const onFinish = async (values: LoginFormValues) => {
     setSubmitting(true);
     try {
       const data = await usersAPI.login(values.login, values.password, values.rememberMe);
-      console.log(data);
+      dispatch(actions.setCurrentUser(data));
     } catch {}
     setSubmitting(false);
   };

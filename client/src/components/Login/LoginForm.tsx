@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import usersAPI from "../../api/users";
+import React, { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Form, Input, Button, Checkbox } from 'antd';
-import { useDispatch } from "react-redux";
-import { actions } from "../../redux/reducers/users";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../redux/reducers/users";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { selectIsAuthorized } from "../../redux/selectors/users";
 
 type LoginFormValues = {
   login: string,
@@ -25,15 +25,16 @@ const LoginForm: React.FC = () => {
   const intl = useIntl();
   const dispatch = useDispatch();
   let [isSubmitting, setSubmitting] = useState(false);
+  const isAuthorized = useSelector(selectIsAuthorized);
 
   const onFinish = async (values: LoginFormValues) => {
     setSubmitting(true);
-    try {
-      const data = await usersAPI.login(values.login, values.password, values.rememberMe);
-      dispatch(actions.setCurrentUser(data));
-    } catch { }
-    setSubmitting(false);
+    dispatch(login(values.login, values.password, values.rememberMe));
   };
+
+  useEffect(() => {
+    setSubmitting(false);
+  }, [isAuthorized])
 
   return <Form
     {...layout}

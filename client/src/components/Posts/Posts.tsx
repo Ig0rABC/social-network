@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FormattedMessage, FormattedNumber } from "react-intl";
 import { List } from 'antd';
 import { Post } from "../../types/models";
-import postsAPI from "../../api/posts";
+import { selectFilter, selectIsFetching, selectLikesInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/posts";
+import { actions, requestPosts } from "../../redux/reducers/posts";
 import PostComponent from "./Post";
-import { useDispatch, useSelector } from "react-redux";
-import { selectFilter, selectPosts, selectTotalPostsCount } from "../../redux/selectors/posts";
-import { actions } from "../../redux/reducers/posts";
 import PostsSearchForm from "./PostsSearchForm";
-import { FormattedMessage, FormattedNumber } from "react-intl";
 
 const Posts: React.FC = () => {
 
@@ -15,25 +14,24 @@ const Posts: React.FC = () => {
   const filter = useSelector(selectFilter);
   const posts = useSelector(selectPosts);
   const totalPostsCount = useSelector(selectTotalPostsCount);
-  let [isSubmitting, setSubmitting] = useState(false);
-
-  const requestPosts = async () => {
-    const data = await postsAPI.getPosts(filter)
-    dispatch(actions.setPosts(data.posts));
-    dispatch(actions.setTotalPostsCount(data.totalCount));
-  }
+  const isFetching = useSelector(selectIsFetching);
+  const likesInProgress = useSelector(selectLikesInProgress);
 
   useEffect(() => {
-    requestPosts();
+    dispatch(requestPosts(filter));
   }, [])
 
   useEffect(() => {
-    requestPosts();
+    dispatch(requestPosts(filter));
   }, [filter])
 
   const pagination = {
     onChange: async (page: number, pageSize: number | undefined) => {
-      dispatch(actions.setFilter({ ...filter, page, pageSize: pageSize as number }));
+      dispatch(actions.setFilter({
+        ...filter,
+        page,
+        pageSize: pageSize as number
+      }));
     },
     showTotal: (total: number, range: number[]) => (
       <FormattedMessage id="total-posts-count"
@@ -45,21 +43,21 @@ const Posts: React.FC = () => {
     total: totalPostsCount as number,
     current: filter.page,
     pageSize: filter.pageSize,
-    disabled: isSubmitting,
+    disabled: isFetching,
   }
 
   return <>
-    <PostsSearchForm handleSearch={() => { }} isSubmitting={false} />
+    <PostsSearchForm handleSearch={() => { }} isSubmitting={isFetching} />
     <List
       itemLayout="vertical"
       size="large"
       pagination={pagination}
       dataSource={posts}
       renderItem={
-        (post: Post) => <PostComponent post={post} />
+        (post: Post) => <PostComponent post={post} isSubmitting={likesInProgress.includes(post.id)} />
       }
     />
   </>
 }
 
-export default Posts;
+export default React.memo(Posts);

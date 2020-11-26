@@ -1,13 +1,9 @@
 import { RootState } from "../store";
 
-export const selectUserId = (state: RootState) => {
-  return state.users.currentUser.id;
+export const selectCurrentUser = (state: RootState) => {
+  return state.users.currentUser;
 }
 
-export const selectLogin = (state: RootState) => {
-  return state.users.currentUser.login;
-}
-
-export const selectPhotoUrl = (state: RootState) => {
-  return state.users.currentUser.photoUrl;
+export const selectIsAuthorized = (state: RootState) => {
+  return state.users.isAuthorized;
 }

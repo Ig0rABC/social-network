@@ -5,8 +5,7 @@ import { Post } from "../../types/models";
 import { FormattedDate, FormattedMessage, FormattedNumber } from "react-intl";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { actions } from "../../redux/reducers/posts";
-import postsAPI from "../../api/posts";
+import { toggleIsLikedPost } from "../../redux/reducers/posts";
 
 type Props = {
   icon: React.FC | "img",
@@ -30,20 +29,12 @@ const IconCount: React.FC<Props> = ({ icon, count, messageId, defaultMessage, is
   </Space>
 );
 
-const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
+const PostComponent: React.FC<{ post: Post, isSubmitting: boolean }> = ({ post, isSubmitting }) => {
 
   const dispatch = useDispatch();
-  let [isSubmitting, setSubmitting] = useState(false);
 
   const handleLikeClick = async () => {
-    setSubmitting(true);
-    if (post.isLiked) {
-      await postsAPI.unlikePost(post.id);
-    } else {
-      await postsAPI.likePost(post.id);
-    }
-    dispatch(actions.toggleIsLikedPost(post.id));
-    setSubmitting(false);
+    dispatch(toggleIsLikedPost(post.id, post.isLiked));
   }
 
   const handleCommentsClick = () => {

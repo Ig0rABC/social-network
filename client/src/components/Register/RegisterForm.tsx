@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import usersAPI from "../../api/users";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { register } from "../../redux/reducers/users";
+import { useDispatch } from "react-redux";
 
 type RegisterFormValues = {
   login: string,
@@ -19,15 +20,13 @@ const tailLayout = {
 
 const LoginForm: React.FC = () => {
 
+  const dispatch = useDispatch();
   const intl = useIntl();
   let [isSubmitting, setSubmitting] = useState(false);
 
   const onFinish = async (values: RegisterFormValues) => {
     setSubmitting(true);
-    try {
-      const data = await usersAPI.register(values.login, values.password);
-      console.log(data);
-    } catch { }
+    dispatch(register(values.login, values.password));
     setSubmitting(false);
   };
 

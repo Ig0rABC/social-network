@@ -12,11 +12,16 @@ const usersAPI = {
     const response = await api.post("users/login", { login, password, rememberMe });
     return response.data;
   },
+  async me() {
+    await sleep(2000);
+    const response = await api.get("users/me");
+    return response.data;
+  },
   async logout() {
     await sleep(2500);
     const response = await api.delete("users/login");
     return response.data;
-  }
+  },
 }
 
 export default usersAPI;

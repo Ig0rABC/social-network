@@ -42,7 +42,7 @@ def login():
         max_age = REMEMBER_ME_MAX_AGE
     else:
         max_age = None
-    response = make_response(jsonify(converts_keys(data, case='snake')), 200)
+    response = make_response(jsonify(converts_keys(data, case='camel')), 201)
     response.set_cookie(
         'token',
         value=token,
@@ -66,3 +66,12 @@ def logout():
         httponly=False
     )
     return response
+
+@app.route('users/me', methods=['GET'])
+def me():
+    cookies = request.cookies
+    if 'token' not in cookies:
+        return jsonify(), 401
+    data = database.users.get_user_id(**cookies)
+    data = database.users.me(**data)
+    return jsonify(converts_keys(data, case='camel'))

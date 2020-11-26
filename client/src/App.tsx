@@ -20,6 +20,7 @@ const App: React.FC = () => {
       <React.Suspense fallback={<Preloader />}>
         <Switch>
           <Route exact path="/register" component={Register} />
+          <Route path="/users" render={() => <div>User Profile</div>} />
           <Route exact path="/" component={Home} />
         </Switch>
       </React.Suspense>

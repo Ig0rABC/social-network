@@ -1,5 +1,9 @@
 import { RootState } from "../store";
 
+export const selectIsFetching = (state: RootState) => {
+  return state.posts.isFetching;
+}
+
 export const selectFilter = (state: RootState) => {
   return state.posts.filter;
 }
@@ -10,4 +14,8 @@ export const selectPosts = (state: RootState) => {
 
 export const selectTotalPostsCount = (state: RootState) => {
   return state.posts.totalPostsCount;
+}
+
+export const selectLikesInProgress = (state: RootState) => {
+  return state.posts.likesInProgress;
 }

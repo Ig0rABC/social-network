@@ -18,8 +18,7 @@ class Users(Table):
         SELECT id FROM users
         WHERE login = %(login)s
         AND password = crypt(%(password)s, password)
-        RETURNING token, id, login,
-        (SELECT photo_url FROM profiles WHERE user_id = id)
+        RETURNING token
         ''', kwargs)
 
     def get_user_id(self, **kwargs):
@@ -32,4 +31,12 @@ class Users(Table):
         self._database.execute_and_commit('''
         DELETE FROM tokens
         WHERE token = %(token)s
+        ''', kwargs)
+
+    def me(self, **kwargs):
+        return self._database.fetch_one('''
+        SELECT users.id, login, photo_url FROM users
+        INNER JOIN profiles
+        ON profiles.user_id = users.id
+        WHERE users.id = %(user_id)s
         ''', kwargs)

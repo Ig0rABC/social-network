@@ -1,4 +1,5 @@
-import { InferActions } from "../../types/flux";
+import usersAPI from "../../api/users";
+import { InferActions, Thunk } from "../../types/flux";
 import { User } from "../../types/models";
 
 const initialState = {
@@ -43,3 +44,27 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
 }
 
 export default usersReducer;
+
+export const register = (login: string, password: string): Thunk<Action> => async (dispatch) => {
+  try {
+    await usersAPI.register(login, password);
+    await usersAPI.login(login, password, false);
+    const data = await usersAPI.me();
+    dispatch(actions.setCurrentUser(data));
+  } catch { }
+}
+
+export const login = (login: string, password: string, rememberMe: boolean): Thunk<Action> => async (dispatch) => {
+  try {
+    await usersAPI.login(login, password, rememberMe);
+    const data = await usersAPI.me();
+    dispatch(actions.setCurrentUser(data));
+  } catch { }
+}
+
+export const logout = (): Thunk<Action> => async (dispatch) => {
+  try {
+    await usersAPI.logout();
+  } catch { }
+  dispatch(actions.resetCurrentUser());
+}

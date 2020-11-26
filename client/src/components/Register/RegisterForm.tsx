@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import usersAPI from "../../api/users";
-import { FormattedMessage } from "react-intl";
-import { Form, Input, Button, Checkbox } from 'antd';
+import { FormattedMessage, useIntl } from "react-intl";
+import { Form, Input, Button } from 'antd';
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 type RegisterFormValues = {
   login: string,
@@ -18,6 +19,7 @@ const tailLayout = {
 
 const LoginForm: React.FC = () => {
 
+  const intl = useIntl();
   let [isSubmitting, setSubmitting] = useState(false);
 
   const onFinish = async (values: RegisterFormValues) => {
@@ -25,7 +27,7 @@ const LoginForm: React.FC = () => {
     try {
       const data = await usersAPI.register(values.login, values.password);
       console.log(data);
-    } catch {}
+    } catch { }
     setSubmitting(false);
   };
 
@@ -36,24 +38,28 @@ const LoginForm: React.FC = () => {
   >
 
     <Form.Item name="login"
-      label={<FormattedMessage id="login" defaultMessage="login" />}
       rules={[
         {
           required: true,
           message: <FormattedMessage id="empty-login" defaultMessage="empty login" />
         }
       ]}
-    ><Input /></Form.Item>
+    ><Input prefix={<UserOutlined />} placeholder={intl.formatMessage({
+      id: "placeholders.login",
+      defaultMessage: "login"
+    })} /></Form.Item>
 
     <Form.Item name="password"
-      label={<FormattedMessage id="password" defaultMessage="password" />}
       rules={[
         {
           required: true,
           message: <FormattedMessage id="empty-password" defaultMessage="empty password" />
         }
       ]}
-    ><Input.Password /></Form.Item>
+    ><Input.Password prefix={<LockOutlined />} placeholder={intl.formatMessage({
+      id: "placeholders.password",
+      defaultMessage: "password"
+    })} /></Form.Item>
 
     <Form.Item {...tailLayout}>
       <Button type="primary" htmlType="submit" disabled={isSubmitting}>

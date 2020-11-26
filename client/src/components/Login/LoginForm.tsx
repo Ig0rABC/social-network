@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import usersAPI from "../../api/users";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Form, Input, Button, Checkbox } from 'antd';
 import { useDispatch } from "react-redux";
 import { actions } from "../../redux/reducers/users";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 type LoginFormValues = {
   login: string,
@@ -21,6 +22,7 @@ const tailLayout = {
 
 const LoginForm: React.FC = () => {
 
+  const intl = useIntl();
   const dispatch = useDispatch();
   let [isSubmitting, setSubmitting] = useState(false);
 
@@ -29,7 +31,7 @@ const LoginForm: React.FC = () => {
     try {
       const data = await usersAPI.login(values.login, values.password, values.rememberMe);
       dispatch(actions.setCurrentUser(data));
-    } catch {}
+    } catch { }
     setSubmitting(false);
   };
 
@@ -40,24 +42,28 @@ const LoginForm: React.FC = () => {
   >
 
     <Form.Item name="login"
-      label={<FormattedMessage id="login" defaultMessage="login" />}
       rules={[
         {
           required: true,
           message: <FormattedMessage id="empty-login" defaultMessage="empty login" />
         }
       ]}
-    ><Input /></Form.Item>
+    ><Input prefix={<UserOutlined />} placeholder={intl.formatMessage({
+      id: "placeholders.login",
+      defaultMessage: "login"
+    })} /></Form.Item>
 
     <Form.Item name="password"
-      label={<FormattedMessage id="password" defaultMessage="password" />}
       rules={[
         {
           required: true,
           message: <FormattedMessage id="empty-password" defaultMessage="empty password" />
         }
       ]}
-    ><Input.Password /></Form.Item>
+    ><Input.Password prefix={<LockOutlined />} placeholder={intl.formatMessage({
+      id: "placeholders.password",
+      defaultMessage: "password"
+    })} /></Form.Item>
 
     <Form.Item {...tailLayout} name="rememberMe" valuePropName="checked">
       <Checkbox>

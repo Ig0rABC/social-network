@@ -1,13 +1,12 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Button, Select } from 'antd';
-import postsAPI from "../../api/posts";
-import { Category } from "../../types/models";
 import { TagOutlined } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
-import { actions } from "../../redux/reducers/posts";
+import { Category } from "../../types/models";
+import { selectIsFetching } from "../../redux/selectors/posts";
 
-type PostFormValues = {
+export type PostFormValues = {
   category: Category,
   content: string
 }
@@ -28,34 +27,35 @@ const OPTIONS = [
   "literature", "psychology", "other", "no category"
 ];
 
-const PostForm: React.FC = () => {
+type Props = {
+  onFinish: (values: PostFormValues) => void,
+  initialValues?: {
+    category: Category,
+    content: string
+  },
+  extraComponents?: JSX.Element[]
+}
+
+const PostForm: React.FC<Props> = ({ onFinish, initialValues, extraComponents }) => {
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  let [isSubmitting, setSubmitting] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
+  const isFetcing = useSelector(selectIsFetching);
   // @ts-ignore
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
-
-  const onFinish = async (values: PostFormValues) => {
-    setSubmitting(true);
-    try {
-      const data = await postsAPI.createPost(values.category, values.content);
-      dispatch(actions.addPost(data));
-    } catch { }
-    setSubmitting(false);
-    form.resetFields();
-  };
 
   const handleChange = (selectedItems: any) => {
     setSelectedItems(selectedItems);
   };
 
-
   return <Form form={form}
     {...layout}
-    initialValues={{ category: "no category", content: "" }}
-    onFinish={onFinish}
+    initialValues={initialValues || { category: "no category", content: "" }}
+    onFinish={(values) => {
+      onFinish(values);
+      form.resetFields();
+    }}
   >
 
     <Form.Item name="category">
@@ -79,14 +79,17 @@ const PostForm: React.FC = () => {
         }
       ]}
     >
-      <Input.TextArea value="dsads" showCount maxLength={1000} minLength={10} />
+      <Input.TextArea showCount maxLength={1000} minLength={10} />
     </Form.Item>
 
     <Form.Item {...tailLayout}>
-      <Button type="primary" htmlType="submit" disabled={isSubmitting}>
+      <Button type="primary" htmlType="submit" disabled={isFetcing}>
         <FormattedMessage id="buttons.post" defaultMessage="post" />
       </Button>
     </Form.Item>
+
+    {extraComponents}
+
   </Form>
 }
 

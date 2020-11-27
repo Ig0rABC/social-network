@@ -8,9 +8,10 @@ const initialState = {
   posts: [] as Post[],
   totalPostsCount: null as number | null,
   likesInProgress: [] as number[],
+  editingPostId: null as number | null,
   filter: {
     authorId: null as number | null,
-    category: "programming" as Category,
+    category: null as Category | null,
     search: null as string | null,
     order: [] as PostOrder[],
     page: 1,
@@ -37,6 +38,25 @@ export const actions = {
   addPost: (post: Post) => ({
     type: "posts/ADD-POST",
     payload: post
+  } as const),
+  deletePost: (postId: number) => ({
+    type: "posts/DELETE-POST",
+    payload: postId
+  } as const),
+  updatePost: (postId: number, category: Category, content: string) => ({
+    type: "posts/UPDATE-POST",
+    payload: {
+      postId,
+      category,
+      content
+    }
+  } as const),
+  setEditingPostId: (postId: number) => ({
+    type: "posts/SET-EDITING-POST-ID",
+    payload: postId
+  } as const),
+  resetEditingPostId: () => ({
+    type: "posts/RESET-EDITING-POST-ID"
   } as const),
   toggleIsLikedPost: (postId: number) => ({
     type: "posts/TOGGLE-IS-LIKED-POST",
@@ -77,7 +97,36 @@ const postsReducer = (state = initialState, action: Action): InitialState => {
     case "posts/ADD-POST":
       return {
         ...state,
-        posts: [action.payload, ...state.posts]
+        posts: [action.payload, ...state.posts],
+        totalPostsCount: state.totalPostsCount as number + 1
+      }
+    case "posts/DELETE-POST":
+      return {
+        ...state,
+        posts: state.posts.filter(post => post.id !== action.payload),
+        totalPostsCount: state.totalPostsCount as number - 1
+      }
+    case "posts/UPDATE-POST":
+      return {
+        ...state,
+        posts: state.posts
+          .map(post => post.id === action.payload.postId
+            ? {
+              ...post,
+              category: action.payload.category,
+              content: action.payload.content
+            } : post
+          )
+      }
+    case "posts/SET-EDITING-POST-ID":
+      return {
+        ...state,
+        editingPostId: action.payload
+      }
+    case "posts/RESET-EDITING-POST-ID":
+      return {
+        ...state,
+        editingPostId: initialState.editingPostId
       }
     case "posts/TOGGLE-IS-LIKED-POST":
       return {
@@ -130,4 +179,20 @@ export const toggleIsLikedPost = (postId: number, isLiked: boolean): Thunk<Actio
   }
   dispatch(actions.toggleIsLikedPost(postId));
   dispatch(actions.setLikeInProgress(postId, false));
+}
+
+export const createPost = (category: Category, content: string): Thunk<Action> => async (dispatch) => {
+  const data = await postsAPI.createPost(category, content);
+  dispatch(actions.addPost(data));
+}
+
+export const deletePost = (postId: number): Thunk<Action> => async (dispatch) => {
+  await postsAPI.deletePost(postId);
+  dispatch(actions.deletePost(postId));
+}
+
+export const updatePost = (postId: number, category: Category, content: string): Thunk<Action> => async (dispatch) => {
+  await postsAPI.updatePost(postId, category, content);
+  dispatch(actions.updatePost(postId, category, content));
+  dispatch(actions.resetEditingPostId());
 }

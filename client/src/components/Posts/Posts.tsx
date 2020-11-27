@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
-import { List } from 'antd';
-import { Post } from "../../types/models";
-import { selectFilter, selectIsFetching, selectLikesInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/posts";
-import { actions, requestPosts } from "../../redux/reducers/posts";
+import { List, Form, Button } from 'antd';
+import { selectEditingPostId, selectFilter, selectIsFetching, selectLikesInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/posts";
+import { actions, createPost, deletePost, requestPosts, toggleIsLikedPost, updatePost } from "../../redux/reducers/posts";
 import PostComponent from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
+import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/users";
+import PostForm, { PostFormValues } from "./PostForm";
 
 const Posts: React.FC = () => {
 
@@ -16,17 +17,44 @@ const Posts: React.FC = () => {
   const totalPostsCount = useSelector(selectTotalPostsCount);
   const isFetching = useSelector(selectIsFetching);
   const likesInProgress = useSelector(selectLikesInProgress);
-
-  useEffect(() => {
-    dispatch(requestPosts(filter));
-  }, [])
+  const isAuthorized = useSelector(selectIsAuthorized);
+  const currentUser = useSelector(selectCurrentUser);
+  const editingPostId = useSelector(selectEditingPostId);
 
   useEffect(() => {
     dispatch(requestPosts(filter));
   }, [filter])
 
+  const handleLikeClick = (postId: number, isLiked: boolean) => () => {
+    dispatch(toggleIsLikedPost(postId, isLiked));
+  }
+
+  const handleCommentsClick = (postId: number) => () => {
+    console.log("POST COMMENTS");
+  }
+
+  const handleDeleteClick = (postId: number) => () => {
+    dispatch(deletePost(postId));
+  }
+
+  const handleUnauthorizedClick = () => {
+    console.log("ANUTHORIZED");
+  }
+
+  const onFinishCreatingPost = (values: PostFormValues) => {
+    dispatch(createPost(values.category, values.content));
+  }
+
+  const onFinishUpdatingPost = (postId: number) => (values: PostFormValues) => {
+    dispatch(updatePost(postId, values.category, values.content));
+  }
+
+  const handleCancelClick = () => {
+    dispatch(actions.resetEditingPostId());
+  }
+
   const pagination = {
-    onChange: async (page: number, pageSize: number | undefined) => {
+    onChange: (page: number, pageSize: number | undefined) => {
       dispatch(actions.setFilter({
         ...filter,
         page,
@@ -46,15 +74,40 @@ const Posts: React.FC = () => {
     disabled: isFetching,
   }
 
+  const cancelButton = (
+    <Form.Item>
+      <Button onClick={handleCancelClick}>
+        <FormattedMessage id="buttons.cancel" defaultMessage="cancel" />
+      </Button>
+    </Form.Item>
+  )
+
   return <>
-    <PostsSearchForm handleSearch={() => { }} isSubmitting={isFetching} />
+    <PostForm onFinish={onFinishCreatingPost} />
+    {/*<PostsSearchForm handleSearch={() => { }} isSubmitting={isFetching} />-*/}
     <List
       itemLayout="vertical"
       size="large"
       pagination={pagination}
       dataSource={posts}
-      renderItem={
-        (post: Post) => <PostComponent post={post} isSubmitting={likesInProgress.includes(post.id)} />
+      loading={isFetching}
+      renderItem={post => {
+        return (
+          <PostComponent {...post}
+            isAuthorized={isAuthorized}
+            isOwn={currentUser.id === post.author.id}
+            isSubmitting={likesInProgress.includes(post.id)}
+            editMode={post.id === editingPostId}
+            handleEditClick={() => dispatch(actions.setEditingPostId(post.id))}
+            handleLikeClick={handleLikeClick(post.id, post.isLiked)}
+            handleDeleteClick={handleDeleteClick(post.id)}
+            handleCommentsClick={handleCommentsClick(post.id)}
+            handleUnauthorizedClick={handleUnauthorizedClick}
+            onFinish={onFinishUpdatingPost(post.id)}
+            cancelButton={cancelButton}
+          />
+        )
+      }
       }
     />
   </>

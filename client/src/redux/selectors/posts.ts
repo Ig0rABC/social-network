@@ -19,3 +19,7 @@ export const selectTotalPostsCount = (state: RootState) => {
 export const selectLikesInProgress = (state: RootState) => {
   return state.posts.likesInProgress;
 }
+
+export const selectEditingPostId = (state: RootState) => {
+  return state.posts.editingPostId;
+}

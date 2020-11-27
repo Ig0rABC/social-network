@@ -1,82 +1,77 @@
-import React, { useState } from "react";
-import { List, Avatar, Space, Button, Tooltip } from 'antd';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { FormattedDate, FormattedMessage } from "react-intl";
+import { List, Avatar, Button } from "antd";
 import { MessageOutlined, LikeOutlined, LikeFilled } from '@ant-design/icons';
 import { Post } from "../../types/models";
-import { FormattedDate, FormattedMessage, FormattedNumber } from "react-intl";
-import { NavLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { toggleIsLikedPost } from "../../redux/reducers/posts";
+import IconCount from "../common/IconCount";
+import PostForm, { PostFormValues } from "./PostForm";
 
-type Props = {
-  icon: React.FC | "img",
-  count: number,
-  messageId: string,
-  defaultMessage: string,
-  isSubmitting?: boolean,
-  onClick: () => void
+type Props = Post & {
+  isAuthorized: boolean,
+  isSubmitting: boolean,
+  isOwn: boolean,
+  editMode: boolean,
+  handleEditClick: () => void,
+  handleDeleteClick: () => void,
+  handleLikeClick: () => void,
+  handleCommentsClick: () => void,
+  handleUnauthorizedClick: () => void,
+  onFinish: (values: PostFormValues) => void,
+  cancelButton: JSX.Element
 }
 
-const IconCount: React.FC<Props> = ({ icon, count, messageId, defaultMessage, isSubmitting, onClick }) => (
-  <Space>
-    <Tooltip title={<FormattedMessage id={messageId} defaultMessage={defaultMessage} />}>
-      <Button type="link" onClick={onClick} disabled={isSubmitting}>
-        {React.createElement(icon)}
-      </Button>
-    </Tooltip>
-    <FormattedNumber
-      value={count}
-    />
-  </Space>
-);
+const PostComponent: React.FC<Props> = ({ isAuthorized, id, category, author, content, created, isLiked, likesCount, commentsCount, isSubmitting, isOwn, editMode, handleDeleteClick, handleEditClick, handleLikeClick, handleCommentsClick, handleUnauthorizedClick, onFinish, cancelButton }) => {
 
-const PostComponent: React.FC<{ post: Post, isSubmitting: boolean }> = ({ post, isSubmitting }) => {
-
-  const dispatch = useDispatch();
-
-  const handleLikeClick = async () => {
-    dispatch(toggleIsLikedPost(post.id, post.isLiked));
+  if (editMode) {
+    return <PostForm onFinish={onFinish} initialValues={{ category, content }} extraComponents={[cancelButton]} />
   }
 
-  const handleCommentsClick = () => {
-    console.log("COMMENTS");
-  }
-
-  return (
-    <List.Item
-      key={post.id}
-      actions={[
-        <IconCount
-          icon={post.isLiked ? LikeFilled : LikeOutlined}
-          count={post.likesCount}
-          onClick={handleLikeClick}
-          messageId={post.isLiked ? "buttons.unlike" : "buttons.like"}
-          defaultMessage={post.isLiked ? "unlike" : "like"}
-          isSubmitting={isSubmitting}
-        />,
-        <IconCount
-          icon={MessageOutlined}
-          count={post.commentsCount}
-          onClick={handleCommentsClick}
-          messageId="buttons.view-comments"
-          defaultMessage="view comments"
+  return <List.Item key={id}
+    actions={[
+      <IconCount
+        icon={isLiked ? LikeFilled : LikeOutlined}
+        count={likesCount}
+        onClick={isAuthorized ? handleLikeClick : handleUnauthorizedClick}
+        messageId={isLiked ? "buttons.unlike" : "buttons.like"}
+        defaultMessage={isLiked ? "unlike" : "like"}
+        isSubmitting={isSubmitting}
+      />,
+      <IconCount
+        icon={MessageOutlined}
+        count={commentsCount}
+        onClick={isAuthorized ? handleCommentsClick : handleUnauthorizedClick}
+        messageId="buttons.view-comments"
+        defaultMessage="view comments"
+      />,
+      isOwn ? <Button onClick={handleEditClick}>
+        <FormattedMessage
+          id="buttons.edit"
+          defaultMessage="edit"
         />
-      ]}
-    >
-      <List.Item.Meta
-        title={<NavLink to={"/users/" + post.author.id}>{post.author.login}</NavLink>}
-        avatar={<NavLink to={"/users/" + post.author.id}><Avatar src={post.author.photoUrl} /></NavLink>}
-        description={
-          <FormattedDate
-            value={post.created}
-            year="numeric"
-            month="long"
-            day="numeric"
-          />
-        }
-      />
-      {post.content}
-    </List.Item>
-  )
+      </Button> : <div />,
+      isOwn ? <Button onClick={handleDeleteClick}>
+        <FormattedMessage
+          id="buttons.delete"
+          defaultMessage="delete"
+        />
+      </Button> : <div />
+    ]}
+  >
+    <List.Item.Meta
+      title={<NavLink to={"/users/" + author.id}>{author.login}</NavLink>}
+      avatar={<NavLink to={"/users/" + author.id}><Avatar src={author.photoUrl} /></NavLink>}
+      description={
+        <FormattedDate
+          value={created}
+          year="numeric"
+          month="long"
+          day="numeric"
+        />
+      }
+    />
+    {content}
+  </List.Item>
 }
 
 export default PostComponent;

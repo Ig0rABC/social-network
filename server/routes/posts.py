@@ -54,12 +54,10 @@ def update_post(post_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    data = {}
-    data.update(database.posts.get_author_id(id=post_id))
-    data.update(database.users.get_user_id(**cookies))
-    if data['user_id'] != data['author_id']:
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    data = database.posts.update(id=post_id, author_id=user_id, **payload)
+    if not data:
         return jsonify(), 401
-    data = database.posts.update(id=post_id, **payload)
     return jsonify(converts_keys(data, case='camel'))
 
 @app.route('/posts/<int:post_id>', methods=['DELETE'])

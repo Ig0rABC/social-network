@@ -9,9 +9,9 @@ const postsAPI = {
     const response = await api.post("posts", { category, content });
     return response.data;
   },
-  async updatePost(postId: number, content: string) {
+  async updatePost(postId: number, category: Category, content: string) {
     await sleep(2000);
-    const response = await api.put("posts/" + postId, { content });
+    const response = await api.put("posts/" + postId, { category, content });
     return response.data;
   },
   async deletePost(postId: number) {

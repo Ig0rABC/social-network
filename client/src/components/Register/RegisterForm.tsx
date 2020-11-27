@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { register } from "../../redux/reducers/users";
-import { useDispatch } from "react-redux";
 
 type RegisterFormValues = {
   login: string,
@@ -24,10 +24,9 @@ const LoginForm: React.FC = () => {
   const intl = useIntl();
   let [isSubmitting, setSubmitting] = useState(false);
 
-  const onFinish = async (values: RegisterFormValues) => {
+  const onFinish = (values: RegisterFormValues) => {
     setSubmitting(true);
     dispatch(register(values.login, values.password));
-    setSubmitting(false);
   };
 
   return <Form
@@ -62,7 +61,7 @@ const LoginForm: React.FC = () => {
 
     <Form.Item {...tailLayout}>
       <Button type="primary" htmlType="submit" disabled={isSubmitting}>
-        <FormattedMessage id="buttons.sign-in" defaultMessage="sign in" />
+        <FormattedMessage id="buttons.sign-up" defaultMessage="sign up" />
       </Button>
     </Form.Item>
 

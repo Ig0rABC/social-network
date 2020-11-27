@@ -67,7 +67,7 @@ def logout():
     )
     return response
 
-@app.route('users/me', methods=['GET'])
+@app.route('/users/me', methods=['GET'])
 def me():
     cookies = request.cookies
     if 'token' not in cookies:

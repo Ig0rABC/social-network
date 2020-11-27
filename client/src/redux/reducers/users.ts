@@ -45,20 +45,24 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
 
 export default usersReducer;
 
+export const me = (): Thunk<Action> => async (dispatch) => {
+  try {
+    const data = await usersAPI.me();
+    dispatch(actions.setCurrentUser(data));
+  } catch {}
+}
+
 export const register = (login: string, password: string): Thunk<Action> => async (dispatch) => {
   try {
     await usersAPI.register(login, password);
-    await usersAPI.login(login, password, false);
-    const data = await usersAPI.me();
-    dispatch(actions.setCurrentUser(data));
+    await dispatch(signIn(login, password, false));
   } catch { }
 }
 
-export const login = (login: string, password: string, rememberMe: boolean): Thunk<Action> => async (dispatch) => {
+export const signIn = (login: string, password: string, rememberMe: boolean): Thunk<Action> => async (dispatch) => {
   try {
     await usersAPI.login(login, password, rememberMe);
-    const data = await usersAPI.me();
-    dispatch(actions.setCurrentUser(data));
+    await dispatch(me());
   } catch { }
 }
 

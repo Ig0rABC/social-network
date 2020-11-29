@@ -72,6 +72,6 @@ def me():
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    data = database.users.get_user_id(**cookies)
-    data = database.users.me(**data)
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    data = database.users.me(user_id=user_id)
     return jsonify(converts_keys(data, case='camel'))

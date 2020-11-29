@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
 import { List, Form, Button } from 'antd';
 import { selectEditingPostId, selectFilter, selectIsFetching, selectLikesInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/posts";
-import { actions, createPost, deletePost, requestPosts, toggleIsLikedPost, updatePost } from "../../redux/reducers/posts";
+import { actions, createPost, deletePost, requestPosts, requestShiftedPost, setFilter, toggleIsLikedPost, updatePost } from "../../redux/reducers/posts";
 import PostComponent from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
 import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/users";
@@ -14,23 +14,31 @@ const Posts: React.FC = () => {
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
   const posts = useSelector(selectPosts);
-  const totalPostsCount = useSelector(selectTotalPostsCount);
+  const totalPostsCount = useSelector(selectTotalPostsCount) as number;
   const isFetching = useSelector(selectIsFetching);
   const likesInProgress = useSelector(selectLikesInProgress);
   const isAuthorized = useSelector(selectIsAuthorized);
   const currentUser = useSelector(selectCurrentUser);
   const editingPostId = useSelector(selectEditingPostId);
+  const lastPage = Math.ceil(totalPostsCount / filter.pageSize);
 
   useEffect(() => {
     dispatch(requestPosts(filter));
-  }, [filter])
+  }, [])
+
+  if (!isFetching &&
+    posts.length > 0 &&
+    posts.length < filter.pageSize &&
+    filter.page < lastPage) {
+    dispatch(requestShiftedPost(filter));
+  }
 
   const handleLikeClick = (postId: number, isLiked: boolean) => () => {
     dispatch(toggleIsLikedPost(postId, isLiked));
   }
 
   const handleCommentsClick = (postId: number) => () => {
-    console.log("POST COMMENTS");
+    console.log("POST COMMENTS", postId);
   }
 
   const handleDeleteClick = (postId: number) => () => {
@@ -55,7 +63,7 @@ const Posts: React.FC = () => {
 
   const pagination = {
     onChange: (page: number, pageSize: number | undefined) => {
-      dispatch(actions.setFilter({
+      dispatch(setFilter({
         ...filter,
         page,
         pageSize: pageSize as number
@@ -67,8 +75,9 @@ const Posts: React.FC = () => {
           ...range,
           total: <FormattedNumber value={total} />
         }}
-      />),
-    total: totalPostsCount as number,
+      />
+    ),
+    total: totalPostsCount,
     current: filter.page,
     pageSize: filter.pageSize,
     disabled: isFetching,
@@ -88,8 +97,8 @@ const Posts: React.FC = () => {
     <List
       itemLayout="vertical"
       size="large"
-      pagination={pagination}
       dataSource={posts}
+      pagination={pagination}
       loading={isFetching}
       renderItem={post => {
         return (

@@ -15,7 +15,7 @@ const initialState = {
     search: null as string | null,
     order: [] as PostOrder[],
     page: 1,
-    pageSize: 4 as number | undefined
+    pageSize: 4
   }
 }
 
@@ -35,13 +35,17 @@ export const actions = {
     type: "posts/SET-TOTAL-POSTS-COUNT",
     payload: totalPostsCount
   } as const),
-  addPost: (post: Post) => ({
-    type: "posts/ADD-POST",
+  addNewPost: (post: Post) => ({
+    type: "posts/ADD-NEW-POST",
     payload: post
   } as const),
   deletePost: (postId: number) => ({
     type: "posts/DELETE-POST",
     payload: postId
+  } as const),
+  addShiftedPost: (post: Post) => ({
+    type: "posts/ADD-SHIFTED-POST",
+    payload: post
   } as const),
   updatePost: (postId: number, category: Category, content: string) => ({
     type: "posts/UPDATE-POST",
@@ -94,11 +98,16 @@ const postsReducer = (state = initialState, action: Action): InitialState => {
         ...state,
         totalPostsCount: action.payload
       }
-    case "posts/ADD-POST":
+    case "posts/ADD-NEW-POST":
       return {
         ...state,
         posts: [action.payload, ...state.posts],
         totalPostsCount: state.totalPostsCount as number + 1
+      }
+    case "posts/ADD-SHIFTED-POST":
+      return {
+        ...state,
+        posts: [...state.posts, action.payload]
       }
     case "posts/DELETE-POST":
       return {
@@ -183,7 +192,7 @@ export const toggleIsLikedPost = (postId: number, isLiked: boolean): Thunk<Actio
 
 export const createPost = (category: Category, content: string): Thunk<Action> => async (dispatch) => {
   const data = await postsAPI.createPost(category, content);
-  dispatch(actions.addPost(data));
+  dispatch(actions.addNewPost(data));
 }
 
 export const deletePost = (postId: number): Thunk<Action> => async (dispatch) => {
@@ -191,8 +200,23 @@ export const deletePost = (postId: number): Thunk<Action> => async (dispatch) =>
   dispatch(actions.deletePost(postId));
 }
 
+export const requestShiftedPost = (filter: Filter): Thunk<Action> => async (dispatch) => {
+  const newFilter = {
+    ...filter,
+    page: (filter.page * filter.pageSize),
+    pageSize: 1
+  };
+  const data = await postsAPI.getPosts(newFilter);
+  dispatch(actions.addShiftedPost(data.posts[0]));
+}
+
 export const updatePost = (postId: number, category: Category, content: string): Thunk<Action> => async (dispatch) => {
   await postsAPI.updatePost(postId, category, content);
   dispatch(actions.updatePost(postId, category, content));
   dispatch(actions.resetEditingPostId());
+}
+
+export const setFilter = (filter: Filter): Thunk<Action> => async (dispatch) => {
+  dispatch(actions.setFilter(filter));
+  await dispatch(requestPosts(filter));
 }

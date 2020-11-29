@@ -36,7 +36,7 @@ type Props = {
   extraComponents?: JSX.Element[]
 }
 
-const PostForm: React.FC<Props> = ({ onFinish, initialValues, extraComponents }) => {
+const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraComponents }) => {
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -51,7 +51,7 @@ const PostForm: React.FC<Props> = ({ onFinish, initialValues, extraComponents })
 
   return <Form form={form}
     {...layout}
-    initialValues={initialValues || { category: "no category", content: "" }}
+    initialValues={initialValues}
     onFinish={(values) => {
       onFinish(values);
       form.resetFields();

@@ -1,8 +1,9 @@
 import React from "react";
+import Posts from "../Posts/Posts";
 
 const Profile: React.FC = () => {
   return <div>
-    USER PROFILE
+    <Posts authorId={1}/>
   </div>
 }
 

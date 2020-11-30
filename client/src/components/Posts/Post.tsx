@@ -6,6 +6,7 @@ import { MessageOutlined, LikeOutlined, LikeFilled } from '@ant-design/icons';
 import { Post } from "../../types/models";
 import IconCount from "../common/IconCount";
 import PostForm, { PostFormValues } from "./PostForm";
+import PostEditCancelButton from "./PostEditCancelButton";
 
 type Props = Post & {
   isAuthorized: boolean,
@@ -17,14 +18,13 @@ type Props = Post & {
   handleLikeClick: () => void,
   handleCommentsClick: () => void,
   handleUnauthorizedClick: () => void,
-  onFinish: (values: PostFormValues) => void,
-  cancelButton: JSX.Element
+  onFinish: (values: PostFormValues) => void
 }
 
-const PostComponent: React.FC<Props> = ({ isAuthorized, id, category, author, content, created, isLiked, likesCount, commentsCount, isSubmitting, isOwn, editMode, handleDeleteClick, handleEditClick, handleLikeClick, handleCommentsClick, handleUnauthorizedClick, onFinish, cancelButton }) => {
+const PostComponent: React.FC<Props> = ({ isAuthorized, id, category, author, content, created, isLiked, likesCount, commentsCount, isSubmitting, isOwn, editMode, handleDeleteClick, handleEditClick, handleLikeClick, handleCommentsClick, handleUnauthorizedClick, onFinish }) => {
 
   if (editMode) {
-    return <PostForm onFinish={onFinish} initialValues={{ category, content }} extraComponents={[cancelButton]} />
+    return <PostForm key={id} onFinish={onFinish} initialValues={{ category, content }} extraComponents={[PostEditCancelButton]} />
   }
 
   return <List.Item key={id}
@@ -49,13 +49,13 @@ const PostComponent: React.FC<Props> = ({ isAuthorized, id, category, author, co
           id="buttons.edit"
           defaultMessage="edit"
         />
-      </Button> : <div />,
+      </Button> : undefined,
       isOwn ? <Button onClick={handleDeleteClick}>
         <FormattedMessage
           id="buttons.delete"
           defaultMessage="delete"
         />
-      </Button> : <div />
+      </Button> : undefined
     ]}
   >
     <List.Item.Meta

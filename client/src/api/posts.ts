@@ -24,7 +24,9 @@ const postsAPI = {
     const response = await api.get("posts" + buildQueryString({
       category: filter.category,
       page: filter.page,
-      pageSize: filter.pageSize as number
+      pageSize: filter.pageSize,
+      content: filter.search,
+      authorId: filter.authorId
     }));
     return response.data;
   },

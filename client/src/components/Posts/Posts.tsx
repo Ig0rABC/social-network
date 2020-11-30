@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
-import { List, Form, Button } from 'antd';
+import { List } from 'antd';
 import { selectEditingPostId, selectFilter, selectIsFetching, selectLikesInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/posts";
 import { actions, createPost, deletePost, requestPosts, requestShiftedPost, setFilter, toggleIsLikedPost, updatePost } from "../../redux/reducers/posts";
 import PostComponent from "./Post";
@@ -9,7 +9,11 @@ import PostsSearchForm from "./PostsSearchForm";
 import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/users";
 import PostForm, { PostFormValues } from "./PostForm";
 
-const Posts: React.FC = () => {
+type Props = {
+  authorId?: number
+}
+
+const Posts: React.FC<Props> = ({ authorId }) => {
 
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
@@ -20,7 +24,7 @@ const Posts: React.FC = () => {
   const isAuthorized = useSelector(selectIsAuthorized);
   const currentUser = useSelector(selectCurrentUser);
   const editingPostId = useSelector(selectEditingPostId);
-  const lastPage = Math.ceil(totalPostsCount / filter.pageSize);
+  const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
 
   useEffect(() => {
     dispatch(requestPosts(filter));
@@ -29,7 +33,7 @@ const Posts: React.FC = () => {
   if (!isFetching &&
     posts.length > 0 &&
     posts.length < filter.pageSize &&
-    filter.page < lastPage) {
+    filter.page < pagesCount) {
     dispatch(requestShiftedPost(filter));
   }
 
@@ -57,10 +61,6 @@ const Posts: React.FC = () => {
     dispatch(updatePost(postId, values.category, values.content));
   }
 
-  const handleCancelClick = () => {
-    dispatch(actions.resetEditingPostId());
-  }
-
   const pagination = {
     onChange: (page: number, pageSize: number | undefined) => {
       dispatch(setFilter({
@@ -83,17 +83,13 @@ const Posts: React.FC = () => {
     disabled: isFetching,
   }
 
-  const cancelButton = (
-    <Form.Item>
-      <Button onClick={handleCancelClick}>
-        <FormattedMessage id="buttons.cancel" defaultMessage="cancel" />
-      </Button>
-    </Form.Item>
-  )
-
   return <>
-    <PostForm onFinish={onFinishCreatingPost} />
-    {/*<PostsSearchForm handleSearch={() => { }} isSubmitting={isFetching} />-*/}
+    {
+      isAuthorized && (authorId === null || currentUser.id === authorId)
+        ? <PostForm onFinish={onFinishCreatingPost} />
+        : undefined
+    }
+    <PostsSearchForm authorId={authorId} isSubmitting={isFetching} />
     <List
       itemLayout="vertical"
       size="large"
@@ -113,7 +109,6 @@ const Posts: React.FC = () => {
             handleCommentsClick={handleCommentsClick(post.id)}
             handleUnauthorizedClick={handleUnauthorizedClick}
             onFinish={onFinishUpdatingPost(post.id)}
-            cancelButton={cancelButton}
           />
         )
       }

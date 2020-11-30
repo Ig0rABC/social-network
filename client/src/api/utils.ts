@@ -9,12 +9,12 @@ type ToStringProps = {
 export const buildQueryString = (params: ToStringProps): string => {
   const queryParams = new URLSearchParams();
   for (let key in params) {
-    if (params[key] === null) { } else if (key === "page") {
-      // @ts-ignore
-      queryParams.append("offset", ((params.page - 1) * params.pageSize).toString());
+    if (params[key] === null) {
+
+    } else if (key === "page") {
+      queryParams.append("offset", ((params.page as number - 1) * (params.pageSize as number)).toString());
     } else if (key === "pageSize") {
-      // @ts-ignore
-      queryParams.append("limit", params.pageSize.toString());
+      queryParams.append("limit", (params.pageSize as number).toString());
     } else {
       // @ts-ignore
       queryParams.append(key, params[key].toString());

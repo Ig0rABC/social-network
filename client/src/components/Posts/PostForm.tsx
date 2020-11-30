@@ -33,10 +33,10 @@ type Props = {
     category: Category,
     content: string
   },
-  extraComponents?: JSX.Element[]
+  extraComponents?: React.FC[]
 }
 
-const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraComponents }) => {
+const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraComponents=[] }) => {
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();

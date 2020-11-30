@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
-import { TagOutlined } from "@ant-design/icons";
 import { PostOrder } from "../../types/models";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectFilter } from "../../redux/selectors/posts";
+import { setFilter } from "../../redux/reducers/posts";
 
 const layout = {
   labelCol: { span: 8 },
@@ -24,19 +24,40 @@ const OPTIONS: Category[] = [
 ];
 
 type Props = {
-  handleSearch: (value: string) => void,
-  isSubmitting: boolean
+  isSubmitting: boolean,
+  authorId?: number
 }
 
-const PostsSearchForm: React.FC<Props> = ({ handleSearch, isSubmitting }) => {
+const PostsSearchForm: React.FC<Props> = ({ isSubmitting, authorId }) => {
 
+  const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
   const [selectedItems, setSelectedItems] = useState([]);
   // @ts-ignore
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
 
+  useEffect(() => {
+    if (authorId) {
+      dispatch(setFilter({ ...filter, authorId }));
+    }
+    return () => {
+      dispatch(setFilter({ ...filter, authorId: null }));
+    }
+  }, [])
+
   const handleChange = (selectedItems: any) => {
     setSelectedItems(selectedItems);
+  };
+
+  const handleSearch = (search: string | null) => {
+    if (search === "") {
+      search = null;
+    }
+    dispatch(setFilter({ ...filter, search }));
+  };
+
+  const handleSelect = (category: Category) => {
+    dispatch(setFilter({ ...filter, category }));
   };
 
   return <Form {...layout}
@@ -46,7 +67,9 @@ const PostsSearchForm: React.FC<Props> = ({ handleSearch, isSubmitting }) => {
     <Form.Item name="category">
       <Select value={selectedItems}
         onChange={handleChange}
-        suffixIcon={<TagOutlined />}
+        onSelect={handleSelect}
+        loading={isSubmitting}
+        disabled={isSubmitting}
       >
         {filteredOptions.map(item => (
           <Select.Option key={item} value={item}>

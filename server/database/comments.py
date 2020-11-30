@@ -6,6 +6,9 @@ class Comments(AuthorContentTable):
         'table': 'comments',
         'model': 'comment',
         'foreign_key': 'post_id',
+        'searchable': [
+            'content'
+        ]
     }
 
     def get(self, **kwargs):
@@ -29,6 +32,10 @@ class Comments(AuthorContentTable):
         ''', kwargs)
 
     def filter(self, **kwargs):
+        condition = kwargs.copy()
+        condition.pop('user_id', None)
+        if kwargs.get('content', None):
+            kwargs['content'] = '%' + kwargs['content'] + '%'
         return self._database.fetch_all('''
         SELECT comments.*, (
             SELECT count(*) AS likes_count
@@ -44,12 +51,18 @@ class Comments(AuthorContentTable):
         ), (
             SELECT photo_url FROM profiles
             WHERE author_id = profiles.user_id
-        ) FROM comments
+        ), (
+            SELECT exists(
+                SELECT true FROM post_likes
+                WHERE post_likes.user_id = %(user_id)s
+                AND post_likes.post_id = posts.id
+            ) AS is_liked
+        )FROM comments
         {condition}
         ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(condition=self.params_to_condition(**kwargs)), kwargs)
+        '''.format(condition=self.build_condition(**condition)), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''

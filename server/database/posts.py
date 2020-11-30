@@ -6,6 +6,9 @@ class Posts(AuthorContentTable):
         'table': 'posts',
         'model': 'post',
         'foreign_key': 'category',
+        'searchable': [
+            'content'
+        ]
     }
     
     def get_categories(self):
@@ -33,7 +36,9 @@ class Posts(AuthorContentTable):
 
     def filter(self, **kwargs):
         condition = kwargs.copy()
-        condition.pop('user_id')
+        condition.pop('user_id', None)
+        if kwargs.get('content', None):
+            kwargs['content'] = '%' + kwargs['content'] + '%'
         return self._database.fetch_all('''
         SELECT posts.*, (
             SELECT count(*) AS likes_count
@@ -60,7 +65,7 @@ class Posts(AuthorContentTable):
         ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(condition=self.params_to_condition(**condition)), kwargs)
+        '''.format(condition=self.build_condition(**condition)), kwargs)
 
     def create(self, **kwargs):
         return self._database.execute_with_returning('''

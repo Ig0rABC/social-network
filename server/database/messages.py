@@ -3,6 +3,12 @@ from .tables import Table
 
 class Messages(Table):
 
+    metadata = {
+        'searchable': [
+            'content'
+        ]
+    }
+
     def create(self, **kwargs):
         return self._database.execute_with_returning('''
         INSERT INTO messages

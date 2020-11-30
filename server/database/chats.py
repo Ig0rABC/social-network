@@ -3,6 +3,12 @@ from .tables import Table
 
 class Chats(Table):
 
+    metadata = {
+        'searchable': [
+            'title'
+        ]
+    }
+
     def create(self, **kwargs):
         data = self._database.execute_with_returning('''
         INSERT INTO chats
@@ -46,7 +52,7 @@ class Chats(Table):
         INNER JOIN chats_members
         ON chats.id = chats_members.chat_id
         {condition}
-        '''.format(condition=self.params_to_condition(**kwargs)), kwargs)
+        '''.format(condition=self.build_condition(**kwargs)), kwargs)
     
     def get_members(self, **kwargs):
         return self._database.fetch_all('''

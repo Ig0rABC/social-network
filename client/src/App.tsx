@@ -37,7 +37,7 @@ const App: React.FC = () => {
         <React.Suspense fallback={<Preloader />}>
           <Switch>
             <Route exact path="/register" component={Register} />
-            <Route path="/users" component={Profile} />
+            <Route path="/users/:userId?" component={Profile} />
             <Route exact path="/" component={Home} />
           </Switch>
         </React.Suspense>

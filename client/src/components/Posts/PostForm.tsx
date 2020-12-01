@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { SetStateAction, useState } from "react";
+import { useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Button, Select } from 'antd';
 import { TagOutlined } from "@ant-design/icons";
@@ -33,19 +33,18 @@ type Props = {
     category: Category,
     content: string
   },
-  extraComponents?: React.FC[]
+  extraElements?: JSX.Element[]
 }
 
-const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraComponents=[] }) => {
+const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraElements=[] }) => {
 
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
   const [selectedItems, setSelectedItems] = useState([]);
   const isFetcing = useSelector(selectIsFetching);
   // @ts-ignore
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
 
-  const handleChange = (selectedItems: any) => {
+  const handleChange = (selectedItems: SetStateAction<never[]>) => {
     setSelectedItems(selectedItems);
   };
 
@@ -88,7 +87,7 @@ const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no c
       </Button>
     </Form.Item>
 
-    {extraComponents}
+    {extraElements}
 
   </Form>
 }

@@ -4,6 +4,24 @@ export type User = {
   photoUrl: string
 }
 
+export type Contacts = {
+  email: string,
+  github: string,
+  telegram: string,
+  instagram: string,
+  vk: string
+}
+
+export type UserProfile = {
+  id: number,
+  login: string,
+  photoUrl: string,
+  firstName: string,
+  lastName: string,
+  contacts: Contacts,
+  about: string
+}
+
 export type Category = "programming" | "travels" | "countries"
   | "languages" | "politics" | "news" | "blog" | "stories"
   | "music" | "education" | "science" | "films" | "cinema"

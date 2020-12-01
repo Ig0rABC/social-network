@@ -1,6 +1,6 @@
 import usersAPI from "../../api/users";
 import { InferActions, Thunk } from "../../types/flux";
-import { User } from "../../types/models";
+import { User, UserProfile } from "../../types/models";
 
 const initialState = {
   isAuthorized: false,
@@ -8,6 +8,20 @@ const initialState = {
     id: null as number | null,
     login: null as string | null,
     photoUrl: null as string | null
+  },
+  selectedUserProfile: {
+    id: null as number | null,
+    login: null as string | null,
+    photoUrl: null as string | null,
+    firstName: null as string | null,
+    lastName: null as string | null,
+    contacts: {
+      email: null as string | null,
+      github: null as string | null,
+      telegram: null as string | null,
+      instagram: null as string | null,
+      vk: null as string | null
+    }
   }
 }
 
@@ -18,6 +32,10 @@ export const actions = {
   } as const),
   resetCurrentUser: () => ({
     type: "users/RESET-CURRENT-USER"
+  } as const),
+  setSelectedUserProfile: (userProfile: UserProfile) => ({
+    type: "users/SET-SELECTED-USER-PROFILE",
+    payload: userProfile
   } as const)
 }
 
@@ -37,6 +55,11 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
         ...state,
         isAuthorized: false,
         currentUser: initialState.currentUser
+      }
+    case "users/SET-SELECTED-USER-PROFILE":
+      return {
+        ...state,
+        selectedUserProfile: action.payload
       }
     default:
       return state;
@@ -71,4 +94,9 @@ export const logout = (): Thunk<Action> => async (dispatch) => {
     await usersAPI.logout();
   } catch { }
   dispatch(actions.resetCurrentUser());
+}
+
+export const requestUserProfile = (userId: number): Thunk<Action> => async (dispatch) => {
+  const data = await usersAPI.getUserProfile(userId);
+  dispatch(actions.setSelectedUserProfile(data));
 }

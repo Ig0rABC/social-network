@@ -39,6 +39,16 @@ def put_out_author(object):
     }
     object['author'] = author
 
+def put_out_contacts(object):
+    contacts = {
+        'email': object.pop('email'),
+        'github': object.pop('github'),
+        'telegram': object.pop('telegram'),
+        'instagram': object.pop('instagram'),
+        'vk': object.pop('vk')
+    }
+    object['contacts'] = contacts
+
 def get_params_and_payload(request):
     return [
         converts_keys(request.args.to_dict(), case='snake'),

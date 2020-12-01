@@ -7,3 +7,7 @@ export const selectCurrentUser = (state: RootState) => {
 export const selectIsAuthorized = (state: RootState) => {
   return state.users.isAuthorized;
 }
+
+export const selectSelectedUserProfile = (state: RootState) => {
+  return state.users.selectedUserProfile;
+}

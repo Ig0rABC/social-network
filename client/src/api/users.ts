@@ -22,6 +22,11 @@ const usersAPI = {
     const response = await api.delete("users/login");
     return response.data;
   },
+  async getUserProfile(userId: number) {
+    await sleep(2500);
+    const response = await api.get("users/" + userId);
+    return response.data;
+  }
 }
 
 export default usersAPI;

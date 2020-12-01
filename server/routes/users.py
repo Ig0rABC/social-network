@@ -6,7 +6,10 @@ from settings import (
     LOGIN_VALIDATOR,
     PASSWORD_VALIDATOR
 )
-from .utils import check_only_required_payload_props
+from .utils import (
+    check_only_required_payload_props,
+    put_out_contacts
+)
 from settings import REMEMBER_ME_MAX_AGE
 
 @app.route('/users/register', methods=['POST'])
@@ -74,4 +77,10 @@ def me():
         return jsonify(), 401
     user_id = database.users.get_user_id(**cookies)['user_id']
     data = database.users.me(user_id=user_id)
+    return jsonify(converts_keys(data, case='camel'))
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user_data(user_id):
+    data = database.users.get_user_data(id=user_id)
+    put_out_contacts(data)
     return jsonify(converts_keys(data, case='camel'))

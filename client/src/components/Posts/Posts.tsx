@@ -10,10 +10,10 @@ import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/use
 import PostForm, { PostFormValues } from "./PostForm";
 
 type Props = {
-  authorId?: number
+  isOwnPosts: boolean
 }
 
-const Posts: React.FC<Props> = ({ authorId }) => {
+const Posts: React.FC<Props> = ({ isOwnPosts }) => {
 
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
@@ -27,7 +27,9 @@ const Posts: React.FC<Props> = ({ authorId }) => {
   const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
 
   useEffect(() => {
-    dispatch(requestPosts(filter));
+    if (!isOwnPosts) {
+      dispatch(requestPosts(filter));
+    }
   }, [])
 
   if (!isFetching &&
@@ -83,38 +85,29 @@ const Posts: React.FC<Props> = ({ authorId }) => {
     disabled: isFetching,
   }
 
-  return <>
-    {
-      isAuthorized && (authorId === null || currentUser.id === authorId)
-        ? <PostForm onFinish={onFinishCreatingPost} />
-        : undefined
-    }
-    <PostsSearchForm authorId={authorId} isSubmitting={isFetching} />
+  return <div>
+    {isOwnPosts && <PostForm onFinish={onFinishCreatingPost} />}
+    <PostsSearchForm isSubmitting={isFetching} />
     <List
       itemLayout="vertical"
       size="large"
       dataSource={posts}
       pagination={pagination}
       loading={isFetching}
-      renderItem={post => {
-        return (
-          <PostComponent {...post}
-            isAuthorized={isAuthorized}
-            isOwn={currentUser.id === post.author.id}
-            isSubmitting={likesInProgress.includes(post.id)}
-            editMode={post.id === editingPostId}
-            handleEditClick={() => dispatch(actions.setEditingPostId(post.id))}
-            handleLikeClick={handleLikeClick(post.id, post.isLiked)}
-            handleDeleteClick={handleDeleteClick(post.id)}
-            handleCommentsClick={handleCommentsClick(post.id)}
-            handleUnauthorizedClick={handleUnauthorizedClick}
-            onFinish={onFinishUpdatingPost(post.id)}
-          />
-        )
-      }
-      }
+      renderItem={post => <PostComponent {...post}
+        isAuthorized={isAuthorized}
+        isOwn={currentUser.id === post.author.id}
+        isSubmitting={likesInProgress.includes(post.id)}
+        editMode={post.id === editingPostId}
+        handleEditClick={() => dispatch(actions.setEditingPostId(post.id))}
+        handleLikeClick={handleLikeClick(post.id, post.isLiked)}
+        handleDeleteClick={handleDeleteClick(post.id)}
+        handleCommentsClick={handleCommentsClick(post.id)}
+        handleUnauthorizedClick={handleUnauthorizedClick}
+        onFinish={onFinishUpdatingPost(post.id)}
+      />}
     />
-  </>
+  </div>
 }
 
 export default React.memo(Posts);

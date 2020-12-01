@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { FormattedDate, FormattedMessage } from "react-intl";
 import { List, Avatar, Button } from "antd";
-import { MessageOutlined, LikeOutlined, LikeFilled } from '@ant-design/icons';
+import { MessageOutlined, LikeOutlined, LikeFilled, UserOutlined } from '@ant-design/icons';
 import { Post } from "../../types/models";
 import IconCount from "../common/IconCount";
 import PostForm, { PostFormValues } from "./PostForm";
@@ -24,7 +24,7 @@ type Props = Post & {
 const PostComponent: React.FC<Props> = ({ isAuthorized, id, category, author, content, created, isLiked, likesCount, commentsCount, isSubmitting, isOwn, editMode, handleDeleteClick, handleEditClick, handleLikeClick, handleCommentsClick, handleUnauthorizedClick, onFinish }) => {
 
   if (editMode) {
-    return <PostForm key={id} onFinish={onFinish} initialValues={{ category, content }} extraComponents={[PostEditCancelButton]} />
+    return <PostForm key={id} onFinish={onFinish} initialValues={{ category, content }} extraElements={[<PostEditCancelButton/>]} />
   }
 
   return <List.Item key={id}
@@ -44,23 +44,23 @@ const PostComponent: React.FC<Props> = ({ isAuthorized, id, category, author, co
         messageId="buttons.view-comments"
         defaultMessage="view comments"
       />,
-      isOwn ? <Button onClick={handleEditClick}>
+      isOwn && <Button onClick={handleEditClick}>
         <FormattedMessage
           id="buttons.edit"
           defaultMessage="edit"
         />
-      </Button> : undefined,
-      isOwn ? <Button onClick={handleDeleteClick}>
+      </Button>,
+      isOwn && <Button onClick={handleDeleteClick} danger>
         <FormattedMessage
           id="buttons.delete"
           defaultMessage="delete"
         />
-      </Button> : undefined
+      </Button>
     ]}
   >
     <List.Item.Meta
       title={<NavLink to={"/users/" + author.id}>{author.login}</NavLink>}
-      avatar={<NavLink to={"/users/" + author.id}><Avatar src={author.photoUrl} /></NavLink>}
+      avatar={<NavLink to={"/users/" + author.id}><Avatar size={48} src={author.photoUrl} icon={<UserOutlined />} /></NavLink>}
       description={
         <FormattedDate
           value={created}

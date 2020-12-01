@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
@@ -10,9 +10,6 @@ import { setFilter } from "../../redux/reducers/posts";
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { offset: 3, span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
 };
 
 const OPTIONS: Category[] = [
@@ -28,7 +25,7 @@ type Props = {
   authorId?: number
 }
 
-const PostsSearchForm: React.FC<Props> = ({ isSubmitting, authorId }) => {
+const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
 
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
@@ -36,16 +33,7 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting, authorId }) => {
   // @ts-ignore
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
 
-  useEffect(() => {
-    if (authorId) {
-      dispatch(setFilter({ ...filter, authorId }));
-    }
-    return () => {
-      dispatch(setFilter({ ...filter, authorId: null }));
-    }
-  }, [])
-
-  const handleChange = (selectedItems: any) => {
+  const handleChange = (selectedItems:  SetStateAction<never[]>) => {
     setSelectedItems(selectedItems);
   };
 
@@ -79,7 +67,7 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting, authorId }) => {
       </Select>
     </Form.Item>
 
-    <Form.Item {...tailLayout}>
+    <Form.Item>
       <FormattedMessage id="placeholders.search" defaultMessage="search">
         {(message: string) => (
           <Input.Search

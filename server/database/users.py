@@ -40,3 +40,14 @@ class Users(Table):
         ON profiles.user_id = users.id
         WHERE users.id = %(user_id)s
         ''', kwargs)
+    
+    def get_user_data(self, **kwargs):
+        return self._database.fetch_one('''
+        SELECT login, profiles.*, contacts.*
+        FROM users
+        INNER JOIN profiles
+        ON profiles.user_id = id
+        INNER JOIN contacts
+        ON contacts.user_id = id
+        WHERE id = %(id)s
+        ''', kwargs)

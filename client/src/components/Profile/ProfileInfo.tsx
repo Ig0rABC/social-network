@@ -2,6 +2,7 @@ import React from "react";
 import { Descriptions } from 'antd';
 import { FormattedMessage } from "react-intl";
 import { UserProfile } from "../../types/models";
+import ProfileAvatar from "./ProfileAvatar";
 
 type Props = UserProfile;
 
@@ -12,6 +13,7 @@ const ProfileInfo: React.FC<Props> = ({ id, login, photoUrl, firstName, lastName
     : login
 
   return <div>
+    <ProfileAvatar photoUrl={photoUrl} />
     <Descriptions title={title} bordered>
       <Descriptions.Item label={<FormattedMessage id="about" defaultMessage="about" />} span={3}>
         {about}

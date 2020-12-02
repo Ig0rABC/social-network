@@ -2,7 +2,6 @@ import React, { SetStateAction, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
-import { PostOrder } from "../../types/models";
 import { useDispatch, useSelector } from "react-redux";
 import { selectFilter } from "../../redux/selectors/posts";
 import { setFilter } from "../../redux/reducers/posts";
@@ -77,7 +76,6 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
           />
         )}
       </FormattedMessage>
-
     </Form.Item>
 
   </Form>

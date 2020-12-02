@@ -7,14 +7,14 @@ type Props = {
   count: number,
   messageId: string,
   defaultMessage?: string,
-  isSubmitting?: boolean,
+  disabled?: boolean,
   onClick: () => void
 }
 
-const IconCount: React.FC<Props> = ({ icon, count, messageId, defaultMessage, isSubmitting, onClick }) => (
+const IconCount: React.FC<Props> = ({ icon, count, messageId, defaultMessage, disabled, onClick }) => (
   <Space>
     <Tooltip title={<FormattedMessage id={messageId} defaultMessage={defaultMessage} />}>
-      <Button type="link" onClick={onClick} disabled={isSubmitting}>
+      <Button type="link" onClick={onClick} disabled={disabled}>
         {React.createElement(icon)}
       </Button>
     </Tooltip>

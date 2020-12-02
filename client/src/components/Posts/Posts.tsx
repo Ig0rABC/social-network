@@ -39,19 +39,19 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
     dispatch(requestShiftedPost(filter));
   }
 
-  const handleLikeClick = (postId: number, isLiked: boolean) => () => {
+  const onLikeClick = (postId: number, isLiked: boolean) => () => {
     dispatch(toggleIsLikedPost(postId, isLiked));
   }
 
-  const handleCommentsClick = (postId: number) => () => {
+  const onCommentsClick = (postId: number) => () => {
     console.log("POST COMMENTS", postId);
   }
 
-  const handleDeleteClick = (postId: number) => () => {
+  const onDeleteClick = (postId: number) => () => {
     dispatch(deletePost(postId));
   }
 
-  const handleUnauthorizedClick = () => {
+  const onUnauthorizedClick = () => {
     console.log("ANUTHORIZED");
   }
 
@@ -99,11 +99,11 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
         isOwn={currentUser.id === post.author.id}
         isSubmitting={likesInProgress.includes(post.id)}
         editMode={post.id === editingPostId}
-        handleEditClick={() => dispatch(actions.setEditingPostId(post.id))}
-        handleLikeClick={handleLikeClick(post.id, post.isLiked)}
-        handleDeleteClick={handleDeleteClick(post.id)}
-        handleCommentsClick={handleCommentsClick(post.id)}
-        handleUnauthorizedClick={handleUnauthorizedClick}
+        onEditClick={() => dispatch(actions.setEditingPostId(post.id))}
+        onLikeClick={onLikeClick(post.id, post.isLiked)}
+        onDeleteClick={onDeleteClick(post.id)}
+        onCommentsClick={onCommentsClick(post.id)}
+        onUnauthorizedClick={onUnauthorizedClick}
         onFinish={onFinishUpdatingPost(post.id)}
       />}
     />

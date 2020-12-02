@@ -44,7 +44,7 @@ class Comments(AuthorContentTable):
         ), (
             SELECT count(*) AS replies_count
             FROM replies
-            WHERE comment_id = id
+            WHERE comment_id = comments.id
         ), (
             SELECT login FROM users
             WHERE author_id = users.id
@@ -53,9 +53,9 @@ class Comments(AuthorContentTable):
             WHERE author_id = profiles.user_id
         ), (
             SELECT exists(
-                SELECT true FROM post_likes
-                WHERE post_likes.user_id = %(user_id)s
-                AND post_likes.post_id = posts.id
+                SELECT true FROM comment_likes
+                WHERE comment_likes.user_id = %(user_id)s
+                AND comment_likes.comment_id = comments.id
             ) AS is_liked
         )FROM comments
         {condition}

@@ -49,9 +49,9 @@ class Replies(AuthorContentTable):
             WHERE author_id = profiles.user_id
         ), (
             SELECT exists(
-                SELECT true FROM post_likes
-                WHERE post_likes.user_id = %(user_id)s
-                AND post_likes.post_id = posts.id
+                SELECT true FROM reply_likes
+                WHERE reply_likes.user_id = %(user_id)s
+                AND reply_likes.reply_id = replies.id
             ) AS is_liked
         ) FROM replies
         {condition}

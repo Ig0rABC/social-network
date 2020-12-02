@@ -28,7 +28,12 @@ def create_comment():
 def get_comments():
     params = converts_keys(request.args.to_dict(), case='snake')
     set_filter_params(DEFAULT_COMMENT_LIMIT, MAX_COMMENT_LIMIT, params)
-    comments = database.comments.filter(**params)
+    cookies = request.cookies
+    if 'token' in cookies:
+        user_id = database.users.get_user_id(**cookies)['user_id']
+    else:
+        user_id = 0
+    comments = database.comments.filter(user_id=user_id, **params)
     for comment in comments:
         put_out_author(comment)
     return jsonify(converts_keys({

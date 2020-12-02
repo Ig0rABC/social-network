@@ -47,7 +47,7 @@ class Posts(AuthorContentTable):
         ), (
             SELECT count(*) AS comments_count
             FROM comments
-            WHERE post_id = id
+            WHERE post_id = posts.id
         ), (
             SELECT login FROM users
             WHERE author_id = users.id

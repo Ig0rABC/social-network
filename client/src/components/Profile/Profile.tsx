@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { setFilter } from "../../redux/reducers/posts";
-import { requestUserProfile } from "../../redux/reducers/users";
-import { selectFilter } from "../../redux/selectors/posts";
+import { setFilter } from "../../redux/thunks/public";
+import { requestUserProfile } from "../../redux/thunks/users";
+import { selectFilter } from "../../redux/selectors/public";
 import { selectCurrentUser, selectIsAuthorized, selectSelectedUserProfile } from "../../redux/selectors/users";
 import { UserProfile } from "../../types/models";
 import Posts from "../Posts/Posts";

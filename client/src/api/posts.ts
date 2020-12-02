@@ -1,7 +1,7 @@
 import { Category } from "../types/models";
 import api from "./config";
 import { buildQueryString, sleep } from "./utils";
-import { Filter } from "../redux/reducers/posts";
+import { Filter } from "../redux/reducers/public";
 
 const postsAPI = {
   async createPost(category: Category, content: string) {

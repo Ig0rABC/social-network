@@ -4,7 +4,7 @@ import { FormattedMessage } from "react-intl";
 import { Form, Input, Button, Select } from 'antd';
 import { TagOutlined } from "@ant-design/icons";
 import { Category } from "../../types/models";
-import { selectIsFetching } from "../../redux/selectors/posts";
+import { selectIsFetching } from "../../redux/selectors/public";
 
 export type PostFormValues = {
   category: Category,

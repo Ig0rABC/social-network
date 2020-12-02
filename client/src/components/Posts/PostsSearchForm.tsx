@@ -3,8 +3,8 @@ import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
 import { useDispatch, useSelector } from "react-redux";
-import { selectFilter } from "../../redux/selectors/posts";
-import { setFilter } from "../../redux/reducers/posts";
+import { selectFilter } from "../../redux/selectors/public";
+import { setFilter } from "../../redux/thunks/public";
 
 const layout = {
   labelCol: { span: 8 },

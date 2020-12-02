@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Button } from 'antd';
 import { useDispatch } from "react-redux";
 import { FormattedMessage } from "react-intl";
-import { actions } from "../../redux/reducers/posts";
+import actions from "../../redux/actions/public";
 
 const PostEditCancelButton = () => {
 

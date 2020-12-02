@@ -48,7 +48,7 @@ export type Comment = {
   author: User,
   created: Date,
   repliesCount: number,
-  likesCount: number
+  likesCount: number,
   isLiked: boolean
 }
 

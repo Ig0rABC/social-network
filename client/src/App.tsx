@@ -4,7 +4,7 @@ import { Switch, Route, BrowserRouter } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 import "antd/dist/antd.css";
 import languages from "./languages";
-import { initialize } from "./redux/reducers/app";
+import { initialize } from "./redux/thunks/app";
 import { selectIsInitizialied, selectLanguage } from "./redux/selectors/app";
 import Home from "./components/Home/Home";
 import Preloader from "./components/Preloader/Preloader";

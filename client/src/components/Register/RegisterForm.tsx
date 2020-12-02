@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { register } from "../../redux/reducers/users";
+import { register } from "../../redux/thunks/users";
 
 type RegisterFormValues = {
   login: string,

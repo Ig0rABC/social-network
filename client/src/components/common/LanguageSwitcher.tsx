@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectTheme } from "../../redux/selectors/app";
 import { Language } from "../../types/app";
-import { actions } from "../../redux/reducers/app";
+import actions from "../../redux/actions/app";
 import { Menu, Dropdown } from "antd";
 import { TranslationOutlined } from "@ant-design/icons";
 import { FormattedMessage } from "react-intl";

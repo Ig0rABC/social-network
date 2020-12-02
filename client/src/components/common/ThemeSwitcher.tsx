@@ -1,17 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectTheme } from "../../redux/selectors/app";
-import { Theme } from "../../types/app";
-import { actions } from "../../redux/reducers/app";
 import { FormattedMessage } from "react-intl";
-import { EyeOutlined } from "@ant-design/icons";
 import { Menu, Dropdown } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
+import { Theme } from "../../types/app";
+import { selectTheme } from "../../redux/selectors/app";
+import actions from "../../redux/actions/app";
 
 const ThemeSwitcher: React.FC = () => {
 
   const dispatch = useDispatch();
   const theme = useSelector(selectTheme);
-  
+
   const handleMenuClick = (event: any): void => {
     dispatch(actions.switchTheme(event.key as Theme));
   }

@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
 import { List } from 'antd';
-import { selectEditingPostId, selectFilter, selectIsFetching, selectLikePostsInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/public";
-import { createPost, deletePost, requestPosts, requestShiftedPost, setFilter, toggleIsLikedPost, updatePost } from "../../redux/thunks/public";
+import { selectComments, selectEditingCommentId, selectEditingPostId, selectFilter, selectIsFetching, selectLikeCommentsInProgress, selectLikePostsInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/public";
+import { createComment, createPost, deleteComment, deletePost, requestComments, requestPosts, requestShiftedPost, setFilter, toggleIsLikedComment, toggleIsLikedPost, updateComment, updatePost } from "../../redux/thunks/public";
 import actions from "../../redux/actions/public";
 import PostComponent from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
@@ -21,10 +21,13 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
   const posts = useSelector(selectPosts);
   const totalPostsCount = useSelector(selectTotalPostsCount) as number;
   const isFetching = useSelector(selectIsFetching);
-  const likesInProgress = useSelector(selectLikePostsInProgress);
+  const likePostsInProgress = useSelector(selectLikePostsInProgress);
+  const likeCommentsInProgress = useSelector(selectLikeCommentsInProgress);
   const isAuthorized = useSelector(selectIsAuthorized);
   const currentUser = useSelector(selectCurrentUser);
   const editingPostId = useSelector(selectEditingPostId);
+  const editingCommentId = useSelector(selectEditingCommentId);
+  const comments = useSelector(selectComments);
   const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
 
   useEffect(() => {
@@ -40,16 +43,33 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
     dispatch(requestShiftedPost(filter));
   }
 
-  const onLikeClick = (postId: number, isLiked: boolean) => () => {
+  const onLikePostClick = (postId: number, isLiked: boolean) => () => {
     dispatch(toggleIsLikedPost(postId, isLiked));
   }
 
-  const onCommentsClick = (postId: number) => () => {
-    console.log("POST COMMENTS", postId);
+  const onLikeCommentClick = (commentId: number, isLiked: boolean) => () => {
+    dispatch(toggleIsLikedComment(commentId, isLiked));
   }
 
-  const onDeleteClick = (postId: number) => () => {
+  const onViewCommentsClick = (postId: number) => () => {
+    console.log("POST COMMENTS", postId);
+    dispatch(requestComments(postId, null));
+  }
+
+  const onDeletePostClick = (postId: number) => () => {
     dispatch(deletePost(postId));
+  }
+
+  const onDeleteCommentClick = (commentId: number) => () => {
+    dispatch(deleteComment(commentId));
+  }
+
+  const onEditPostClick = (postId: number) => () => {
+    dispatch(actions.setEditingPostId(postId))
+  }
+
+  const onEditCommentClick = (commentId: number) => () => {
+    dispatch(actions.setEditingCommentId(commentId));
   }
 
   const onUnauthorizedClick = () => {
@@ -62,6 +82,14 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
 
   const onFinishUpdatingPost = (postId: number) => (values: PostFormValues) => {
     dispatch(updatePost(postId, values.category, values.content));
+  }
+
+  const onFinishCreatingComment = (values: any) => {
+    dispatch(createComment(values.postId, values.content))
+  }
+
+  const onFinishUpdatingComment = (commentId: number) => (values: any) => {
+    dispatch(updateComment(commentId, values.content))
   }
 
   const pagination = {
@@ -84,6 +112,7 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
     current: filter.page,
     pageSize: filter.pageSize,
     disabled: isFetching,
+    position: "both" as "both" | "top" | "bottom"
   }
 
   return <div>
@@ -95,18 +124,36 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
       dataSource={posts}
       pagination={pagination}
       loading={isFetching}
-      renderItem={post => <PostComponent {...post}
-        isAuthorized={isAuthorized}
-        isOwn={currentUser.id === post.author.id}
-        isSubmitting={likesInProgress.includes(post.id)}
-        editMode={post.id === editingPostId}
-        onEditClick={() => dispatch(actions.setEditingPostId(post.id))}
-        onLikeClick={onLikeClick(post.id, post.isLiked)}
-        onDeleteClick={onDeleteClick(post.id)}
-        onCommentsClick={onCommentsClick(post.id)}
-        onUnauthorizedClick={onUnauthorizedClick}
-        onFinish={onFinishUpdatingPost(post.id)}
-      />}
+      renderItem={post => (
+        <PostComponent post={post}
+          isAuthorized={isAuthorized}
+          currentUserId={currentUser.id as number}
+          likeInProgress={likePostsInProgress.includes(post.id)}
+          likeCommentsInProgress={likeCommentsInProgress}
+          editMode={post.id === editingPostId}
+          editingCommentId={editingCommentId as number}
+          comments={comments.filter(comment => comment.postId === post.id)}
+          handlers={{
+            posts: {
+              onLikePostClick: onLikePostClick(post.id, post.isLiked),
+              onEditPostClick: onEditPostClick(post.id),
+              onDeletePostClick: onDeletePostClick(post.id),
+              onViewCommentsClick: onViewCommentsClick(post.id),
+              onFinishCreatingPost,
+              onFinishUpdatingPost: onFinishUpdatingPost(post.id)
+            },
+            comments: {
+              onLikeCommentClick,
+              onEditCommentClick,
+              onDeleteCommentClick,
+              onFinishCreatingComment,
+              onFinishUpdatingComment
+            },
+            common: {
+              onUnauthorizedClick
+            }
+          }}
+        />)}
     />
   </div>
 }

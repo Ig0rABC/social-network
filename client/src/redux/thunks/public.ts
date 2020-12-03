@@ -57,7 +57,7 @@ export const setFilter = (filter: Filter): Thunk<Action> => async (dispatch) => 
 
 export const requestComments = (postId: number, authorId = null as number | null): Thunk<Action> => async (dispatch) => {
   const data = await commentsAPI.getComments(postId, authorId);
-  dispatch(actions.addComments(data));
+  dispatch(actions.addComments(data.comments));
 }
 
 export const createComment = (postId: number, content: string): Thunk<Action> => async (dispatch) => {
@@ -68,4 +68,19 @@ export const createComment = (postId: number, content: string): Thunk<Action> =>
 export const deleteComment = (commentId: number): Thunk<Action> => async (dispatch) => {
   await commentsAPI.deleteComment(commentId);
   dispatch(actions.deleteComment(commentId));
+}
+
+export const updateComment = (commentId: number, content: string): Thunk<Action> => async (dispatch) => {
+  await commentsAPI.updateComment(commentId, content);
+}
+
+export const toggleIsLikedComment = (commentId: number, isLiked: boolean): Thunk<Action> => async (dispatch) => {
+  dispatch(actions.setLikePostInProgress(commentId, true));
+  if (isLiked) {
+    await commentsAPI.unlikeComment(commentId);
+  } else {
+    await commentsAPI.likeComment(commentId);
+  }
+  dispatch(actions.toggleIsLikedPost(commentId));
+  dispatch(actions.setLikePostInProgress(commentId, false));
 }

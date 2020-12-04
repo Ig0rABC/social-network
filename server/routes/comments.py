@@ -48,10 +48,9 @@ def update_comment(comment_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    data = {}
-    data.update(database.users.get_user_id(**cookies))
-    data.update(database.comments.get_author_id(id=comment_id))
-    if data['user_id'] != data['author_id']:
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    author_id = database.comments.get_author_id(id=comment_id)['author_id']
+    if user_id != author_id:
         return jsonify(), 401
     data = database.comments.update(id=comment_id, **payload)
     return jsonify(converts_keys(data, case='camel'))

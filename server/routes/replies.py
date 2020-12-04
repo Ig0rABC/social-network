@@ -43,13 +43,11 @@ def update_reply(reply_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    data = {}
-    data.update(database.users.get_user_id(**cookies))
-    data.update(database.replies.get_author_id(id=reply_id))
-    if data['user_id'] != ['author_id']:
+    user_id = database.users.get_user_id(**cookies)['user_id']
+    author_id = database.replies.get_author_id(id=reply_id)['author_id']
+    if user_id != author_id:
         return jsonify(), 401
     data = database.replies.update(id=reply_id, **payload)
-    put_out_author(data)
     return jsonify(converts_keys(data, case='camel'))
 
 @app.route('/replies/<int:reply_id>', methods=['DELETE'])

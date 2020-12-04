@@ -82,9 +82,17 @@ class Comments(AuthorContentTable):
         UPDATE {table}
         SET content = %(content)s
         WHERE id = %(id)s
-        RETURNING comments.*,
-        (SELECT login FROM users WHERE users.id = %(author_id)s),
-        (SELECT photo_url FROM profiles WHERE user_id = %(author_id)s),
+        RETURNING comments.*, (
+            SELECT login FROM users
+            INNER JOIN comments
+            ON users.id = comments.author_id
+            WHERE comments.id = %(id)s
+        ), (
+            SELECT photo_url FROM profiles
+            INNER JOIN comments
+            ON profiles.user_id = comments.author_id
+            WHERE comments.id = %(id)s
+        ),
         (SELECT 0 AS likes_count),
         (SELECT 0 AS comments_count)
         '''.format(**self.metadata), kwargs)

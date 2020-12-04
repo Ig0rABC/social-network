@@ -1,4 +1,5 @@
 import { Post, Comment, Category, PostOrder } from "../../types/models";
+import actions from "../actions/app";
 import { Action } from "../actions/public";
 
 const initialState = {
@@ -7,6 +8,8 @@ const initialState = {
   totalPostsCount: null as number | null,
   likePostsInProgress: [] as number[],
   editingPostId: null as number | null,
+  openCommentsInProgress: [] as number[],
+  postsWithOpenedComments: [] as number[], // This is needed for show creation comment form to posts
   filter: {
     authorId: null as number | null,
     category: null as Category | null,
@@ -105,6 +108,19 @@ const publicReducer = (state = initialState, action: Action): InitialState => {
       return {
         ...state,
         filter: action.payload
+      }
+    case "public/SET-OPEN-POST-COMMENTS-IN-PROGRESS":
+      return {
+        ...state,
+        openCommentsInProgress: action.payload.isFetching
+          ? [...state.openCommentsInProgress, action.payload.postId]
+          : state.openCommentsInProgress
+            .filter(postId => postId !== action.payload.postId)
+      }
+    case "public/ADD-POST-WITH-OPENED-COMMENTS":
+      return {
+        ...state,
+        postsWithOpenedComments: [...state.postsWithOpenedComments, action.payload]
       }
     case "public/ADD-COMMENTS":
       return {

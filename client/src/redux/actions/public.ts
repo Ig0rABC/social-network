@@ -57,6 +57,17 @@ export const actions = {
     type: "public/SET-FILTER",
     payload: filter
   } as const),
+  setOpenPostCommentsInProgress: (postId: number, isFetching: boolean) => ({
+    type: "public/SET-OPEN-POST-COMMENTS-IN-PROGRESS",
+    payload: {
+      postId,
+      isFetching
+    }
+  } as const),
+  addPostWithOpenedComments: (postId: number) => ({
+    type: "public/ADD-POST-WITH-OPENED-COMMENTS",
+    payload: postId
+  } as const),
   addComments: (comments: Comment[]) => ({
     type: "public/ADD-COMMENTS",
     payload: comments

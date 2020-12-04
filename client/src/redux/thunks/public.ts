@@ -56,8 +56,11 @@ export const setFilter = (filter: Filter): Thunk<Action> => async (dispatch) => 
 }
 
 export const requestComments = (postId: number, authorId = null as number | null): Thunk<Action> => async (dispatch) => {
+  dispatch(actions.setOpenPostCommentsInProgress(postId, true));
   const data = await commentsAPI.getComments(postId, authorId);
   dispatch(actions.addComments(data.comments));
+  dispatch(actions.setOpenPostCommentsInProgress(postId, false));
+  dispatch(actions.addPostWithOpenedComments(postId));
 }
 
 export const createComment = (postId: number, content: string): Thunk<Action> => async (dispatch) => {

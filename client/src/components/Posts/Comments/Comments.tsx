@@ -10,6 +10,7 @@ type Props = {
   comments: CommentType[],
   editingCommentId: number,
   likeCommentsInProgress: number[],
+  openedComments: boolean,
   handlers: {
     comments: {
       onLikeCommentClick: (commentId: number, isLiked: boolean) => () => void
@@ -26,11 +27,11 @@ type Props = {
 
 const Comments: React.FC<Props> = (props) => {
 
-  const { comments, likeCommentsInProgress, editingCommentId, handlers, ...restProps } = props;
+  const { comments, likeCommentsInProgress, editingCommentId, handlers, openedComments, ...restProps } = props;
   const isEmpty = comments.length === 0;
 
   return <div>
-    {!isEmpty && <CommentForm onFinish={handlers.comments.onFinishCreatingComment} />}
+    {openedComments && <CommentForm onFinish={handlers.comments.onFinishCreatingComment} />}
     <List
       itemLayout="horizontal"
       size="default"

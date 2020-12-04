@@ -22,6 +22,7 @@ type Props = {
   likeInProgress: boolean,
   likeCommentsInProgress: number[],
   editingCommentId: number,
+  openedComments: boolean,
   handlers: {
     posts: {
       onLikePostClick: () => void,

@@ -35,3 +35,7 @@ export const selectLikeCommentsInProgress = (state: RootState) => {
 export const selectEditingCommentId = (state: RootState) => {
   return state.public.editingCommentId;
 }
+
+export const selectPostsWithOpenedComments = (state: RootState) => {
+  return state.public.postsWithOpenedComments;
+}

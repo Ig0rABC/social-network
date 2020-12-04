@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
 import { List } from 'antd';
-import { selectComments, selectEditingCommentId, selectEditingPostId, selectFilter, selectIsFetching, selectLikeCommentsInProgress, selectLikePostsInProgress, selectPosts, selectTotalPostsCount } from "../../redux/selectors/public";
+import { selectComments, selectEditingCommentId, selectEditingPostId, selectFilter, selectIsFetching, selectLikeCommentsInProgress, selectLikePostsInProgress, selectPosts, selectPostsWithOpenedComments, selectTotalPostsCount } from "../../redux/selectors/public";
 import { createComment, createPost, deleteComment, deletePost, requestComments, requestPosts, requestShiftedPost, setFilter, toggleIsLikedComment, toggleIsLikedPost, updateComment, updatePost } from "../../redux/thunks/public";
 import actions from "../../redux/actions/public";
 import PostComponent from "./Post";
@@ -29,6 +29,7 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
   const editingPostId = useSelector(selectEditingPostId);
   const editingCommentId = useSelector(selectEditingCommentId);
   const comments = useSelector(selectComments);
+  const postsWithOpenedComments = useSelector(selectPostsWithOpenedComments);
   const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
 
   useEffect(() => {
@@ -53,7 +54,14 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
   }
 
   const onViewCommentsClick = (postId: number) => () => {
-    dispatch(requestComments(postId));
+    if (!postsWithOpenedComments.includes(postId)) {
+      const post = posts.find(post => post.id === postId);
+      if (post?.commentsCount === 0) {
+        dispatch(actions.addPostWithOpenedComments(postId));
+      } else {
+        dispatch(requestComments(postId));
+      }
+    }
   }
 
   const onDeletePostClick = (postId: number) => () => {
@@ -133,6 +141,7 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
           editMode={post.id === editingPostId}
           editingCommentId={editingCommentId as number}
           comments={comments.filter(comment => comment.postId === post.id)}
+          openedComments={postsWithOpenedComments.includes(post.id)}
           handlers={{
             posts: {
               onLikePostClick: onLikePostClick(post.id, post.isLiked),

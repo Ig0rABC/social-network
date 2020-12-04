@@ -9,6 +9,7 @@ import PostComponent from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
 import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/users";
 import PostForm, { PostFormValues } from "./PostForm";
+import { CommentFormValues } from "./Comments/CommentForm";
 
 type Props = {
   isOwnPosts: boolean
@@ -52,8 +53,7 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
   }
 
   const onViewCommentsClick = (postId: number) => () => {
-    console.log("POST COMMENTS", postId);
-    dispatch(requestComments(postId, null));
+    dispatch(requestComments(postId));
   }
 
   const onDeletePostClick = (postId: number) => () => {
@@ -84,11 +84,11 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
     dispatch(updatePost(postId, values.category, values.content));
   }
 
-  const onFinishCreatingComment = (values: any) => {
-    dispatch(createComment(values.postId, values.content))
+  const onFinishCreatingComment = (postId: number) => (values: CommentFormValues) => {
+    dispatch(createComment(postId, values.content))
   }
 
-  const onFinishUpdatingComment = (commentId: number) => (values: any) => {
+  const onFinishUpdatingComment = (commentId: number) => (values: CommentFormValues) => {
     dispatch(updateComment(commentId, values.content))
   }
 
@@ -139,14 +139,13 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
               onEditPostClick: onEditPostClick(post.id),
               onDeletePostClick: onDeletePostClick(post.id),
               onViewCommentsClick: onViewCommentsClick(post.id),
-              onFinishCreatingPost,
               onFinishUpdatingPost: onFinishUpdatingPost(post.id)
             },
             comments: {
               onLikeCommentClick,
               onEditCommentClick,
               onDeleteCommentClick,
-              onFinishCreatingComment,
+              onFinishCreatingComment: onFinishCreatingComment(post.id),
               onFinishUpdatingComment
             },
             common: {

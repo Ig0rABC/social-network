@@ -3,6 +3,7 @@ import { Comment } from "antd";
 import { Post, Comment as CommentType } from "../../types/models";
 import actions from "../../redux/actions/public";
 import PostForm, { PostFormValues } from "./PostForm";
+import { CommentFormValues } from "./Comments/CommentForm";
 import AuthorAvatar from "../common/AuthorAvatar";
 import UserLink from "../common/UserLink";
 import Comments from "./Comments/Comments";
@@ -27,15 +28,14 @@ type Props = {
       onEditPostClick: () => void,
       onDeletePostClick: () => void,
       onViewCommentsClick: () => void,
-      onFinishCreatingPost: (values: PostFormValues) => void,
       onFinishUpdatingPost: (values: PostFormValues) => void,
     },
     comments: {
       onLikeCommentClick: (commentId: number, isLiked: boolean) => () => void
       onEditCommentClick: (commentId: number) => () => void,
       onDeleteCommentClick: (commentId: number) => () => void,
-      onFinishCreatingComment: (values: any) => void,
-      onFinishUpdatingComment: (commentId: number) => (values: any) => void
+      onFinishCreatingComment: (values: CommentFormValues) => void,
+      onFinishUpdatingComment: (commentId: number) => (values: CommentFormValues) => void
     },
     common: {
       onUnauthorizedClick: () => void,

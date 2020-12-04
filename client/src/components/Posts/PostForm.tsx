@@ -36,7 +36,7 @@ type Props = {
   extraElements?: JSX.Element[]
 }
 
-const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraElements=[] }) => {
+const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraElements = [] }) => {
 
   const [form] = Form.useForm();
   const [selectedItems, setSelectedItems] = useState([]);

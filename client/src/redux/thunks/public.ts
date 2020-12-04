@@ -72,15 +72,17 @@ export const deleteComment = (commentId: number): Thunk<Action> => async (dispat
 
 export const updateComment = (commentId: number, content: string): Thunk<Action> => async (dispatch) => {
   await commentsAPI.updateComment(commentId, content);
+  dispatch(actions.updateComment(commentId, content));
+  dispatch(actions.resetEditingCommentId());
 }
 
 export const toggleIsLikedComment = (commentId: number, isLiked: boolean): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setLikePostInProgress(commentId, true));
+  dispatch(actions.setLikeCommentInProgress(commentId, true));
   if (isLiked) {
     await commentsAPI.unlikeComment(commentId);
   } else {
     await commentsAPI.likeComment(commentId);
   }
-  dispatch(actions.toggleIsLikedPost(commentId));
-  dispatch(actions.setLikePostInProgress(commentId, false));
+  dispatch(actions.toggleIsLikedComment(commentId));
+  dispatch(actions.setLikeCommentInProgress(commentId, false));
 }

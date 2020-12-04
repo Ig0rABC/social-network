@@ -6,6 +6,7 @@
   "empty-login": "Please, enter your login",
   "empty-password": "Please, enter your password",
   "empty-post": "Sorry, you can't post an empty post",
+  "empty-comment": "Sorry, you can't post an empty comment",
   "loading": "Loading",
   "choose-language": "Choose Language",
   "choose-theme": "Choose Theme",

@@ -39,3 +39,19 @@ export const selectEditingCommentId = (state: RootState) => {
 export const selectPostsWithOpenedComments = (state: RootState) => {
   return state.public.postsWithOpenedComments;
 }
+
+export const selectCommentsWithOpenedReplies = (state: RootState) => {
+  return state.public.commentsWithOpenedReplies;
+}
+
+export const selectReplies = (state: RootState) => {
+  return state.public.replies;
+}
+
+export const selectLikeRepliesInProgress = (state: RootState) => {
+  return state.public.likeRepliesInProgress;
+}
+
+export const selectEditingReplyId = (state: RootState) => {
+  return state.public.editingReplyId;
+}

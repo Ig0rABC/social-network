@@ -1,4 +1,5 @@
-import { Post, Comment, Category, PostOrder } from "../../types/models";
+import { Post, Comment, Category, PostOrder, Reply } from "../../types/models";
+import actions from "../actions/app";
 import { Action } from "../actions/public";
 
 const initialState = {
@@ -7,7 +8,7 @@ const initialState = {
   totalPostsCount: null as number | null,
   likePostsInProgress: [] as number[],
   editingPostId: null as number | null,
-  openCommentsInProgress: [] as number[],
+  openPostCommentsInProgress: [] as number[],
   postsWithOpenedComments: [] as number[], // This is needed for show creation comment form to posts
   filter: {
     authorId: null as number | null,
@@ -19,7 +20,12 @@ const initialState = {
   },
   comments: [] as Comment[],
   likeCommentsInProgress: [] as number[],
-  editingCommentId: null as number | null
+  editingCommentId: null as number | null,
+  openCommentRepliesInProgress: [] as number[],
+  commentsWithOpenedReplies: [] as number[],
+  replies: [] as Reply[],
+  likeRepliesInProgress: [] as number[],
+  editingReplyId: null as number | null
 }
 
 type InitialState = typeof initialState;
@@ -111,9 +117,9 @@ const publicReducer = (state = initialState, action: Action): InitialState => {
     case "public/SET-OPEN-POST-COMMENTS-IN-PROGRESS":
       return {
         ...state,
-        openCommentsInProgress: action.payload.isFetching
-          ? [...state.openCommentsInProgress, action.payload.postId]
-          : state.openCommentsInProgress
+        openPostCommentsInProgress: action.payload.isFetching
+          ? [...state.openPostCommentsInProgress, action.payload.postId]
+          : state.openCommentRepliesInProgress
             .filter(postId => postId !== action.payload.postId)
       }
     case "public/ADD-POST-WITH-OPENED-COMMENTS":
@@ -193,6 +199,92 @@ const publicReducer = (state = initialState, action: Action): InitialState => {
           ? [...state.likeCommentsInProgress, action.payload.commentId]
           : state.likeCommentsInProgress
             .filter(commentId => commentId !== action.payload.commentId)
+      }
+    case "public/SET-OPEN-COMMENT-REPLIES-IN-PROGRESS":
+      return {
+        ...state,
+        openPostCommentsInProgress: action.payload.isFetching
+          ? [...state.openPostCommentsInProgress, action.payload.commentId]
+          : state.openPostCommentsInProgress
+            .filter(commentId => commentId !== action.payload.commentId)
+      }
+    case "public/ADD-COMMENT-WITH-OPENED-REPLIES":
+      return {
+        ...state,
+        commentsWithOpenedReplies: [...state.commentsWithOpenedReplies, action.payload]
+      }
+    case "public/ADD-REPLIES":
+      return {
+        ...state,
+        replies: [...state.replies, ...action.payload]
+      }
+    case "public/ADD-NEW-REPLY":
+      return {
+        ...state,
+        replies: [...state.replies, action.payload],
+        comments: state.comments
+          .map(comment => comment.id === action.payload.commentId
+            ? {
+              ...comment, repliesCount: comment.repliesCount + 1
+            } : comment
+          )
+      }
+    case "public/UPDATE-REPLY":
+      return {
+        ...state,
+        replies: state.replies
+          .map(reply => reply.id === action.payload.replyId
+            ? {
+              ...reply,
+              content: action.payload.content
+            } : reply
+          )
+      }
+    case "public/DELETE-REPLY":
+      const reply = state.replies.find(reply => reply.id === action.payload);
+      const commentId = reply?.commentId;
+      return {
+        ...state,
+        replies: state.replies.filter(reply => reply.id !== action.payload),
+        comments: state.comments
+          .map(comment => comment.id === commentId
+            ? {
+              ...comment,
+              repliesCount: comment.repliesCount - 1
+            } : comment
+          )
+      }
+    case "public/SET-EDITING-REPLY-ID":
+      return {
+        ...state,
+        editingReplyId: action.payload
+      }
+    case "public/RESET-EDITING-REPLY-ID":
+      return {
+        ...state,
+        editingReplyId: initialState.editingReplyId
+      }
+    case "public/TOGGLE-IS-LIKED-REPLY":
+      return {
+        ...state,
+        replies: state.replies
+          .map(reply => reply.id === action.payload
+            ? {
+              ...reply,
+              likesCount: reply.isLiked
+                ? reply.likesCount - 1
+                : reply.likesCount + 1,
+              isLiked: !reply.isLiked,
+            } : reply
+          )
+      }
+    case "public/SET-LIKE-REPLY-IN-PROGRESS":
+      return {
+        ...state,
+        likeRepliesInProgress: action.payload.isFetching
+          ? [...state.likeRepliesInProgress, action.payload.replyId]
+          : state.likeRepliesInProgress
+            .filter(commentId => commentId !== action.payload.replyId)
       }
     default:
       return state;

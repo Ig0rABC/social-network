@@ -1,9 +1,10 @@
-import postsAPI from "../../api/posts";
-import commentsAPI from "../../api/comments";
 import { Thunk } from "../../types/flux";
-import { Category } from "../../types/models";
 import actions, { Action } from "../actions/public";
+import { Category } from "../../types/models";
 import { Filter } from "../reducers/public";
+import commentsAPI from "../../api/comments";
+import postsAPI from "../../api/posts";
+import repliesAPI from "../../api/replies";
 
 export const requestPosts = (filter: Filter): Thunk<Action> => async (dispatch) => {
   dispatch(actions.setIsFetching(true));
@@ -83,4 +84,39 @@ export const toggleIsLikedComment = (commentId: number, isLiked: boolean): Thunk
   }
   dispatch(actions.toggleIsLikedComment(commentId));
   dispatch(actions.setLikeCommentInProgress(commentId, false));
+}
+
+export const requestReplies = (commentId: number): Thunk<Action> => async (dispatch) => {
+  dispatch(actions.setOpenCommentRepliesInProgress(commentId, true));
+  const data = await repliesAPI.getReplies(commentId);
+  dispatch(actions.addReplies(data.replies));
+  dispatch(actions.setOpenCommentRepliesInProgress(commentId, false));
+  dispatch(actions.addCommentWithOpenedReplies(commentId));
+}
+
+export const createReply = (commentId: number, content: string): Thunk<Action> => async (dispatch) => {
+  const data = await repliesAPI.createReply(commentId, content);
+  dispatch(actions.addNewReply(data));
+}
+
+export const updateReply = (replyId: number, content: string): Thunk<Action> => async (dispatch) => {
+  await repliesAPI.updateReply(replyId, content);
+  dispatch(actions.updateReply(replyId, content));
+  dispatch(actions.resetEitingReplyId());
+}
+
+export const deleteReply = (replyId: number): Thunk<Action> => async (dispatch) => {
+  await repliesAPI.deleteReply(replyId);
+  dispatch(actions.deleteReply(replyId));
+}
+
+export const toggleIsLikedReply = (replyId: number, isLiked: boolean): Thunk<Action> => async (dispatch) => {
+  dispatch(actions.setLikeReplyInProgress(replyId, true));
+  if (isLiked) {
+    await repliesAPI.unlikeReply(replyId);
+  } else {
+    await repliesAPI.likeReply(replyId);
+  }
+  dispatch(actions.toggleIsLikedReply(replyId));
+  dispatch(actions.setLikeReplyInProgress(replyId, false));
 }

@@ -2,14 +2,15 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
 import { List } from 'antd';
-import { selectComments, selectEditingCommentId, selectEditingPostId, selectFilter, selectIsFetching, selectLikeCommentsInProgress, selectLikePostsInProgress, selectPosts, selectPostsWithOpenedComments, selectTotalPostsCount } from "../../redux/selectors/public";
-import { createComment, createPost, deleteComment, deletePost, requestComments, requestPosts, requestShiftedPost, toggleIsLikedComment, toggleIsLikedPost, updateComment, updatePost } from "../../redux/thunks/public";
+import { selectComments, selectCommentsWithOpenedReplies, selectEditingCommentId, selectEditingPostId, selectEditingReplyId, selectFilter, selectIsFetching, selectLikeCommentsInProgress, selectLikePostsInProgress, selectLikeRepliesInProgress, selectPosts, selectPostsWithOpenedComments, selectReplies, selectTotalPostsCount } from "../../redux/selectors/public";
+import { createComment, createPost, createReply, deleteComment, deletePost, deleteReply, requestComments, requestPosts, requestReplies, requestShiftedPost, toggleIsLikedComment, toggleIsLikedPost, toggleIsLikedReply, updateComment, updatePost, updateReply } from "../../redux/thunks/public";
 import actions from "../../redux/actions/public";
 import PostComponent from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
 import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/users";
 import PostForm, { PostFormValues } from "./PostForm";
 import { CommentFormValues } from "./Comments/CommentForm";
+import { ReplyFormValues } from "./Comments/Replies/ReplyForm";
 
 type Props = {
   authorId?: number
@@ -18,19 +19,22 @@ type Props = {
 const Posts: React.FC<Props> = ({ authorId }) => {
 
   const dispatch = useDispatch();
+  const isAuthorized = useSelector(selectIsAuthorized);
+  const currentUser = useSelector(selectCurrentUser);
+  const isFetching = useSelector(selectIsFetching);
   const filter = useSelector(selectFilter);
   const posts = useSelector(selectPosts);
   const totalPostsCount = useSelector(selectTotalPostsCount) as number;
-  const isFetching = useSelector(selectIsFetching);
   const likePostsInProgress = useSelector(selectLikePostsInProgress);
-  const likeCommentsInProgress = useSelector(selectLikeCommentsInProgress);
-  const isAuthorized = useSelector(selectIsAuthorized);
-  const currentUser = useSelector(selectCurrentUser);
   const editingPostId = useSelector(selectEditingPostId);
-  const editingCommentId = useSelector(selectEditingCommentId);
-  const comments = useSelector(selectComments);
   const postsWithOpenedComments = useSelector(selectPostsWithOpenedComments);
-  const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
+  const comments = useSelector(selectComments);
+  const likeCommentsInProgress = useSelector(selectLikeCommentsInProgress);
+  const editingCommentId = useSelector(selectEditingCommentId);
+  const commentsWithOpenedReplies = useSelector(selectCommentsWithOpenedReplies);
+  const replies = useSelector(selectReplies);
+  const likeRepliesInProgress = useSelector(selectLikeRepliesInProgress);
+  const editingReplyId = useSelector(selectEditingReplyId);
 
   useEffect(() => {
     if (authorId) {
@@ -48,6 +52,7 @@ const Posts: React.FC<Props> = ({ authorId }) => {
   }, [filter])
 
   useEffect(() => {
+    const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
     if (!isFetching &&
       posts.length > 0 &&
       posts.length < filter.pageSize &&
@@ -111,6 +116,37 @@ const Posts: React.FC<Props> = ({ authorId }) => {
     dispatch(updateComment(commentId, values.content))
   }
 
+  const onViewRepliesClick = (commentId: number) => () => {
+    if (!commentsWithOpenedReplies.includes(commentId)) {
+      const comment = comments.find(comment => comment.id === commentId);
+      if (comment?.repliesCount === 0) {
+        dispatch(actions.addCommentWithOpenedReplies(commentId));
+      } else {
+        dispatch(requestReplies(commentId));
+      }
+    }
+  }
+
+  const onLikeReplyClick = (replyId: number, isLiked: boolean) => () => {
+    dispatch(toggleIsLikedReply(replyId, isLiked));
+  }
+
+  const onDeleteReplyClick = (replyId: number) => () => {
+    dispatch(deleteReply(replyId));
+  }
+
+  const onFinishCreatingReply = (commentId: number) => (values: ReplyFormValues) => {
+    dispatch(createReply(commentId, values.content));
+  }
+
+  const onFinishUpdatingReply = (replyId: number) => (values: ReplyFormValues) => {
+    dispatch(updateReply(replyId, values.content));
+  }
+
+  const onEditReplyClick = (replyId: number) => () => {
+    dispatch(actions.setEditingReplyId(replyId));
+  }
+
   const pagination = {
     onChange: (page: number, pageSize: number | undefined) => {
       dispatch(actions.setFilter({
@@ -143,36 +179,51 @@ const Posts: React.FC<Props> = ({ authorId }) => {
       dataSource={posts}
       pagination={pagination}
       loading={isFetching}
-      renderItem={post => (
-        <PostComponent post={post}
+      renderItem={post => {
+        const postComments = comments.filter(comment => comment.postId === post.id);
+        const postCommentsReplies = replies.filter(reply => postComments.find(comment => comment.id === reply.commentId));
+        return <PostComponent post={post}
           isAuthorized={isAuthorized}
           currentUserId={currentUser.id as number}
           likeInProgress={likePostsInProgress.includes(post.id)}
           likeCommentsInProgress={likeCommentsInProgress}
           editMode={post.id === editingPostId}
           editingCommentId={editingCommentId as number}
-          comments={comments.filter(comment => comment.postId === post.id)}
+          comments={postComments}
           openedComments={postsWithOpenedComments.includes(post.id)}
+          replies={postCommentsReplies}
+          editingReplyId={editingReplyId as number}
+          likeRepliesInProgress={likeRepliesInProgress}
+          commentsWithOpenedReplies={commentsWithOpenedReplies}
           handlers={{
             posts: {
-              onLikePostClick: onLikePostClick(post.id, post.isLiked),
-              onEditPostClick: onEditPostClick(post.id),
-              onDeletePostClick: onDeletePostClick(post.id),
+              onLikeClick: onLikePostClick(post.id, post.isLiked),
+              onEditClick: onEditPostClick(post.id),
+              onDeleteClick: onDeletePostClick(post.id),
               onViewCommentsClick: onViewCommentsClick(post.id),
-              onFinishUpdatingPost: onFinishUpdatingPost(post.id)
+              onFinishUpdating: onFinishUpdatingPost(post.id)
             },
             comments: {
-              onLikeCommentClick,
-              onEditCommentClick,
-              onDeleteCommentClick,
-              onFinishCreatingComment: onFinishCreatingComment(post.id),
-              onFinishUpdatingComment
+              onLikeClick: onLikeCommentClick,
+              onEditClick: onEditCommentClick,
+              onDeleteClick: onDeleteCommentClick,
+              onFinishCreating: onFinishCreatingComment,
+              onFinishUpdating: onFinishUpdatingComment,
+              onViewRepliesClick
+            },
+            replies: {
+              onLikeClick: onLikeReplyClick,
+              onEditClick: onEditReplyClick,
+              onDeleteClick: onDeleteReplyClick,
+              onFinishCreating: onFinishCreatingReply,
+              onFinishUpdating: onFinishUpdatingReply
             },
             common: {
               onUnauthorizedClick
             }
           }}
-        />)}
+        />
+      }}
     />
   </div>
 }

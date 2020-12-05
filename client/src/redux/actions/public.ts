@@ -1,5 +1,5 @@
 import { InferActions } from "../../types/flux";
-import { Category, Post, Comment } from "../../types/models";
+import { Category, Post, Comment, Reply } from "../../types/models";
 import { Filter } from "../reducers/public";
 
 export const actions = {
@@ -102,6 +102,54 @@ export const actions = {
     type: "public/SET-LIKE-COMMENT-IN-PROGRESS",
     payload: {
       commentId,
+      isFetching
+    }
+  } as const),
+  setOpenCommentRepliesInProgress: (commentId: number, isFetching: boolean) => ({
+    type: "public/SET-OPEN-COMMENT-REPLIES-IN-PROGRESS",
+    payload: {
+      commentId,
+      isFetching
+    }
+  } as const),
+  addCommentWithOpenedReplies: (commentId: number) => ({
+    type: "public/ADD-COMMENT-WITH-OPENED-REPLIES",
+    payload: commentId
+  } as const),
+  addReplies: (replies: Reply[]) => ({
+    type: "public/ADD-REPLIES",
+    payload: replies
+  } as const),
+  addNewReply: (reply: Reply) => ({
+    type: "public/ADD-NEW-REPLY",
+    payload: reply
+  } as const),
+  updateReply: (replyId: number, content: string) => ({
+    type: "public/UPDATE-REPLY",
+    payload: {
+      replyId,
+      content
+    }
+  } as const),
+  deleteReply: (replyId: number) => ({
+    type: "public/DELETE-REPLY",
+    payload: replyId
+  } as const),
+  setEditingReplyId: (replyId: number) => ({
+    type: "public/SET-EDITING-REPLY-ID",
+    payload: replyId
+  } as const),
+  resetEitingReplyId: () => ({
+    type: "public/RESET-EDITING-REPLY-ID"
+  } as const),
+  toggleIsLikedReply: (replyId: number) => ({
+    type: "public/TOGGLE-IS-LIKED-REPLY",
+    payload: replyId
+  } as const),
+  setLikeReplyInProgress: (replyId: number, isFetching: boolean) => ({
+    type: "public/SET-LIKE-REPLY-IN-PROGRESS",
+    payload: {
+      replyId,
       isFetching
     }
   } as const)

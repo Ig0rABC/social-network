@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
 import { List } from 'antd';
 import { selectComments, selectEditingCommentId, selectEditingPostId, selectFilter, selectIsFetching, selectLikeCommentsInProgress, selectLikePostsInProgress, selectPosts, selectPostsWithOpenedComments, selectTotalPostsCount } from "../../redux/selectors/public";
-import { createComment, createPost, deleteComment, deletePost, requestComments, requestPosts, requestShiftedPost, setFilter, toggleIsLikedComment, toggleIsLikedPost, updateComment, updatePost } from "../../redux/thunks/public";
+import { createComment, createPost, deleteComment, deletePost, requestComments, requestPosts, requestShiftedPost, toggleIsLikedComment, toggleIsLikedPost, updateComment, updatePost } from "../../redux/thunks/public";
 import actions from "../../redux/actions/public";
 import PostComponent from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
@@ -12,10 +12,10 @@ import PostForm, { PostFormValues } from "./PostForm";
 import { CommentFormValues } from "./Comments/CommentForm";
 
 type Props = {
-  isOwnPosts: boolean
+  authorId?: number
 }
 
-const Posts: React.FC<Props> = ({ isOwnPosts }) => {
+const Posts: React.FC<Props> = ({ authorId }) => {
 
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
@@ -33,17 +33,28 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
   const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
 
   useEffect(() => {
-    if (!isOwnPosts) {
-      dispatch(requestPosts(filter));
+    if (authorId) {
+      dispatch(actions.setFilter({ ...filter, authorId }));
     }
-  }, [])
+    return () => {
+      if (authorId) {
+        dispatch(actions.setFilter({ ...filter, authorId: null as number | null }));
+      }
+    }
+  }, [authorId])
 
-  if (!isFetching &&
-    posts.length > 0 &&
-    posts.length < filter.pageSize &&
-    filter.page < pagesCount) {
-    dispatch(requestShiftedPost(filter));
-  }
+  useEffect(() => {
+    dispatch(requestPosts(filter));
+  }, [filter])
+
+  useEffect(() => {
+    if (!isFetching &&
+      posts.length > 0 &&
+      posts.length < filter.pageSize &&
+      filter.page === pagesCount) {
+      dispatch(requestShiftedPost(filter));
+    }
+  }, [posts.length])
 
   const onLikePostClick = (postId: number, isLiked: boolean) => () => {
     dispatch(toggleIsLikedPost(postId, isLiked));
@@ -102,7 +113,7 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
 
   const pagination = {
     onChange: (page: number, pageSize: number | undefined) => {
-      dispatch(setFilter({
+      dispatch(actions.setFilter({
         ...filter,
         page,
         pageSize: pageSize as number
@@ -124,7 +135,7 @@ const Posts: React.FC<Props> = ({ isOwnPosts }) => {
   }
 
   return <div>
-    {isOwnPosts && <PostForm onFinish={onFinishCreatingPost} />}
+    {isAuthorized && <PostForm onFinish={onFinishCreatingPost} />}
     <PostsSearchForm isSubmitting={isFetching} />
     <List
       itemLayout="vertical"

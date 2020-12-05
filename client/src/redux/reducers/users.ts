@@ -19,7 +19,8 @@ const initialState = {
       telegram: null as string | null,
       instagram: null as string | null,
       vk: null as string | null
-    }
+    },
+    about: null as string | null
   }
 }
 

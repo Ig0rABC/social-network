@@ -1,11 +1,7 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { setFilter } from "../../redux/thunks/public";
-import { requestUserProfile } from "../../redux/thunks/users";
-import { selectFilter } from "../../redux/selectors/public";
-import { selectCurrentUser, selectIsAuthorized, selectSelectedUserProfile } from "../../redux/selectors/users";
-import { UserProfile } from "../../types/models";
+import { selectCurrentUser } from "../../redux/selectors/users";
 import Posts from "../Posts/Posts";
 import ProfileInfo from "./ProfileInfo";
 
@@ -15,30 +11,16 @@ type Params = {
 
 const Profile: React.FC = () => {
 
-  const dispatch = useDispatch();
-  const isAuthorized = useSelector(selectIsAuthorized);
   const currentUser = useSelector(selectCurrentUser);
-  const filter = useSelector(selectFilter);
-  const selectedUserProfile = useSelector(selectSelectedUserProfile);
   const { userId } = useParams<Params>();
 
   const authorId = Number.isNaN(userId)
-    ? currentUser.id
+    ? currentUser.id as number
     : Number(userId)
 
-  useEffect(() => {
-    if (authorId) {
-      dispatch(setFilter({ ...filter, authorId }));
-    }
-    dispatch(requestUserProfile(authorId as number));
-    return () => {
-      dispatch(setFilter({ ...filter, authorId: null as number | null }));
-    }
-  }, [])
-
   return <div>
-    <ProfileInfo {...selectedUserProfile as UserProfile}/>
-    <Posts isOwnPosts={isAuthorized && (currentUser.id === authorId)} />
+    <ProfileInfo userId={authorId} />
+    <Posts authorId={authorId} />
   </div>
 }
 

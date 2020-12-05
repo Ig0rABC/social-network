@@ -13,7 +13,7 @@ const Home: React.FC = () => {
     <ThemeSwitcher />
     <Login />
     <LogoutButton />
-    <Posts isOwnPosts={false} />
+    <Posts />
   </div>
 }
 

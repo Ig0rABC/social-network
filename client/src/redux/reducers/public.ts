@@ -1,5 +1,4 @@
 import { Post, Comment, Category, PostOrder } from "../../types/models";
-import actions from "../actions/app";
 import { Action } from "../actions/public";
 
 const initialState = {

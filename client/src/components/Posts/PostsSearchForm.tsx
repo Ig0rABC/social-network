@@ -1,10 +1,10 @@
 import React, { SetStateAction, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
-import { useDispatch, useSelector } from "react-redux";
 import { selectFilter } from "../../redux/selectors/public";
-import { setFilter } from "../../redux/thunks/public";
+import actions from "../../redux/actions/public";
 
 const layout = {
   labelCol: { span: 8 },
@@ -40,11 +40,11 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
     if (search === "") {
       search = null;
     }
-    dispatch(setFilter({ ...filter, search }));
+    dispatch(actions.setFilter({ ...filter, search }));
   };
 
   const handleSelect = (category: Category) => {
-    dispatch(setFilter({ ...filter, category }));
+    dispatch(actions.setFilter({ ...filter, category }));
   };
 
   return <Form {...layout}

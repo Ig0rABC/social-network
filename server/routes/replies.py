@@ -28,7 +28,12 @@ def create_reply():
 def get_replies():
     params = converts_keys(request.args.to_dict(), case='snake')
     set_filter_params(DEFAULT_REPLY_LIMIT, MAX_REPLY_LIMIT, params)
-    replies = database.posts.filter(**params)
+    cookies = request.cookies
+    if 'token' in cookies:
+        user_id = database.users.get_user_id(**cookies)['user_id']
+    else:
+        user_id = 0
+    replies = database.replies.filter(user_id=user_id, **params)
     for reply in replies:
         put_out_author(reply)
     return jsonify(converts_keys({

@@ -56,7 +56,7 @@ const Posts: React.FC<Props> = ({ authorId }) => {
     if (!isFetching &&
       posts.length > 0 &&
       posts.length < filter.pageSize &&
-      filter.page === pagesCount) {
+      filter.page < pagesCount) {
       dispatch(requestShiftedPost(filter));
     }
   }, [posts.length])

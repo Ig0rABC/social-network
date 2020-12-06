@@ -12,14 +12,12 @@ export type Contacts = {
   vk: string
 }
 
-export type UserProfile = {
-  id: number,
-  login: string,
-  photoUrl: string,
+export type UserProfile = User & {
   firstName: string,
   lastName: string,
   contacts: Contacts,
-  about: string
+  about: string,
+  isFollowed: boolean
 }
 
 export type Category = "programming" | "travels" | "countries"

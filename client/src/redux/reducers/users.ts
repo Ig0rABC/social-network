@@ -2,6 +2,7 @@ import { Action } from "../actions/users";
 
 const initialState = {
   isAuthorized: false,
+  followingInProgress: false,
   currentUser: {
     id: null as number | null,
     login: null as string | null,
@@ -20,7 +21,8 @@ const initialState = {
       instagram: null as string | null,
       vk: null as string | null
     },
-    about: null as string | null
+    about: null as string | null,
+    isFollowed: false
   }
 }
 
@@ -44,6 +46,19 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
       return {
         ...state,
         selectedUserProfile: action.payload
+      }
+    case "users/SET-FOLLOWING-IN-PROGRESS":
+      return {
+        ...state,
+        followingInProgress: action.payload
+      }
+    case "users/TOGGLE-IS-FOLLOWED":
+      return {
+        ...state,
+        selectedUserProfile: {
+          ...state.selectedUserProfile,
+          isFollowed: !state.selectedUserProfile.isFollowed
+        }
       }
     default:
       return state;

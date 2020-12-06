@@ -1,6 +1,7 @@
 import { Thunk } from "../../types/flux";
 import actions, { Action } from "../actions/users";
 import usersAPI from "../../api/users";
+import followAPI from "../../api/follow";
 
 export const me = (): Thunk<Action> => async (dispatch) => {
   try {
@@ -33,4 +34,15 @@ export const logout = (): Thunk<Action> => async (dispatch) => {
 export const requestUserProfile = (userId: number): Thunk<Action> => async (dispatch) => {
   const data = await usersAPI.getUserProfile(userId);
   dispatch(actions.setSelectedUserProfile(data));
+}
+
+export const toggleIsFollowed = (userId: number, isFollowed: boolean): Thunk<Action> => async (dispatch) => {
+  dispatch(actions.setFollowingInProgress(true));
+  if (isFollowed) {
+    await followAPI.unfollow(userId);
+  } else {
+    await followAPI.follow(userId);
+  }
+  dispatch(actions.toggleFollow(userId));
+  dispatch(actions.setFollowingInProgress(true));
 }

@@ -1,31 +1,21 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Descriptions } from 'antd';
-import ProfileAvatar from "./ProfileAvatar";
-import { selectSelectedUserProfile } from "../../redux/selectors/users";
-import { requestUserProfile } from "../../redux/thunks/users";
+import { UserProfile } from "../../types/models";
 
 type Props = {
-  userId: number
+  profile: UserProfile
 }
 
-const ProfileInfo: React.FC<Props> = ({ userId }) => {
+const ProfileInfo: React.FC<Props> = ({ profile }) => {
 
-  const dispatch = useDispatch();
-  const selectedUserProfile = useSelector(selectSelectedUserProfile);
-  const { login, firstName, lastName, photoUrl, contacts, about } = selectedUserProfile;
-
-  useEffect(() => {
-    dispatch(requestUserProfile(userId))
-  }, [])
+  const { login, firstName, lastName, contacts, about } = profile;
 
   const title = firstName || lastName
     ? `${login}, ${firstName} ${lastName}`
     : login
 
   return <div>
-    <ProfileAvatar photoUrl={photoUrl as string} />
     <Descriptions title={title} bordered>
       <Descriptions.Item label={<FormattedMessage id="about" defaultMessage="about" />} span={3}>
         {about}

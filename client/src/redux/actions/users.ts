@@ -12,6 +12,14 @@ const actions = {
   setSelectedUserProfile: (userProfile: UserProfile) => ({
     type: "users/SET-SELECTED-USER-PROFILE",
     payload: userProfile
+  } as const),
+  setFollowingInProgress: (isFetching: boolean) => ({
+    type: "users/SET-FOLLOWING-IN-PROGRESS",
+    payload: isFetching
+  } as const),
+  toggleFollow: (userId: number) => ({
+    type: "users/TOGGLE-IS-FOLLOWED",
+    payload: userId
   } as const)
 }
 

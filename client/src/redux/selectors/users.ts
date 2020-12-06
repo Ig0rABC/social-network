@@ -11,3 +11,7 @@ export const selectIsAuthorized = (state: RootState) => {
 export const selectSelectedUserProfile = (state: RootState) => {
   return state.users.selectedUserProfile;
 }
+
+export const selectFollowingInProgress = (state: RootState) => {
+  return state.users.followingInProgress;
+}

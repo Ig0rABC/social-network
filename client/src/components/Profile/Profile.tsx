@@ -1,9 +1,13 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { selectCurrentUser } from "../../redux/selectors/users";
+import { selectCurrentUser, selectSelectedUserProfile } from "../../redux/selectors/users";
+import { requestUserProfile } from "../../redux/thunks/users";
+import { UserProfile } from "../../types/models";
 import Posts from "../Posts/Posts";
+import ProfileAvatar from "./ProfileAvatar";
 import ProfileInfo from "./ProfileInfo";
+import ToggleFollowButton from "./ToggleFollowButton";
 
 type Params = {
   userId: string
@@ -11,15 +15,23 @@ type Params = {
 
 const Profile: React.FC = () => {
 
-  const currentUser = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
   const { userId } = useParams<Params>();
+  const currentUser = useSelector(selectCurrentUser);
+  const selectedUserProfile = useSelector(selectSelectedUserProfile) as UserProfile;
 
   const authorId = Number.isNaN(userId)
     ? currentUser.id as number
     : Number(userId)
 
+  useEffect(() => {
+    dispatch(requestUserProfile(authorId))
+  }, [authorId])
+
   return <div>
-    <ProfileInfo userId={authorId} />
+    <ProfileAvatar photoUrl={currentUser.photoUrl as string} />
+    <ToggleFollowButton userId={authorId} isFollowed={selectedUserProfile.isFollowed} />
+    <ProfileInfo profile={selectedUserProfile} />
     <Posts authorId={authorId} />
   </div>
 }

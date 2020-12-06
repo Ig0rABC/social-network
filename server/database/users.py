@@ -43,7 +43,13 @@ class Users(Table):
     
     def get_user_data(self, **kwargs):
         return self._database.fetch_one('''
-        SELECT login, profiles.*, contacts.*
+        SELECT login, profiles.*, contacts.*, (
+            SELECT exists(
+                SELECT true FROM followings
+                WHERE follower_id = %(follower_id)s
+                AND followings.user_id = %(id)s
+            ) AS is_followed
+        )
         FROM users
         INNER JOIN profiles
         ON profiles.user_id = id

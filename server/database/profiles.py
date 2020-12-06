@@ -1,5 +1,8 @@
 from .tables import UserInfoTable
 
+
 class Profiles(UserInfoTable):
 
-    table = 'profiles'
+    metadata = {
+        'table': 'profiles'
+    }

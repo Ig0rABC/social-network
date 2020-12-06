@@ -11,16 +11,16 @@ from .utils import (
     check_only_required_query_params
 )
 
-@app.route('/followings/<int:user_id>', methods=['POST'])
+@app.route('/follow/<int:user_id>', methods=['POST'])
 def follow(user_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     follower_id = database.users.get_user_id(**cookies)['user_id']
-    database.followings.follow(follower_id=follower_id, followed_id=user_id)
+    database.followings.follow(follower_id=follower_id, user_id=user_id)
     return jsonify(), 201
 
-@app.route('/followings', methods=['GET'])
+@app.route('/follow', methods=['GET'])
 def get_followings():
     cookies = request.cookies
     if 'token' not in cookies:
@@ -29,16 +29,16 @@ def get_followings():
     followings = database.followings.get_followings(**data)
     return jsonify(converts_keys({'folllowings': followings}, case='camel'))
 
-@app.route('/followings/<int:user_id>', methods=['DELETE'])
+@app.route('/follow/<int:user_id>', methods=['DELETE'])
 def unfollow(user_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     follower_id = database.users.get_user_id(**cookies)['user_id']
-    database.followings.unfollow(follower_id=follower_id, followed_id=user_id)
+    database.followings.unfollow(follower_id=follower_id, user_id=user_id)
     return jsonify(), 204
 
-@app.route('/followings/feed', methods=['GET'])
+@app.route('/feed', methods=['GET'])
 def get_feed():
     cookies = request.cookies()
     if 'token' not in cookies:

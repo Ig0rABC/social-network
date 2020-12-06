@@ -17,8 +17,8 @@ CREATE TABLE tokens(
 
 CREATE TABLE followings(
     follower_id INTEGER REFERENCES users(id),
-    followed_id INTEGER REFERENCES users(id),
-    PRIMARY KEY (follower_id, followed_id)
+    user_id INTEGER REFERENCES users(id),
+    PRIMARY KEY (follower_id, user_id)
 );
 
 CREATE TABLE profiles(

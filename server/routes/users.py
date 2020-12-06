@@ -81,6 +81,11 @@ def me():
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user_data(user_id):
-    data = database.users.get_user_data(id=user_id)
+    cookies = request.cookies
+    if 'token' in cookies:
+        follower_id = database.users.get_user_id(**cookies)['user_id']
+    else:
+        follower_id = 0
+    data = database.users.get_user_data(id=user_id, follower_id=follower_id)
     put_out_contacts(data)
     return jsonify(converts_keys(data, case='camel'))

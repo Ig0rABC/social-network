@@ -34,27 +34,27 @@ class FollowingsDatabase(TestCaseWithUsers):
     
     def test_follow_user(self):
         follower_id = self.register_user(self.USER_1)['user_id']
-        followed_id = self.register_user(self.USER_2)['user_id']
-        database.followings.follow(follower_id=follower_id, followed_id=followed_id)
+        user_id = self.register_user(self.USER_2)['user_id']
+        database.followings.follow(follower_id=follower_id, user_id=user_id)
         followings = database.followings.get_followings(follower_id=follower_id)
         self.assertEqual(len(followings), 1)
     
     def test_unfollow_user(self):
         follower_id = database.users.register(**self.USER_1)['user_id']
-        followed_id = database.users.register(**self.USER_2)['user_id']
-        database.followings.follow(follower_id=follower_id, followed_id=followed_id)
-        database.followings.unfollow(follower_id=follower_id, followed_id=followed_id)
+        user_id = database.users.register(**self.USER_2)['user_id']
+        database.followings.follow(follower_id=follower_id, user_id=user_id)
+        database.followings.unfollow(follower_id=follower_id, user_id=user_id)
         followings = database.followings.get_followings(follower_id=follower_id)
         self.assertFalse(followings)
     
     def test_get_feed(self):
         follower_id = database.users.register(**self.USER_1)['user_id']
-        followed_id = database.users.register(**self.USER_2)['user_id']
-        no_followed_id = database.users.register(**self.USER_3)['user_id']
-        database.posts.create(author_id=followed_id, **self.POST_1)
-        database.posts.create(author_id=followed_id, **self.POST_2)
-        database.posts.create(author_id=no_followed_id, **self.POST_3)
+        user_id = database.users.register(**self.USER_2)['user_id']
+        no_user_id = database.users.register(**self.USER_3)['user_id']
+        database.posts.create(author_id=user_id, **self.POST_1)
+        database.posts.create(author_id=user_id, **self.POST_2)
+        database.posts.create(author_id=no_user_id, **self.POST_3)
         database.posts.create(author_id=follower_id, **self.POST_4)
-        database.followings.follow(follower_id=follower_id, followed_id=followed_id)
+        database.followings.follow(follower_id=follower_id, user_id=user_id)
         feed = database.followings.get_feed(follower_id=follower_id, limit=10, offset=0)
         self.assertEqual(len(feed), 2)

@@ -12,7 +12,7 @@ class PostTests(PostsTestCase):
         self.assertEqual(response.status_code, 201)
         post = json.loads(response.content)
         self.assertEqual(post['id'], 1)
-        self.assertEqual(post['authorId'], 1)
+        self.assertEqual(post['author']['id'], 1)
         self.assertIn('created', post)
         self.assertEqual(post['category'], self.POST_1_PAYLOAD['category'])
         self.assertEqual(post['content'], self.POST_1_PAYLOAD['content'])
@@ -54,7 +54,7 @@ class PostTests(PostsTestCase):
         self.create_post(session, self.POST_3_PAYLOAD)
         self.create_post(session, self.POST_4_PAYLOAD)
         payload = {
-            'category': 'Programming'
+            'category': 'programming'
         }
         response = self.get_posts(payload)
         self.assertEqual(response.status_code, 200)
@@ -63,10 +63,10 @@ class PostTests(PostsTestCase):
         self.assertEqual(len(posts), 2)
         self.assertEqual(posts[0]['category'], payload['category'])
         self.assertEqual(posts[0]['content'], self.POST_4_PAYLOAD['content'])
-        self.assertEqual(posts[0]['authorId'], 2)
+        self.assertEqual(posts[0]['author']['id'], 2)
         self.assertEqual(posts[1]['category'], payload['category'])
         self.assertEqual(posts[1]['content'], self.POST_1_PAYLOAD['content'])
-        self.assertEqual(posts[1]['authorId'], 1)
+        self.assertEqual(posts[1]['author']['id'], 1)
 
     def test_get_posts_by_category_and_author_id(self):
         self.register_user(self.USER_1_PAYLOAD)
@@ -90,22 +90,19 @@ class PostTests(PostsTestCase):
         posts = data['posts']
         self.assertEqual(len(posts), 2)
         self.assertEqual(posts[0]['category'], payload['category'])
-        self.assertEqual(posts[0]['authorId'], payload['authorId'])
+        self.assertEqual(posts[0]['author']['id'], payload['authorId'])
         self.assertEqual(posts[1]['category'], payload['category'])
-        self.assertEqual(posts[1]['authorId'], payload['authorId'])
+        self.assertEqual(posts[1]['author']['id'], payload['authorId'])
 
     def test_update_post_by_author(self):
         self.register_user(self.USER_1_PAYLOAD)
         session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
-        response = self.update_post(session, {
-            'id': 1,
-            'content': self.POST_2_PAYLOAD['content']
-        })
+        response = self.update_post(session, 1, self.POST_2_PAYLOAD)
         self.assertEqual(response.status_code, 200)
         post = json.loads(response.content)
-        self.assertEqual(post['category'], self.POST_1_PAYLOAD['category'])
+        self.assertEqual(post['category'], self.POST_2_PAYLOAD['category'])
         self.assertEqual(post['content'], self.POST_2_PAYLOAD['content'])
 
     def test_update_post_not_by_author(self):
@@ -116,10 +113,7 @@ class PostTests(PostsTestCase):
         self.logout_user(session)
         self.register_user(self.USER_2_PAYLOAD)
         self.login_user(session, self.USER_2_PAYLOAD)
-        response = self.update_post(session, {
-            'id': 1,
-            'content': self.POST_2_PAYLOAD['content']
-        })
+        response = self.update_post(session, 1, self.POST_2_PAYLOAD)
         self.assertEqual(response.status_code, 401)
 
     def test_update_post_not_logged(self):
@@ -128,10 +122,7 @@ class PostTests(PostsTestCase):
         self.login_user(session, self.USER_1_PAYLOAD)
         self.create_post(session, self.POST_1_PAYLOAD)
         self.logout_user(session)
-        response = self.update_post(session, {
-            'id': 1,
-            'content': self.POST_2_PAYLOAD['content']
-        })
+        response = self.update_post(session, 1, self.POST_2_PAYLOAD)
         self.assertEqual(response.status_code, 401)
     
     def test_delete_post_by_author(self):
@@ -140,7 +131,7 @@ class PostTests(PostsTestCase):
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post = json.loads(response.content)
-        response = self.delete_post(session, {'id': post['id']})
+        response = self.delete_post(session, post['id'])
         self.assertEqual(response.status_code, 205)
 
     def test_delete_post_not_by_author(self):
@@ -152,7 +143,7 @@ class PostTests(PostsTestCase):
         post = json.loads(response.content)
         self.logout_user(session)
         self.login_user(session, self.USER_2_PAYLOAD)
-        response = self.delete_post(session, {'id': post['id']})
+        response = self.delete_post(session, post['id'])
         self.assertEqual(response.status_code, 401)
 
     def test_delete_post_not_logged(self):
@@ -162,7 +153,7 @@ class PostTests(PostsTestCase):
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post = json.loads(response.content)
         self.logout_user(session)
-        response = self.delete_post(session, {'id': post})
+        response = self.delete_post(session, post['id'])
         self.assertEqual(response.status_code, 401)
 
     def test_like_post(self):
@@ -172,7 +163,7 @@ class PostTests(PostsTestCase):
         response = self.create_post(session, self.POST_1_PAYLOAD)
         post = json.loads(response.content)
         response = self.like(session, {'post_id': post['id']})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
     
     def test_like_post_not_logged(self):
         self.register_user(self.USER_1_PAYLOAD)

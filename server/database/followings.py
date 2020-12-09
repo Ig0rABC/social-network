@@ -2,23 +2,23 @@ from .tables import Table
 
 class Followings(Table):
 
-    def follow(self, **kwargs):
-        self._database.execute_and_commit('''
+    def follow():
+        return '''
         INSERT INTO followings
         (follower_id, user_id)
         VALUES
         (%(follower_id)s, %(user_id)s)
-        ''', kwargs)
+        '''
     
-    def unfollow(self, **kwargs):
-        self._database.execute_and_commit('''
+    def unfollow():
+        return '''
         DELETE FROM followings
         WHERE follower_id = %(follower_id)s
         AND user_id = %(user_id)s
-        ''', kwargs)
+        '''
     
-    def get_feed(self, **kwargs):
-        return self._database.fetch_all('''
+    def feed():
+        return '''
         SELECT *, (
             SELECT count(*) AS likes_count
             FROM post_likes
@@ -40,18 +40,18 @@ class Followings(Table):
         ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        ''', kwargs)
+        '''
     
-    def count_feed(self, **kwargs):
-        return self._database.fetch_one('''
+    def feed_count():
+        return '''
         SELECT count(*) AS total_count FROM posts
         INNER JOIN followings
         ON author_id = user_id
         WHERE follower_id = %(follower_id)s
-        ''', kwargs)
+        '''
 
-    def get_followings(self, **kwargs):
-        return self._database.fetch_all('''
+    def get_followings():
+        return '''
         SELECT user_id, u.login, p.photo_url
         FROM followings
         INNER JOIN users AS u
@@ -59,5 +59,5 @@ class Followings(Table):
         INNER JOIN profiles AS p
         ON user_id = p.user_id
         WHERE follower_id = %(follower_id)s
-        ''', kwargs)
+        '''
         

@@ -1,2 +1,3 @@
-from .database import *
-from .routes import *
+from .users import *
+from .posts import *
+from .comments import *

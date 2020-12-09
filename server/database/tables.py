@@ -4,10 +4,7 @@ class Table:
         'searchable': []
     }
 
-    def __init__(self, database):
-        self._database = database
-
-    def build_equal_condition(self, **kwargs):
+    def build_equal_condition(**kwargs):
         if not kwargs:
             return ''
         return 'WHERE ' + ' AND '.join(
@@ -15,7 +12,7 @@ class Table:
             for k in kwargs.keys()
         )
 
-    def build_like_condition(self, **kwargs):
+    def build_like_condition(**kwargs):
         if not kwargs:
             return ''
         return 'WHERE ' + ' AND '.join(
@@ -23,18 +20,19 @@ class Table:
             for k in kwargs.keys()
         )
 
-    def build_condition(self, **kwargs):
+    @classmethod
+    def build_condition(cls, **kwargs):
         kwargs.pop('limit', None)
         kwargs.pop('offset', None)
-        condition = self.build_equal_condition(**{
+        condition = cls.build_equal_condition(**{
             k: v
             for k, v in kwargs.items()
-            if k not in self.metadata['searchable']
+            if k not in cls.metadata['searchable']
         })
-        search = self.build_like_condition(**{
+        search = cls.build_like_condition(**{
             k: v
             for k, v in kwargs.items()
-            if k in self.metadata['searchable']
+            if k in cls.metadata['searchable']
         })
         if not condition:
             if not search:
@@ -42,7 +40,7 @@ class Table:
             return search
         return condition + ' ' + search.replace('WHERE', 'AND')
 
-    def params_to_update(self, **kwargs):
+    def params_to_update(**kwargs):
         if not kwargs:
             return ''
         return 'SET ' + ', '.join(
@@ -57,24 +55,27 @@ class UserInfoTable(Table):
         'table': None
     }
 
-    def create(self, **kwargs):
-        self._database.execute_and_commit('''
+    @classmethod
+    def create(cls):
+        return '''
         INSERT INTO {0} (user_id)
         VALUES (%(user_id)s)
-        '''.format(self.metadata['table']), kwargs)
+        '''.format(cls.metadata['table'])
 
-    def get(self, **kwargs):
-        return self._database.fetch_one('''
+    @classmethod
+    def get(cls):
+        return '''
         SELECT * FROM {0}
         WHERE user_id = %(user_id)s
-        '''.format(self.metadata['table']), kwargs)
+        '''.format(cls.metadata['table'])
 
-    def update(self, **kwargs):
-        self._database.execute_and_commit('''
+    @classmethod
+    def update(cls, user_info):
+        return '''
         UPDATE {0}
         {1}
         WHERE user_id = %(user_id)s
-        '''.format(self.metadata['table'], self.params_to_update(**kwargs)), kwargs)
+        '''.format(cls.metadata['table'], cls.params_to_update(**user_info))
 
 
 class AuthorContentTable(Table):
@@ -87,39 +88,41 @@ class AuthorContentTable(Table):
         'searchable': None
     }
 
-    def count(self, **kwargs):
-        condition = kwargs.copy()
-        condition.pop('user_id', None)
-        if kwargs.get('content', None):
-            kwargs['content'] = '%' + kwargs['content'] + '%'
-        return self._database.fetch_one('''
-        SELECT count(*) AS total_count FROM {table}
-        {condition}
-        '''.format(**self.metadata, condition=self.build_condition(**condition)), kwargs)
+    @classmethod
+    def count(cls, **kwargs):
+        return '''
+        SELECT count(*) AS total_count
+        FROM {0}
+        {1}
+        '''.format(cls.metadata['table'], cls.build_condition(**kwargs))
 
-    def get_author_id(self, **kwargs):
-        return self._database.fetch_one('''
-        SELECT author_id FROM {table}
+    @classmethod
+    def get_author_id(cls):
+        return '''
+        SELECT author_id FROM {0}
         WHERE id = %(id)s
-        '''.format(**self.metadata), kwargs)
+        '''.format(cls.metadata['table'])
 
-    def delete(self, **kwargs):
-        return self._database.execute_and_commit('''
-        DELETE FROM {table}
+    @classmethod
+    def delete(cls):
+        return '''
+        DELETE FROM {0}
         WHERE id = %(id)s
-        '''.format(**self.metadata), kwargs)
+        '''.format(cls.metadata['table'])
 
-    def like(self, **kwargs):
-        self._database.execute_and_commit('''
-        INSERT INTO {model}_likes
-        (user_id, {model}_id)
+    @classmethod
+    def like(cls):
+        return '''
+        INSERT INTO {0}_likes
+        (user_id, {0}_id)
         VALUES
-        (%(user_id)s, %({model}_id)s)
-        '''.format(**self.metadata), kwargs)
+        (%(user_id)s, %({0}_id)s)
+        '''.format(cls.metadata['model'])
 
-    def unlike(self, **kwargs):
-        self._database.execute_and_commit('''
-        DELETE FROM {model}_likes
+    @classmethod
+    def unlike(cls):
+        return '''
+        DELETE FROM {0}_likes
         WHERE user_id = %(user_id)s
-        AND {model}_id = %({model}_id)s
-        '''.format(**self.metadata), kwargs)
+        AND {0}_id = %({0}_id)s
+        '''.format(cls.metadata['model'])

@@ -1,8 +1,9 @@
-from settings import app
+from logging.config import dictConfig
+from settings import app, DEBUG, LOGGING_CONFIG
 from flask import jsonify
 from flask_cors import CORS
+from exceptions import AppException
 from routes import *
-from exceptions import SocialNetworkException
 
 CORS(app)
 
@@ -14,11 +15,12 @@ def after_request(response):
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
-@app.errorhandler(SocialNetworkException)
-def social_network_handle_error(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
+@app.errorhandler(AppException)
+def handle_error(error):
+    app.logger.error(error.message)
+    return jsonify(error.to_dict()), error.status_code
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    if not DEBUG:
+        dictConfig(LOGGING_CONFIG)
+    app.run(debug=DEBUG)

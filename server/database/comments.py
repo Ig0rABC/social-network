@@ -11,8 +11,8 @@ class Comments(AuthorContentTable):
         ]
     }
 
-    def get(self, **kwargs):
-        return self._database.fetch_one('''
+    def get():
+        return '''
         SELECT comments.*, (
             SELECT count(*) AS likes_count
             FROM comment_likes
@@ -29,14 +29,11 @@ class Comments(AuthorContentTable):
             WHERE author_id = profiles.user_id
         ) FROM comments
         WHERE id = %(id)s
-        ''', kwargs)
+        '''
 
-    def filter(self, **kwargs):
-        condition = kwargs.copy()
-        condition.pop('user_id', None)
-        if kwargs.get('content', None):
-            kwargs['content'] = '%' + kwargs['content'] + '%'
-        return self._database.fetch_all('''
+    @classmethod
+    def filter(cls, **kwargs):
+        return '''
         SELECT comments.*, (
             SELECT count(*) AS likes_count
             FROM comment_likes
@@ -58,14 +55,14 @@ class Comments(AuthorContentTable):
                 AND comment_likes.comment_id = comments.id
             ) AS is_liked
         )FROM comments
-        {condition}
+        {0}
         ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(condition=self.build_condition(**condition)), kwargs)
+        '''.format(cls.build_condition(**kwargs))
 
-    def create(self, **kwargs):
-        return self._database.execute_with_returning('''
+    def create():
+        return '''
         INSERT INTO comments
         (author_id, post_id, content)
         VALUES
@@ -75,11 +72,11 @@ class Comments(AuthorContentTable):
         (SELECT photo_url FROM profiles WHERE user_id = %(author_id)s),
         (SELECT 0 AS likes_count),
         (SELECT 0 AS replies_count)
-        ''', kwargs)
+        '''
 
-    def update(self, **kwargs):
-        return self._database.execute_with_returning('''
-        UPDATE {table}
+    def update():
+        return '''
+        UPDATE comments
         SET content = %(content)s
         WHERE id = %(id)s
         RETURNING comments.*, (
@@ -95,4 +92,4 @@ class Comments(AuthorContentTable):
         ),
         (SELECT 0 AS likes_count),
         (SELECT 0 AS comments_count)
-        '''.format(**self.metadata), kwargs)
+        '''

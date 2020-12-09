@@ -9,70 +9,63 @@ class Chats(Table):
         ]
     }
 
-    def create(self, **kwargs):
-        data = self._database.execute_with_returning('''
+    def create():
+        return '''
         INSERT INTO chats
         (owner_id, title)
         VALUES
         (%(owner_id)s, %(title)s)
         RETURNING *
-        ''', kwargs)
-        kwargs.update(data)
-        self._database.execute_and_commit('''
-        INSERT INTO chats_members
-        (chat_id, user_id)
-        VALUES
-        (%(id)s, %(owner_id)s)
-        ''', kwargs)
-        return data
+        '''
 
-    def delete(self, **kwargs):
-        self._database.execute_and_commit('''
+    def delete():
+        return '''
         DELETE FROM chats
         WHERE id = %(id)s
-        ''', kwargs)
+        '''
 
-    def update(self, **kwargs):
-        return self._database.execute_with_returning('''
+    def update():
+        return '''
         UPDATE chats
-        {0}
+        SET title = %(title)s
         WHERE id = %(id)s
         RETURNING *
-        '''.format(self.params_to_update(**kwargs)), kwargs)
-    
-    def get(self, **kwargs):
-        return self._database.fetch_one('''
+        '''
+
+    def get():
+        return '''
         SELECT * FROM chats
         WHERE id = %(id)s
-        ''', kwargs)
-    
-    def filter(self, **kwargs):
-        return self._database.fetch_all('''
+        '''
+
+    @classmethod
+    def filter(cls, **kwargs):
+        return '''
         SELECT * FROM chats
         INNER JOIN chats_members
         ON chats.id = chats_members.chat_id
-        {condition}
-        '''.format(condition=self.build_condition(**kwargs)), kwargs)
-    
-    def get_members(self, **kwargs):
-        return self._database.fetch_all('''
+        {0}
+        '''.format(cls.build_condition(**kwargs))
+
+    def get_members():
+        return '''
         SELECT id AS user_id, login FROM users
         INNER JOIN chats_members
         ON user_id = id
         WHERE chat_id = %(chat_id)s
-        ''', kwargs)
-    
-    def add_member(self, **kwargs):
-        self._database.execute_and_commit('''
+        '''
+
+    def add_member():
+        return '''
         INSERT INTO chats_members
         (user_id, chat_id)
         VALUES
         (%(user_id)s, %(chat_id)s)
-        ''' , kwargs)
-    
-    def remove_member(self, **kwargs):
-        self._database.execute_and_commit('''
+        '''
+
+    def remove_member():
+        return '''
         DELETE FROM chats_members
         WHERE user_id = %(user_id)s
         AND chat_id = %(chat_id)s
-        ''', kwargs)
+        '''

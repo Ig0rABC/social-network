@@ -1,12 +1,24 @@
 from json import loads
 from flask import jsonify
 from any_case import converts_keys, to_camel_case
-from exceptions import NotOnlyRequiredPayloadProps
+from exceptions import (
+    NotOnlyRequiredPayloadProps,
+    InvalidContactsError,
+    IncorrectLoginError,
+    IncorrectPasswordError
+)
+from settings import (
+    CONTACTS_PATTERNS,
+    LOGIN_PATTERN,
+    PASSWORD_PATTERN
+)
+
 
 def are_params_safe(params):
     if 'user_id' in converts_keys(params, case='snake'):
         return False
     return True
+
 
 def set_filter_params(default_limit, max_limit, params):
     params.setdefault('limit', default_limit)
@@ -14,6 +26,7 @@ def set_filter_params(default_limit, max_limit, params):
     if params['limit'] > max_limit:
         params['limit'] = max_limit
     params.setdefault('offset', 0)
+
 
 def check_only_required_payload_props(payload, *args):
     payload = payload.copy()
@@ -23,6 +36,7 @@ def check_only_required_payload_props(payload, *args):
     if payload:
         raise NotOnlyRequiredPayloadProps(args)
 
+
 def check_only_required_query_params(params, *args):
     params = params.copy()
     for key in args:
@@ -31,23 +45,50 @@ def check_only_required_query_params(params, *args):
     if params:
         raise NotOnlyRequiredPayloadProps(args)
 
-def put_out_author(object):
-    author = {
-        'id': object.pop('author_id'),
-        'login': object.pop('login'),
-        'photo_url': object.pop('photo_url')
-    }
-    object['author'] = author
 
-def put_out_contacts(object):
-    contacts = {
-        'email': object.pop('email'),
-        'github': object.pop('github'),
-        'telegram': object.pop('telegram'),
-        'instagram': object.pop('instagram'),
-        'vk': object.pop('vk')
+def validate_login(login):
+    if not LOGIN_PATTERN.fullmatch(login):
+        raise IncorrectLoginError
+
+
+def validate_password(password):
+    if not PASSWORD_PATTERN.fullmatch(password):
+        raise IncorrectPasswordError
+
+
+def validate_contacts(contacts):
+    invalid = []
+    for key, value in contacts.items():
+        if key not in CONTACTS_PATTERNS:
+            continue
+        if not CONTACTS_PATTERNS[key].fullmatch(value):
+            invalid.append(key)
+    if invalid:
+        raise InvalidContactsError(invalid)
+
+
+def put_out_author(model):
+    author = {
+        'id': model.pop('author_id'),
+        'login': model.pop('login'),
+        'photo_url': model.pop('photo_url')
     }
-    object['contacts'] = contacts
+    model['author'] = author
+
+
+def put_out_contacts(profile):
+    contacts = {
+        'github': profile.pop('github'),
+        'telegram': profile.pop('telegram'),
+        'email': profile.pop('email'),
+        'vk': profile.pop('vk'),
+        'facebook': profile.pop('facebook'),
+        'twitter': profile.pop('twitter'),
+        'instagram': profile.pop('instagram'),
+        'phon_number': profile.pop('phone_number')
+    }
+    profile['contacts'] = contacts
+
 
 def get_params_and_payload(request):
     return [

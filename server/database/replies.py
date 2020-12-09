@@ -1,5 +1,6 @@
 from .tables import AuthorContentTable
 
+
 class Replies(AuthorContentTable):
 
     metadata = {
@@ -11,8 +12,8 @@ class Replies(AuthorContentTable):
         ]
     }
 
-    def get(self, **kwargs):
-        return self._database.fetch_one('''
+    def get():
+        return '''
         SELECT replies.*, (
             SELECT count(*) AS likes_count
             FROM reply_likes
@@ -29,14 +30,12 @@ class Replies(AuthorContentTable):
         INNER JOIN profiles
         ON author_id = profiles.user_id
         WHERE replies.id = %(id)s
-        '''.format(**self.metadata), kwargs)
+        '''
 
-    def filter(self, **kwargs):
-        condition = kwargs.copy()
-        condition.pop('user_id', None)
-        if kwargs.get('content', None):
-            kwargs['content'] = '%' + kwargs['content'] + '%'
-        return self._database.fetch_all('''
+    @classmethod
+    def filter(cls, **kwargs):
+        kwargs.pop('user_id', None)
+        return '''
         SELECT replies.*, (
             SELECT count(*) AS likes_count
             FROM reply_likes
@@ -54,28 +53,27 @@ class Replies(AuthorContentTable):
                 AND reply_likes.reply_id = replies.id
             ) AS is_liked
         ) FROM replies
-        {condition}
+        {0}
         ORDER BY id DESC
         LIMIT %(limit)s
         OFFSET %(offset)s
-        '''.format(condition=self.build_condition(**condition)), kwargs)
+        '''.format(cls.build_condition(**kwargs))
 
-    def create(self, **kwargs):
-        return self._database.execute_with_returning('''
+    def create():
+        return '''
         INSERT INTO replies
-        (author_id, {foreign_key}, content)
+        (author_id, comment_id, content)
         VALUES
-        (%(author_id)s, %({foreign_key})s, %(content)s)
+        (%(author_id)s, %(comment_id))s, %(content)s)
         RETURNING replies.*,
         (SELECT login FROM users WHERE users.id = %(author_id)s),
         (SELECT photo_url FROM profiles WHERE user_id = %(author_id)s),
         (SELECT 0 AS likes_count)
-        '''.format(**self.metadata), kwargs)
+        '''
 
-
-    def update(self, **kwargs):
-        return self._database.execute_with_returning('''
-        UPDATE {table}
+    def update():
+        return '''
+        UPDATE replies
         SET content = %(content)s
         WHERE id = %(id)s
         RETURNING replies.*, (
@@ -90,4 +88,4 @@ class Replies(AuthorContentTable):
             WHERE comments.id = %(id)s
         ),
         (SELECT 0 AS likes_count)
-        '''.format(**self.metadata), kwargs)
+        '''

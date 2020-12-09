@@ -13,7 +13,7 @@ class CommentsTests(CommentsTestCase):
         self.assertEqual(response.status_code, 201)
         comment = json.loads(response.content)
         self.assertEqual(comment['id'], 1)
-        self.assertEqual(comment['authorId'], 1)
+        self.assertEqual(comment['author']['id'], 1)
         self.assertEqual(comment['postId'], self.COMMENT_1_PAYLOAD['post_id'])
         self.assertEqual(comment['content'], self.COMMENT_1_PAYLOAD['content'])
     

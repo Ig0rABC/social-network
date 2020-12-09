@@ -20,27 +20,27 @@ class UserTests(UsersTestCase):
         response = self.register_user(payload)
         self.assertEqual(response.status_code, 401)
     
-    def test_register_user_with_no_params(self):
+    def test_register_user_with_no_payload(self):
         response = self.register_user({})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 400)
     
     def test_register_user_with_no_login(self):
         payload = self.USER_1_PAYLOAD.copy()
-        payload['login'] = ''
+        payload.pop('login')
         response = self.register_user(payload)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 400)
     
     def test_register_user_with_no_password(self):
         payload = self.USER_1_PAYLOAD.copy()
-        payload['password'] = ''
+        payload.pop('password')
         response = self.register_user(payload)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 400)
 
     def test_login_user(self):
         self.register_user(self.USER_1_PAYLOAD)
         session = Session()
         response = self.login_user(session, self.USER_1_PAYLOAD)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertTrue('token' in session.cookies)
     
     def test_login_user_when_he_already_loged(self):
@@ -48,7 +48,7 @@ class UserTests(UsersTestCase):
         session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.login_user(session, self.USER_1_PAYLOAD)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
     
     def test_login_user_when_another_user_loged(self):
         self.register_user(self.USER_1_PAYLOAD)
@@ -56,9 +56,8 @@ class UserTests(UsersTestCase):
         session = Session()
         self.login_user(session, self.USER_1_PAYLOAD)
         response = self.login_user(session, self.USER_2_PAYLOAD)
-        self.assertEqual(response.status_code, 200)
         response = self.login_user(session, self.USER_1_PAYLOAD)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
     
     def test_logout_user(self):
         self.register_user(self.USER_1_PAYLOAD)

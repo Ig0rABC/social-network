@@ -35,7 +35,10 @@ CREATE TABLE contacts(
     telegram VARCHAR(32) DEFAULT '',
     email VARCHAR(64) DEFAULT '',
     vk VARCHAR(64) DEFAULT '',
-    instagram VARCHAR(64) DEFAULT ''
+    facebook VARCHAR(64) DEFAULT '',
+    twitter VARCHAR(64) DEFAULT '',
+    instagram VARCHAR(32) DEFAULT '',
+    phone_number VARCHAR(32) DEFAULT ''
 );
 
 CREATE TABLE chats(

@@ -1,8 +1,11 @@
 from json import loads
+from psycopg2 import connect
+from psycopg2.extras import RealDictCursor
 from flask import jsonify, request
 from any_case import converts_keys
+from database import Users, Comments
 from settings import (
-    app, database,
+    app, DSN,
     DEFAULT_COMMENT_LIMIT,
     MAX_COMMENT_LIMIT
 )
@@ -19,10 +22,15 @@ def create_comment():
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    author_id = database.users.get_user_id(**cookies)['user_id']
-    data = database.comments.create(**payload, author_id=author_id)
-    put_out_author(data)
-    return jsonify(converts_keys(data, case='camel')), 201
+    with connect(DSN) as connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(Users.get_user_id(), cookies)
+            record = cursor.fetchone()
+            author_id = record['user_id']
+            cursor.execute(Comments.create(), {'author_id': author_id, **payload})
+            comment = cursor.fetchone()
+    put_out_author(comment)
+    return jsonify(converts_keys(comment, case='camel')), 201
 
 @app.route('/comments', methods=['GET'])
 def get_comments():
@@ -30,40 +38,60 @@ def get_comments():
     set_filter_params(DEFAULT_COMMENT_LIMIT, MAX_COMMENT_LIMIT, params)
     cookies = request.cookies
     if 'token' in cookies:
-        user_id = database.users.get_user_id(**cookies)['user_id']
+        with connect(DSN) as connection:
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(Users.get_user_id(), cookies)
+                record = cursor.fetchone()
     else:
         user_id = 0
-    comments = database.comments.filter(user_id=user_id, **params)
+    with connect(DSN) as connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(Comments.filter(**params), {'user_id': user_id, **params})
+            comments = cursor.fetchall()
+            cursor.execute(Comments.count(**params), params)
+            record = cursor.fetchone()
     for comment in comments:
         put_out_author(comment)
     return jsonify(converts_keys({
         'comments': comments,
-        **database.comments.count(**params)
+        **record
     }, case='camel'))
 
 @app.route('/comments/<int:comment_id>', methods=['PUT'])
 def update_comment(comment_id):
     payload = converts_keys(loads(request.data), case='snake')
-    check_only_required_payload_props(payload, 'content')
+    check_only_required_payload_props(payload, 'post_id', 'content')
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    user_id = database.users.get_user_id(**cookies)['user_id']
-    author_id = database.comments.get_author_id(id=comment_id)['author_id']
+    with connect(DSN) as connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(Users.get_user_id(), cookies)
+            user_id = cursor.fetchone()['user_id']
+            cursor.execute(Comments.get_author_id(), {'id': comment_id})
+            author_id = cursor.fetchone()['author_id']
     if user_id != author_id:
         return jsonify(), 401
-    data = database.comments.update(id=comment_id, **payload)
-    return jsonify(converts_keys(data, case='camel'))
+    with connect(DSN) as connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(Comments.update(), {'id': comment_id, **payload})
+            comment = cursor.fetchone()
+    return jsonify(converts_keys(comment, case='camel'))
 
 @app.route('/comments/<int:comment_id>', methods=['DELETE'])
 def delete_comment(comment_id):
     cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
-    data = {}
-    data.update(database.users.get_user_id(**cookies))
-    data.update(database.comments.get_author_id(id=comment_id))
-    if data['user_id'] != data['author_id']:
+    with connect(DSN) as connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(Users.get_user_id(), cookies)
+            user_id = cursor.fetchone()['user_id']
+            cursor.execute(Comments.get_author_id(), {'id': comment_id})
+            author_id = cursor.fetchone()['author_id']
+    if user_id != author_id:
         return jsonify(), 401
-    database.comments.delete(id=comment_id)
+    with connect(DSN) as connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(Comments.delete(), {'id': comment_id})
     return jsonify(), 205

@@ -1,8 +1,10 @@
+import { getObjectWithoutNullProps } from "../../utils";
 import { Action } from "../actions/users";
 
 const initialState = {
   isAuthorized: false,
   followingInProgress: false,
+  profileEditMode: false,
   currentUser: {
     id: null as number | null,
     login: null as string | null,
@@ -15,11 +17,14 @@ const initialState = {
     firstName: null as string | null,
     lastName: null as string | null,
     contacts: {
-      email: null as string | null,
       github: null as string | null,
       telegram: null as string | null,
+      email: null as string | null,
+      vk: null as string | null,
+      facebook: null as string | null,
+      twitter: null as string | null,
       instagram: null as string | null,
-      vk: null as string | null
+      phoneNumber: null as string | null
     },
     about: null as string | null,
     isFollowed: false
@@ -45,7 +50,15 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
     case "users/SET-SELECTED-USER-PROFILE":
       return {
         ...state,
-        selectedUserProfile: action.payload
+        selectedUserProfile: action.payload as typeof initialState.selectedUserProfile
+      }
+    case "users/UPDATE-SELECTED-USER-PROFILE":
+      return {
+        ...state,
+        selectedUserProfile: {
+          ...state.selectedUserProfile,
+          ...getObjectWithoutNullProps(action.payload)
+        }
       }
     case "users/SET-FOLLOWING-IN-PROGRESS":
       return {
@@ -59,6 +72,11 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
           ...state.selectedUserProfile,
           isFollowed: !state.selectedUserProfile.isFollowed
         }
+      }
+    case "users/SET-RPOFILE-EDIT-MODE":
+      return {
+        ...state,
+        profileEditMode: action.payload
       }
     default:
       return state;

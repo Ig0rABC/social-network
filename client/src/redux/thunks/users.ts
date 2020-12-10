@@ -2,12 +2,13 @@ import { Thunk } from "../../types/flux";
 import actions, { Action } from "../actions/users";
 import usersAPI from "../../api/users";
 import followAPI from "../../api/follow";
+import { ProfileInfoFormValues } from "../../components/Profile/ProfileInfo/ProfileInfoForm";
 
 export const me = (): Thunk<Action> => async (dispatch) => {
   try {
     const data = await usersAPI.me();
     dispatch(actions.setCurrentUser(data));
-  } catch {}
+  } catch { }
 }
 
 export const register = (login: string, password: string): Thunk<Action> => async (dispatch) => {
@@ -34,6 +35,12 @@ export const logout = (): Thunk<Action> => async (dispatch) => {
 export const requestUserProfile = (userId: number): Thunk<Action> => async (dispatch) => {
   const data = await usersAPI.getUserProfile(userId);
   dispatch(actions.setSelectedUserProfile(data));
+}
+
+export const updateUserProfile = (profile: ProfileInfoFormValues): Thunk<Action> => async (dispatch) => {
+  await usersAPI.updateUserProfile(profile);
+  dispatch(actions.updateSelectedUserProfile(profile));
+  dispatch(actions.setProfileEditMode(false));
 }
 
 export const toggleIsFollowed = (userId: number, isFollowed: boolean): Thunk<Action> => async (dispatch) => {

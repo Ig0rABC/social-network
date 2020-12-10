@@ -61,7 +61,7 @@ def validate_contacts(contacts):
     for key, value in contacts.items():
         if key not in CONTACTS_PATTERNS:
             continue
-        if not CONTACTS_PATTERNS[key].fullmatch(value):
+        if not (key or CONTACTS_PATTERNS[key].fullmatch(value)):
             invalid.append(key)
     if invalid:
         raise InvalidContactsError(invalid)
@@ -77,17 +77,19 @@ def put_out_author(model):
 
 
 def put_out_contacts(profile):
-    contacts = {
-        'github': profile.pop('github'),
-        'telegram': profile.pop('telegram'),
-        'email': profile.pop('email'),
-        'vk': profile.pop('vk'),
-        'facebook': profile.pop('facebook'),
-        'twitter': profile.pop('twitter'),
-        'instagram': profile.pop('instagram'),
-        'phon_number': profile.pop('phone_number')
+    profile['contacts'] = {
+        key: profile.pop(key)
+        for key in [
+            'github',
+            'telegram',
+            'email',
+            'vk',
+            'facebook',
+            'twitter',
+            'instagram',
+            'phone_number'
+        ]
     }
-    profile['contacts'] = contacts
 
 
 def get_params_and_payload(request):

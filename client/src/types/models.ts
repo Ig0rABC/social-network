@@ -5,11 +5,14 @@ export type User = {
 }
 
 export type Contacts = {
-  email: string,
   github: string,
   telegram: string,
+  email: string,
+  vk: string,
+  facebook: string,
+  twitter: string,
   instagram: string,
-  vk: string
+  phoneNumber: string
 }
 
 export type UserProfile = User & {
@@ -17,7 +20,7 @@ export type UserProfile = User & {
   lastName: string,
   contacts: Contacts,
   about: string,
-  isFollowed: boolean
+  isFollowed?: boolean
 }
 
 export type Category = "programming" | "travels" | "countries"

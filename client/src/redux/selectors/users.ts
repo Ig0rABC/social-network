@@ -15,3 +15,7 @@ export const selectSelectedUserProfile = (state: RootState) => {
 export const selectFollowingInProgress = (state: RootState) => {
   return state.users.followingInProgress;
 }
+
+export const selectProfileEditMode = (state: RootState) => {
+  return state.users.profileEditMode;
+}

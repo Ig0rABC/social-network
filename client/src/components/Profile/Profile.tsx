@@ -6,7 +6,7 @@ import { requestUserProfile } from "../../redux/thunks/users";
 import { UserProfile } from "../../types/models";
 import Posts from "../Posts/Posts";
 import ProfileAvatar from "./ProfileAvatar";
-import ProfileInfo from "./ProfileInfo";
+import ProfileInfo from "./ProfileInfo/ProfileInfo";
 import ToggleFollowButton from "./ToggleFollowButton";
 
 type Params = {
@@ -18,7 +18,7 @@ const Profile: React.FC = () => {
   const dispatch = useDispatch();
   const { userId } = useParams<Params>();
   const currentUser = useSelector(selectCurrentUser);
-  const selectedUserProfile = useSelector(selectSelectedUserProfile) as UserProfile;
+  const selectedUserProfile = useSelector(selectSelectedUserProfile);
 
   const authorId = Number.isNaN(userId)
     ? currentUser.id as number
@@ -31,7 +31,7 @@ const Profile: React.FC = () => {
   return <div>
     <ProfileAvatar photoUrl={currentUser.photoUrl as string} />
     <ToggleFollowButton userId={authorId} isFollowed={selectedUserProfile.isFollowed} />
-    <ProfileInfo profile={selectedUserProfile} />
+    {<ProfileInfo profile={selectedUserProfile as UserProfile} />}
     <Posts authorId={authorId} />
   </div>
 }

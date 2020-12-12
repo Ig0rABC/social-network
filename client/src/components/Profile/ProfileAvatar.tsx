@@ -8,7 +8,7 @@ const style = {
 }
 
 type Props = {
-  photoUrl: string
+  photoUrl: string | null
 }
 
 const ProfileAvatar: React.FC<Props> = ({ photoUrl }) => {

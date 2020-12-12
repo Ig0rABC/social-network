@@ -19,3 +19,13 @@ export const selectFollowingInProgress = (state: RootState) => {
 export const selectProfileEditMode = (state: RootState) => {
   return state.users.profileEditMode;
 }
+
+export const selectFollowings = (state: RootState) => {
+  return state.users.followings;
+}
+
+export const selectIsFollowedOnSelectedUser = (state: RootState) => {
+  const selectedUserProfile = selectSelectedUserProfile(state);
+  const followings = selectFollowings(state);
+  return !!followings.find(user => user.id === selectedUserProfile.id);
+}

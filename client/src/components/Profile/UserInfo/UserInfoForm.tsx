@@ -28,7 +28,7 @@ const contactsInitial = {
 const contactsPatterns = {
   github: /https:\/\/github.com\/\w+/,
   telegram: /@[\w\d]+/,
-  email: /\w+@(gmail.com|mail.ru)/,
+  email: /\w+@\w+\.\w{2,}/,
   vk: /https:\/\/vk.com\/(id\d+|[\w\d]{5,32})/,
   facebook: /https:\/\/facebook.com\/[\w\d]+/,
   twitter: /https:\/\/twitter.com\/[\w\d]+/,
@@ -38,7 +38,7 @@ const contactsPatterns = {
 
 const contactsArray: string[] = ["github", "email", "vk", "facebook", "twitter", "instagram", "phoneNumber"];
 
-export type ProfileInfoFormValues = {
+export type UserInfoFormValues = {
   firstName: string,
   lastName: string,
   about: string,
@@ -49,7 +49,7 @@ type Props = {
   profile: UserProfile
 }
 
-const ProfileInfoForm: React.FC<Props> = ({ profile }) => {
+const UserInfoForm: React.FC<Props> = ({ profile }) => {
 
   const initialValues = {
     ...profile,
@@ -64,7 +64,7 @@ const ProfileInfoForm: React.FC<Props> = ({ profile }) => {
 
   const dispatch = useDispatch();
   const intl = useIntl();
-  const [form] = useForm<ProfileInfoFormValues>();
+  const [form] = useForm<UserInfoFormValues>();
   const [contactsStatuses, setContactsStatuses] = useState({
     github: true,
     telegram: true,
@@ -76,7 +76,7 @@ const ProfileInfoForm: React.FC<Props> = ({ profile }) => {
     phoneNumber: true
   });
 
-  const handleFinish = (values: ProfileInfoFormValues) => {
+  const handleFinish = (values: UserInfoFormValues) => {
     for (let key in contactsInitial) {
       // @ts-ignore
       if (values[key] === contactsInitial[key]) {
@@ -157,4 +157,4 @@ const ProfileInfoForm: React.FC<Props> = ({ profile }) => {
   </Form>
 }
 
-export default ProfileInfoForm;
+export default UserInfoForm;

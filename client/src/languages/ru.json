@@ -18,7 +18,11 @@
   "news-feed": "Новости",
   "messages": "Сообщения",
   "post-by": "Пост",
+  "about": "О себе",
+  "phone-number": "Номер телефона",
   "total-posts-count": "{0}-{1} Из {total} Постов",
+  "followings-count": "Кол-во подписок: {count}",
+  "followers-count": "{count} Подписчиков",
   "themes": {
     "dark": "Темная",
     "light": "Светлая"

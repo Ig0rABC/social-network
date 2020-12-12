@@ -1,5 +1,6 @@
-import { getObjectWithoutNullProps } from "../../utils";
 import { Action } from "../actions/users";
+import { User } from "../../types/models";
+import { getObjectWithoutNullProps } from "../../utils";
 
 const initialState = {
   isAuthorized: false,
@@ -27,8 +28,9 @@ const initialState = {
       phoneNumber: null as string | null
     },
     about: null as string | null,
-    isFollowed: false
-  }
+    followersCount: null as number | null,
+  },
+  followings: [] as User[]
 }
 
 type InitialState = typeof initialState;
@@ -65,18 +67,28 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
         ...state,
         followingInProgress: action.payload
       }
-    case "users/TOGGLE-IS-FOLLOWED":
+    case "users/SET-IS-FOLLOWED":
       return {
         ...state,
         selectedUserProfile: {
           ...state.selectedUserProfile,
-          isFollowed: !state.selectedUserProfile.isFollowed
-        }
+          followersCount: action.payload.isFollowed
+            ? state.selectedUserProfile.followersCount as number + 1
+            : state.selectedUserProfile.followersCount as number - 1
+        },
+        followings: action.payload.isFollowed
+          ? [...state.followings, action.payload.user]
+          : state.followings.filter(user => user.id !== action.payload.user.id)
       }
-    case "users/SET-RPOFILE-EDIT-MODE":
+    case "users/SET-PROFILE-EDIT-MODE":
       return {
         ...state,
         profileEditMode: action.payload
+      }
+    case "users/SET-FOLLOWINGS":
+      return {
+        ...state,
+        followings: action.payload
       }
     default:
       return state;

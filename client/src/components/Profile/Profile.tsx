@@ -1,13 +1,15 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { selectCurrentUser, selectSelectedUserProfile } from "../../redux/selectors/users";
+import { selectCurrentUser, selectIsFollowedOnSelectedUser, selectSelectedUserProfile } from "../../redux/selectors/users";
 import { requestUserProfile } from "../../redux/thunks/users";
-import { UserProfile } from "../../types/models";
+import { User, UserProfile } from "../../types/models";
 import Posts from "../Posts/Posts";
 import ProfileAvatar from "./ProfileAvatar";
-import ProfileInfo from "./ProfileInfo/ProfileInfo";
+import UserInfo from "./UserInfo/UserInfo";
 import ToggleFollowButton from "./ToggleFollowButton";
+import FollowersCount from "./FollowersCount";
+import Followings from "../../Followings/Followings";
 
 type Params = {
   userId: string
@@ -19,20 +21,26 @@ const Profile: React.FC = () => {
   const { userId } = useParams<Params>();
   const currentUser = useSelector(selectCurrentUser);
   const selectedUserProfile = useSelector(selectSelectedUserProfile);
+  const isFollowed = useSelector(selectIsFollowedOnSelectedUser);
 
-  const authorId = Number.isNaN(userId)
+  const selectedUserId = Number.isNaN(userId)
     ? currentUser.id as number
     : Number(userId)
+  const isOwnProfile = selectedUserId === currentUser.id;
 
   useEffect(() => {
-    dispatch(requestUserProfile(authorId))
-  }, [authorId])
+    dispatch(requestUserProfile(selectedUserId))
+  }, [selectedUserId])
 
   return <div>
-    <ProfileAvatar photoUrl={currentUser.photoUrl as string} />
-    <ToggleFollowButton userId={authorId} isFollowed={selectedUserProfile.isFollowed} />
-    {<ProfileInfo profile={selectedUserProfile as UserProfile} />}
-    <Posts authorId={authorId} />
+    <ProfileAvatar photoUrl={currentUser.photoUrl} />
+    {isOwnProfile
+      || <ToggleFollowButton user={selectedUserProfile as User} isFollowed={isFollowed} />
+    }
+    <FollowersCount followersCount={selectedUserProfile.followersCount} />
+    <UserInfo profile={selectedUserProfile as UserProfile} />
+    {isOwnProfile && <Followings />}
+    <Posts authorId={selectedUserId} />
   </div>
 }
 

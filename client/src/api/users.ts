@@ -1,4 +1,4 @@
-import { ProfileInfoFormValues } from "../components/Profile/ProfileInfo/ProfileInfoForm";
+import { UserInfoFormValues } from "../components/Profile/UserInfo/UserInfoForm";
 import { getObjectWithoutNullProps } from "../utils";
 import api, { NETWORK_DELAY } from "./config";
 import { sleep } from "./utils";
@@ -29,10 +29,10 @@ const usersAPI = {
     const response = await api.get("users/" + userId);
     return response.data;
   },
-  async updateUserProfile(profile: ProfileInfoFormValues) {
-    const profileInfo = getObjectWithoutNullProps(profile);
+  async updateUserProfile(profile: UserInfoFormValues) {
+    const userInfo = getObjectWithoutNullProps(profile);
     await sleep(NETWORK_DELAY);
-    const response = await api.put("users", { ...profileInfo });
+    const response = await api.put("users", { ...userInfo });
     return response.data;
   }
 }

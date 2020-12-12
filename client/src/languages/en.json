@@ -18,7 +18,11 @@
   "news-feed": "News Feed",
   "messages": "Messages",
   "post-by": "Post by",
+  "about": "About me",
+  "phone-number": "Phone number",
   "total-posts-count": "{0}-{1} Of {total} Posts",
+  "followings-count": "Followings: {count}",
+  "followers-count": "{count} Followers",
   "themes": {
     "dark": "Dark",
     "light": "Light"

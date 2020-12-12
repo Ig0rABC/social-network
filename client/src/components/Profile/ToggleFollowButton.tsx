@@ -2,21 +2,22 @@ import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleIsFollowed } from "../../redux/thunks/users";
+import { setIsFollowed } from "../../redux/thunks/users";
 import { selectFollowingInProgress } from "../../redux/selectors/users";
+import { User } from "../../types/models";
 
 type Props = {
-  userId: number,
+  user: User,
   isFollowed: boolean
 }
 
-const ToggleFollowButton: React.FC<Props> = ({ userId, isFollowed }) => {
+const ToggleFollowButton: React.FC<Props> = ({ user, isFollowed }) => {
 
   const dispatch = useDispatch();
   const isFollowingInProgress = useSelector(selectFollowingInProgress);
 
   const handleClick = () => {
-    dispatch(toggleIsFollowed(userId, isFollowed));
+    dispatch(setIsFollowed(user, !isFollowed));
   }
 
   return <Button onClick={handleClick} disabled={isFollowingInProgress}>

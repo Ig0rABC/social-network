@@ -2,7 +2,8 @@ import { Thunk } from "../../types/flux";
 import actions, { Action } from "../actions/users";
 import usersAPI from "../../api/users";
 import followAPI from "../../api/follow";
-import { ProfileInfoFormValues } from "../../components/Profile/ProfileInfo/ProfileInfoForm";
+import { UserInfoFormValues } from "../../components/Profile/UserInfo/UserInfoForm";
+import { User } from "../../types/models";
 
 export const me = (): Thunk<Action> => async (dispatch) => {
   try {
@@ -37,19 +38,26 @@ export const requestUserProfile = (userId: number): Thunk<Action> => async (disp
   dispatch(actions.setSelectedUserProfile(data));
 }
 
-export const updateUserProfile = (profile: ProfileInfoFormValues): Thunk<Action> => async (dispatch) => {
+export const updateUserProfile = (profile: UserInfoFormValues): Thunk<Action> => async (dispatch) => {
   await usersAPI.updateUserProfile(profile);
   dispatch(actions.updateSelectedUserProfile(profile));
   dispatch(actions.setProfileEditMode(false));
 }
 
-export const toggleIsFollowed = (userId: number, isFollowed: boolean): Thunk<Action> => async (dispatch) => {
+export const setIsFollowed = (user: User, isFollowed: boolean): Thunk<Action> => async (dispatch) => {
   dispatch(actions.setFollowingInProgress(true));
   if (isFollowed) {
-    await followAPI.unfollow(userId);
+    await followAPI.follow(user.id);
   } else {
-    await followAPI.follow(userId);
+    await followAPI.unfollow(user.id);
   }
-  dispatch(actions.toggleFollow(userId));
+  dispatch(actions.setIsFollowed(user, isFollowed));
+  dispatch(actions.setFollowingInProgress(false));
+}
+
+export const requestFollowings = (): Thunk<Action> => async (dispatch) => {
   dispatch(actions.setFollowingInProgress(true));
+  const data = await followAPI.getFolowings();
+  dispatch(actions.setFollowings(data.followings));
+  dispatch(actions.setFollowingInProgress(false));
 }

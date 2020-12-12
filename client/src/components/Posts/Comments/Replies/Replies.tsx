@@ -36,6 +36,9 @@ const Replies: React.FC<Props> = (props) => {
       itemLayout="horizontal"
       size="default"
       dataSource={replies}
+      locale={{
+        emptyText: <div />
+      }}
       style={{ display: isEmpty ? "none" : "inline" }}
       renderItem={reply => (
         <Reply reply={reply} {...restProps}

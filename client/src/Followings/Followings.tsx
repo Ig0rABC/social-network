@@ -25,6 +25,9 @@ const Followings: React.FC = () => {
     <List
       size="small"
       itemLayout="horizontal"
+      locale={{
+        emptyText: <div />
+      }}
       dataSource={followings}
       renderItem={following => <Following user={following} />}
     />

@@ -11,6 +11,7 @@ import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/use
 import PostForm, { PostFormValues } from "./PostForm";
 import { CommentFormValues } from "./Comments/CommentForm";
 import { ReplyFormValues } from "./Comments/Replies/ReplyForm";
+import EmptyList from "../common/Empty";
 
 type Props = {
   authorId?: number
@@ -170,10 +171,22 @@ const Posts: React.FC<Props> = ({ authorId }) => {
     position: "both" as "both" | "top" | "bottom"
   }
 
+  let canPost = false;
+  if (isAuthorized) {
+    if (authorId) {
+      canPost = authorId === currentUser.id;
+    } else {
+      canPost = true;
+    }
+  }
+
   return <div>
-    {isAuthorized && <PostForm onFinish={onFinishCreatingPost} />}
+    {canPost && <PostForm onFinish={onFinishCreatingPost} />}
     <PostsSearchForm isSubmitting={isFetching} />
     <List
+      locale={{
+        emptyText: <EmptyList />
+      }}
       itemLayout="vertical"
       size="large"
       dataSource={posts}

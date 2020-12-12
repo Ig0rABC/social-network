@@ -21,13 +21,7 @@ const postsAPI = {
   },
   async getPosts(filter: Filter) {
     await sleep(NETWORK_DELAY);
-    const response = await api.get("posts" + buildQueryString({
-      category: filter.category,
-      page: filter.page,
-      pageSize: filter.pageSize,
-      content: filter.search,
-      authorId: filter.authorId
-    }));
+    const response = await api.get("posts" + buildQueryString(filter));
     return response.data;
   },
   async likePost(postId: number) {

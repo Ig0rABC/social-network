@@ -1,10 +1,12 @@
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
 import { selectFilter } from "../../redux/selectors/public";
 import actions from "../../redux/actions/public";
+import { buildQueryString } from "../../utils";
 
 const layout = {
   labelCol: { span: 8 },
@@ -29,10 +31,27 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
   const [selectedItems, setSelectedItems] = useState([]);
+  const history = useHistory();
   // @ts-ignore
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
 
-  const handleChange = (selectedItems:  SetStateAction<never[]>) => {
+  useEffect(() => {
+    console.log("[]");
+    const search = history.location.search;
+    const newFilter = Object.fromEntries(new URLSearchParams(search));
+    dispatch(actions.setFilter({ ...filter, ...newFilter }));
+  }, [])
+
+  useEffect(() => {
+    const newFilter: any = { ...filter };
+    delete newFilter.authorId;
+    delete newFilter.pageSize;
+    history.push({
+      search: buildQueryString(newFilter)
+    })
+  }, [filter])
+
+  const handleChange = (selectedItems: SetStateAction<never[]>) => {
     setSelectedItems(selectedItems);
   };
 
@@ -60,14 +79,20 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
       >
         {filteredOptions.map(item => (
           <Select.Option key={item} value={item}>
-            <FormattedMessage id={"categories." + item} defaultMessage={item} />
+            <FormattedMessage
+              id={"categories." + item}
+              defaultMessage={item}
+            />
           </Select.Option>
         ))}
       </Select>
     </Form.Item>
 
     <Form.Item>
-      <FormattedMessage id="placeholders.search" defaultMessage="search">
+      <FormattedMessage
+        id="placeholders.search"
+        defaultMessage="search"
+      >
         {(message: string) => (
           <Input.Search
             placeholder={message}

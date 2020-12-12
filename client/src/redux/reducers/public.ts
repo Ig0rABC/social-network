@@ -1,4 +1,4 @@
-import { Post, Comment, Category, PostOrder, Reply } from "../../types/models";
+import { Post, Comment, Category, Reply } from "../../types/models";
 import { Action } from "../actions/public";
 
 const initialState = {
@@ -13,7 +13,6 @@ const initialState = {
     authorId: null as number | null,
     category: null as Category | null,
     search: null as string | null,
-    order: [] as PostOrder[],
     page: 1,
     pageSize: 4
   },

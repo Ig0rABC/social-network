@@ -5,20 +5,13 @@ import { Form, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { signIn } from "../../redux/thunks/users";
 import { selectIsAuthorized } from "../../redux/selectors/users";
+import { NavLink } from "react-router-dom";
 
 type LoginFormValues = {
   login: string,
   password: string,
   rememberMe: boolean
 }
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
 
 const LoginForm: React.FC = () => {
 
@@ -33,12 +26,22 @@ const LoginForm: React.FC = () => {
   };
 
   useEffect(() => {
-    setSubmitting(false);
+    if (isAuthorized) {
+      setSubmitting(false);
+    }
   }, [isAuthorized])
 
+  const loginPlaceholder = intl.formatMessage({
+    id: "placeholders.login",
+    defaultMessage: "login"
+  });
+  const passwordPlaceholder = intl.formatMessage({
+    id: "placeholders.password",
+    defaultMessage: "password"
+  });
+
   return <Form
-    {...layout}
-    initialValues={{ login: "", password: "", rememberMe: true }}
+    initialValues={{ rememberMe: true }}
     onFinish={onFinish}
   >
 
@@ -46,35 +49,56 @@ const LoginForm: React.FC = () => {
       rules={[
         {
           required: true,
-          message: <FormattedMessage id="empty-login" defaultMessage="empty login" />
+          message: (
+            <FormattedMessage
+              id="empty-login"
+              defaultMessage="empty login"
+            />
+          )
         }
       ]}
-    ><Input prefix={<UserOutlined />} placeholder={intl.formatMessage({
-      id: "placeholders.login",
-      defaultMessage: "login"
-    })} /></Form.Item>
+    ><Input prefix={<UserOutlined />}
+      placeholder={loginPlaceholder}
+      /></Form.Item>
 
     <Form.Item name="password"
       rules={[
         {
           required: true,
-          message: <FormattedMessage id="empty-password" defaultMessage="empty password" />
+          message: (
+            <FormattedMessage
+              id="empty-password"
+              defaultMessage="empty password"
+            />
+          )
         }
       ]}
-    ><Input.Password prefix={<LockOutlined />} placeholder={intl.formatMessage({
-      id: "placeholders.password",
-      defaultMessage: "password"
-    })} /></Form.Item>
+    ><Input.Password prefix={<LockOutlined />}
+      placeholder={passwordPlaceholder}
+      /></Form.Item>
 
-    <Form.Item {...tailLayout} name="rememberMe" valuePropName="checked">
+    <Form.Item name="rememberMe" valuePropName="checked">
       <Checkbox>
-        <FormattedMessage id="remember-me" defaultMessage="remember me" />
+        <FormattedMessage
+          id="remember-me"
+          defaultMessage="remember me"
+        />
       </Checkbox>
     </Form.Item>
 
-    <Form.Item {...tailLayout}>
+    <NavLink to="/register">
+      <FormattedMessage
+        id="register-now"
+        defaultMessage="register now"
+      />
+    </NavLink>
+
+    <Form.Item>
       <Button type="primary" htmlType="submit" disabled={isSubmitting}>
-        <FormattedMessage id="buttons.sign-in" defaultMessage="sign in" />
+        <FormattedMessage
+          id="buttons.sign-in"
+          defaultMessage="sign in"
+        />
       </Button>
     </Form.Item>
   </Form>

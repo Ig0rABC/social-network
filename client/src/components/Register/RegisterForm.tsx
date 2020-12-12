@@ -10,58 +10,66 @@ type RegisterFormValues = {
   password: string
 }
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
-
 const LoginForm: React.FC = () => {
 
   const dispatch = useDispatch();
   const intl = useIntl();
-  let [isSubmitting, setSubmitting] = useState(false);
+  const [isSubmitting, setSubmitting] = useState(false);
 
   const onFinish = (values: RegisterFormValues) => {
     setSubmitting(true);
     dispatch(register(values.login, values.password));
   };
 
-  return <Form
-    {...layout}
-    initialValues={{ login: "", password: "" }}
-    onFinish={onFinish}
-  >
+  const loginPlaceholder = intl.formatMessage({
+    id: "placeholders.login",
+    defaultMessage: "login"
+  });
+  const passwordPlaceholder = intl.formatMessage({
+    id: "placeholders.password",
+    defaultMessage: "password"
+  });
+
+  return <Form onFinish={onFinish}>
 
     <Form.Item name="login"
       rules={[
         {
           required: true,
-          message: <FormattedMessage id="empty-login" defaultMessage="empty login" />
+          message: (
+            <FormattedMessage
+              id="empty-login"
+              defaultMessage="empty login"
+            />
+          )
         }
       ]}
-    ><Input prefix={<UserOutlined />} placeholder={intl.formatMessage({
-      id: "placeholders.login",
-      defaultMessage: "login"
-    })} /></Form.Item>
+    ><Input prefix={<UserOutlined />}
+      placeholder={loginPlaceholder}
+      /></Form.Item>
 
     <Form.Item name="password"
       rules={[
         {
           required: true,
-          message: <FormattedMessage id="empty-password" defaultMessage="empty password" />
+          message: (
+            <FormattedMessage
+              id="empty-password"
+              defaultMessage="empty password"
+            />
+          )
         }
       ]}
-    ><Input.Password prefix={<LockOutlined />} placeholder={intl.formatMessage({
-      id: "placeholders.password",
-      defaultMessage: "password"
-    })} /></Form.Item>
+    ><Input.Password prefix={<LockOutlined />}
+      placeholder={passwordPlaceholder}
+      /></Form.Item>
 
-    <Form.Item {...tailLayout}>
+    <Form.Item>
       <Button type="primary" htmlType="submit" disabled={isSubmitting}>
-        <FormattedMessage id="buttons.sign-up" defaultMessage="sign up" />
+        <FormattedMessage
+          id="buttons.sign-up"
+          defaultMessage="sign up"
+        />
       </Button>
     </Form.Item>
 

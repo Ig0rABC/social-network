@@ -49,6 +49,9 @@ const Comments: React.FC<Props> = (props) => {
       itemLayout="horizontal"
       size="default"
       dataSource={comments}
+      locale={{
+        emptyText: <div />
+      }}
       style={{ display: isEmpty ? "none" : "inline" }}
       renderItem={comment => (
         <Comment comment={comment} {...restProps}

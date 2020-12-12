@@ -3,3 +3,4 @@ from .posts import *
 from .comments import *
 from .replies import *
 from .likes import *
+from .followings import *

@@ -1,7 +1,9 @@
+from psycopg2 import connect
+from psycopg2.extras import RealDictCursor
 from flask import jsonify, request, make_response
 from any_case import converts_keys
 from settings import (
-    app, DSN
+    app, DSN,
     DEFAULT_POST_LIMIT,
     MAX_POST_LIMIT
 )
@@ -21,7 +23,7 @@ def follow(user_id):
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(Users.get_user_id(), cookies)
             record = cursor.fetchone()
-            cursor.execute(Followings.follow(), {**record, **cookies})
+            cursor.execute(Followings.follow(), {'follower_id': record['user_id'], 'user_id': user_id})
     return jsonify(), 201
 
 @app.route('/follow', methods=['GET'])
@@ -33,9 +35,9 @@ def get_followings():
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(Users.get_user_id(), cookies)
             record = cursor.fetchone()
-            cursor.execute(Followings.get_followings(), record)
+            cursor.execute(Followings.get_followings(), {'follower_id': record['user_id']})
             followings = cursor.fetchall()
-    return jsonify(converts_keys({'folllowings': followings}, case='camel'))
+    return jsonify(converts_keys({'followings': followings}, case='camel'))
 
 @app.route('/follow/<int:user_id>', methods=['DELETE'])
 def unfollow(user_id):
@@ -46,7 +48,7 @@ def unfollow(user_id):
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(Users.get_user_id(), cookies)
             record = cursor.fetchone()
-            cursor.execute(Followings.unfollow(), {**record, 'user_id': user_id})
+            cursor.execute(Followings.unfollow(), {'follower_id': record['user_id'], 'user_id': user_id})
     return jsonify(), 204
 
 @app.route('/feed', methods=['GET'])

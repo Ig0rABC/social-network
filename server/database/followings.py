@@ -52,12 +52,11 @@ class Followings(Table):
 
     def get_followings():
         return '''
-        SELECT user_id, u.login, p.photo_url
-        FROM followings
-        INNER JOIN users AS u
-        ON user_id = u.id
-        INNER JOIN profiles AS p
-        ON user_id = p.user_id
+        SELECT id, login, photo_url
+        FROM users
+        INNER JOIN followings
+        ON id = followings.user_id
+        INNER JOIN profiles
+        ON id = profiles.user_id
         WHERE follower_id = %(follower_id)s
         '''
-        

@@ -49,6 +49,10 @@ class Users(Table):
                 WHERE follower_id = %(follower_id)s
                 AND followings.user_id = %(id)s
             ) AS is_followed
+        ), (
+            SELECT count(*) AS followers_count
+            FROM followings
+            WHERE followings.user_id = %(id)s
         )
         FROM users
         INNER JOIN profiles

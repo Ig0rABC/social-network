@@ -1,29 +1,28 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectTheme } from "../../redux/selectors/app";
-import { Language } from "../../types/app";
-import actions from "../../redux/actions/app";
+import { useDispatch } from "react-redux";
+import { FormattedMessage } from "react-intl";
 import { Menu, Dropdown } from "antd";
 import { TranslationOutlined } from "@ant-design/icons";
-import { FormattedMessage } from "react-intl";
+import actions from "../../redux/actions/app";
+
+const { Item } = Menu;
 
 const LanguageSwitcher: React.FC = () => {
 
   const dispatch = useDispatch();
-  const theme = useSelector(selectTheme);
 
-  const handleMenuClick = (event: any): void => {
-    dispatch(actions.switchLanguage(event.key as Language));
+  const handleMenuClick = (event: any) => {
+    dispatch(actions.switchLanguage(event.key));
   }
 
   const menu = (
-    <Menu onClick={handleMenuClick} theme={theme}>
-      <Menu.Item key="en">
+    <Menu onClick={handleMenuClick}>
+      <Item key="en">
         English
-      </Menu.Item>
-      <Menu.Item key="ru">
+      </Item>
+      <Item key="ru">
         Русский
-      </Menu.Item>
+      </Item>
     </Menu>
   )
 
@@ -31,7 +30,6 @@ const LanguageSwitcher: React.FC = () => {
     <FormattedMessage
       id="choose-language"
       defaultMessage="choose language"
-      description="choose language dropdown"
     />
   </Dropdown.Button>
 }

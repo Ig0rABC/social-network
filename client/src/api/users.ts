@@ -24,12 +24,12 @@ const usersAPI = {
     const response = await api.delete("users/login");
     return response.data;
   },
-  async getUserProfile(userId: number) {
+  async getProfile(userId: number) {
     await sleep(NETWORK_DELAY);
     const response = await api.get("users/" + userId);
     return response.data;
   },
-  async updateUserProfile(profile: UserInfoFormValues) {
+  async updateProfile(profile: UserInfoFormValues) {
     const userInfo = getObjectWithoutNullProps(profile);
     await sleep(NETWORK_DELAY);
     const response = await api.put("users", { ...userInfo });

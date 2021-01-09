@@ -15,12 +15,15 @@ export type Contacts = {
   phoneNumber: string
 }
 
-export type UserProfile = User & {
+export type Profile = {
+  userId: number,
+  login: string,
+  photoUrl: string,
   firstName: string,
   lastName: string,
   contacts: Contacts,
   about: string,
-  isFollowed?: boolean
+  followersCount: number
 }
 
 export type Category = "programming" | "travels" | "countries"

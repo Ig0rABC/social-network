@@ -11,8 +11,8 @@ const initialState = {
     login: null as string | null,
     photoUrl: null as string | null
   },
-  selectedUserProfile: {
-    id: null as number | null,
+  selectedProfile: {
+    userId: null as number | null,
     login: null as string | null,
     photoUrl: null as string | null,
     firstName: null as string | null,
@@ -49,16 +49,16 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
         isAuthorized: false,
         currentUser: initialState.currentUser
       }
-    case "users/SET-SELECTED-USER-PROFILE":
+    case "users/SET-SELECTED-PROFILE":
       return {
         ...state,
-        selectedUserProfile: action.payload as typeof initialState.selectedUserProfile
+        selectedProfile: action.payload
       }
-    case "users/UPDATE-SELECTED-USER-PROFILE":
+    case "users/UPDATE-SELECTED-PROFILE":
       return {
         ...state,
-        selectedUserProfile: {
-          ...state.selectedUserProfile,
+        selectedProfile: {
+          ...state.selectedProfile,
           ...getObjectWithoutNullProps(action.payload)
         }
       }
@@ -70,11 +70,11 @@ const usersReducer = (state = initialState, action: Action): InitialState => {
     case "users/SET-IS-FOLLOWED":
       return {
         ...state,
-        selectedUserProfile: {
-          ...state.selectedUserProfile,
+        selectedProfile: {
+          ...state.selectedProfile,
           followersCount: action.payload.isFollowed
-            ? state.selectedUserProfile.followersCount as number + 1
-            : state.selectedUserProfile.followersCount as number - 1
+            ? state.selectedProfile.followersCount as number + 1
+            : state.selectedProfile.followersCount as number - 1
         },
         followings: action.payload.isFollowed
           ? [...state.followings, action.payload.user]

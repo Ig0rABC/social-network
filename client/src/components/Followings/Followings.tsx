@@ -1,21 +1,15 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { List } from "antd";
-import { selectFollowings } from "../redux/selectors/users";
-import { requestFollowings } from "../redux/thunks/users";
-import Following from "./Following";
+import React, { Fragment } from "react";
+import { useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
+import { List } from "antd";
+import { selectFollowings } from "../../redux/selectors/users";
+import Following from "./Following";
 
 const Followings: React.FC = () => {
 
-  const dispatch = useDispatch();
   const followings = useSelector(selectFollowings);
 
-  useEffect(() => {
-    dispatch(requestFollowings());
-  }, [])
-
-  return <div>
+  return <Fragment>
     <FormattedMessage
       id="followings-count"
       values={{
@@ -26,12 +20,12 @@ const Followings: React.FC = () => {
       size="small"
       itemLayout="horizontal"
       locale={{
-        emptyText: <div />
+        emptyText: <Fragment />
       }}
       dataSource={followings}
       renderItem={following => <Following user={following} />}
     />
-  </div>
+  </Fragment>
 }
 
 export default Followings;

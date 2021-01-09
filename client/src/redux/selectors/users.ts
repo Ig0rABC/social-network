@@ -8,8 +8,8 @@ export const selectIsAuthorized = (state: RootState) => {
   return state.users.isAuthorized;
 }
 
-export const selectSelectedUserProfile = (state: RootState) => {
-  return state.users.selectedUserProfile;
+export const selectSelectedProfile = (state: RootState) => {
+  return state.users.selectedProfile;
 }
 
 export const selectFollowingInProgress = (state: RootState) => {
@@ -25,7 +25,9 @@ export const selectFollowings = (state: RootState) => {
 }
 
 export const selectIsFollowedOnSelectedUser = (state: RootState) => {
-  const selectedUserProfile = selectSelectedUserProfile(state);
+  const selectedProfile = selectSelectedProfile(state);
   const followings = selectFollowings(state);
-  return !!followings.find(user => user.id === selectedUserProfile.id);
+  return followings
+    .map(user => user.id)
+    .includes(selectedProfile.userId as number);
 }

@@ -1,8 +1,8 @@
 import { Thunk } from "../../types/flux";
 import actions, { Action } from "../actions/app";
-import { me } from "./users";
+import { requestCurrentUser } from "./users";
 
 export const initialize = (): Thunk<Action> => async (dispatch) => {
-  await dispatch(me());
+  await dispatch(requestCurrentUser());
   dispatch(actions.setIsInitialized(true));
 }

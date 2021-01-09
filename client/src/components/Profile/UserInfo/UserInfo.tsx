@@ -1,19 +1,22 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Button, Descriptions, Divider } from 'antd';
 import { EditOutlined } from "@ant-design/icons";
-import { UserProfile } from "../../../types/models";
+import { Profile } from "../../../types/models";
 import { selectProfileEditMode } from "../../../redux/selectors/users";
 import UserInfoForm from "./UserInfoForm";
 import actions from "../../../redux/actions/users";
-import Contacts from "./Contacts/Contacts"
+import Contacts from "./Contacts/Contacts";
+
+const { Item } = Descriptions;
 
 type Props = {
-  profile: UserProfile
+  profile: Profile,
+  isOwn: boolean
 }
 
-const UserInfo: React.FC<Props> = ({ profile }) => {
+const UserInfo: React.FC<Props> = ({ profile, isOwn }) => {
 
   const dispatch = useDispatch();
   const editMode = useSelector(selectProfileEditMode)
@@ -29,7 +32,10 @@ const UserInfo: React.FC<Props> = ({ profile }) => {
   }
 
   const editButton = (
-    <Button onClick={handleEditClick} icon={<EditOutlined />}>
+    <Button
+      onClick={handleEditClick}
+      icon={<EditOutlined />}
+    >
       <FormattedMessage
         id="buttons.edit"
         defaultMessage="edit"
@@ -37,26 +43,26 @@ const UserInfo: React.FC<Props> = ({ profile }) => {
     </Button>
   )
 
-  return <div>
+  return <Fragment>
     <Descriptions
-      extra={editButton}>
-      <Descriptions.Item span={3}
+      extra={isOwn && editButton}>
+      <Item span={3}
         label={<FormattedMessage
           id="about"
           defaultMessage="about"
         />}
-      >{about}</Descriptions.Item>
+      >{about}</Item>
     </Descriptions>
     {contacts
-      && <Divider plain orientation="left">
+      && <Divider plain orientation="right">
         <FormattedMessage
           id="contacts"
           defaultMessage="contacts"
         />
       </Divider>
     }
-    <Contacts contacts={contacts}/>
-  </div>
+    <Contacts contacts={contacts} />
+  </Fragment>
 }
 
 export default UserInfo;

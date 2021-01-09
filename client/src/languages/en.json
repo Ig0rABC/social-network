@@ -2,6 +2,7 @@
   "home": "Home",
   "registration": "Registration",
   "authorization": "Authorization",
+  "authorization-required": "Authorization Required",
   "register-now": "register now",
   "remember-me": "Remember Me",
   "empty-login": "Please, enter your login",
@@ -19,6 +20,7 @@
   "news-feed": "News Feed",
   "messages": "Messages",
   "post-by": "Post by",
+  "user-posts": "Posts",
   "about": "About me",
   "contacts": "Contacts",
   "phone-number": "Phone number",
@@ -28,7 +30,8 @@
   "followers-count": "{count} Followers",
   "themes": {
     "dark": "Dark",
-    "light": "Light"
+    "light": "Light",
+    "compact": "Compact"
   },
   "placeholders": {
     "login": "Login",
@@ -52,7 +55,22 @@
     "comment": "Comment",
     "reply": "Reply",
     "view-comments": "View Comments",
-    "view-replies": "View Replies"
+    "view-replies": "View Replies",
+    "go-back": "Go Back"
+  },
+  "errors": {
+    "403": {
+      "title": "Forbidden",
+      "description": "Access to the requested resource is forbidden"
+    },
+    "404": {
+      "title": "Not Found",
+      "description": "Sorry, the page you visited does not exist"
+    },
+    "500": {
+      "title": "Internal Server Error",
+      "description": "Sorry, something went wrong on server"
+    }
   },
   "categories": {
     "programming": "Programming",

@@ -1,4 +1,4 @@
-import { User, UserProfile } from "../../types/models";
+import { User, Profile } from "../../types/models";
 import { InferActions } from "../../types/flux";
 import { UserInfoFormValues } from "../../components/Profile/UserInfo/UserInfoForm";
 
@@ -10,13 +10,13 @@ const actions = {
   resetCurrentUser: () => ({
     type: "users/RESET-CURRENT-USER"
   } as const),
-  setSelectedUserProfile: (userProfile: UserProfile) => ({
-    type: "users/SET-SELECTED-USER-PROFILE",
-    payload: userProfile
+  setSelectedProfile: (profile: Profile) => ({
+    type: "users/SET-SELECTED-PROFILE",
+    payload: profile
   } as const),
-  updateSelectedUserProfile: (userProfile: UserInfoFormValues) => ({
-    type: "users/UPDATE-SELECTED-USER-PROFILE",
-    payload: userProfile
+  updateSelectedProfile: (profile: UserInfoFormValues) => ({
+    type: "users/UPDATE-SELECTED-PROFILE",
+    payload: profile
   } as const),
   setFollowingInProgress: (isFetching: boolean) => ({
     type: "users/SET-FOLLOWING-IN-PROGRESS",

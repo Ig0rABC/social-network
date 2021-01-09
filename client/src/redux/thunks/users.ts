@@ -5,7 +5,7 @@ import followAPI from "../../api/follow";
 import { UserInfoFormValues } from "../../components/Profile/UserInfo/UserInfoForm";
 import { User } from "../../types/models";
 
-export const me = (): Thunk<Action> => async (dispatch) => {
+export const requestCurrentUser = (): Thunk<Action> => async (dispatch) => {
   try {
     const data = await usersAPI.me();
     dispatch(actions.setCurrentUser(data));
@@ -22,7 +22,7 @@ export const register = (login: string, password: string): Thunk<Action> => asyn
 export const signIn = (login: string, password: string, rememberMe: boolean): Thunk<Action> => async (dispatch) => {
   try {
     await usersAPI.login(login, password, rememberMe);
-    await dispatch(me());
+    await dispatch(requestCurrentUser());
   } catch { }
 }
 
@@ -33,14 +33,14 @@ export const logout = (): Thunk<Action> => async (dispatch) => {
   dispatch(actions.resetCurrentUser());
 }
 
-export const requestUserProfile = (userId: number): Thunk<Action> => async (dispatch) => {
-  const data = await usersAPI.getUserProfile(userId);
-  dispatch(actions.setSelectedUserProfile(data));
+export const requestProfile = (userId: number): Thunk<Action> => async (dispatch) => {
+  const data = await usersAPI.getProfile(userId);
+  dispatch(actions.setSelectedProfile(data));
 }
 
-export const updateUserProfile = (profile: UserInfoFormValues): Thunk<Action> => async (dispatch) => {
-  await usersAPI.updateUserProfile(profile);
-  dispatch(actions.updateSelectedUserProfile(profile));
+export const updateProfile = (profile: UserInfoFormValues): Thunk<Action> => async (dispatch) => {
+  await usersAPI.updateProfile(profile);
+  dispatch(actions.updateSelectedProfile(profile));
   dispatch(actions.setProfileEditMode(false));
 }
 
@@ -56,8 +56,10 @@ export const setIsFollowed = (user: User, isFollowed: boolean): Thunk<Action> =>
 }
 
 export const requestFollowings = (): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setFollowingInProgress(true));
-  const data = await followAPI.getFolowings();
-  dispatch(actions.setFollowings(data.followings));
-  dispatch(actions.setFollowingInProgress(false));
+  try {
+    const data = await followAPI.getFolowings();
+    dispatch(actions.setFollowings(data.followings));
+  } catch {
+    
+  }
 }

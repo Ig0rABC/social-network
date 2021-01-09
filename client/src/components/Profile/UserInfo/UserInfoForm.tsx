@@ -1,12 +1,15 @@
 import React, { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Button, Form, Input } from "antd";
+import { Button, Divider, Form, Input } from "antd";
 import { GithubOutlined, InstagramOutlined, MailOutlined, SendOutlined, FacebookOutlined, TwitterOutlined, PhoneOutlined } from "@ant-design/icons";
-import { Contacts, UserProfile } from "../../../types/models";
+import { Contacts, Profile } from "../../../types/models";
 import { useDispatch } from "react-redux";
-import { updateUserProfile } from "../../../redux/thunks/users";
+import { updateProfile } from "../../../redux/thunks/users";
 import actions from "../../../redux/actions/users";
 import { useForm } from "antd/lib/form/Form";
+import { getObjectWithoutNullProps } from "../../../utils";
+
+const { Item } = Form;
 
 const contactsIcons = {
   github: <GithubOutlined />,
@@ -46,7 +49,7 @@ export type UserInfoFormValues = {
 }
 
 type Props = {
-  profile: UserProfile
+  profile: Profile
 }
 
 const UserInfoForm: React.FC<Props> = ({ profile }) => {
@@ -77,19 +80,24 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
   });
 
   const handleFinish = (values: UserInfoFormValues) => {
-    for (let key in contactsInitial) {
-      // @ts-ignore
-      if (values[key] === contactsInitial[key]) {
-        // @ts-ignore
-        values[key] = null;
+    const filledContacts: any = {};
+    Object.keys(values.contacts).forEach(key => {
+      const currentValue = values.contacts[key as keyof Contacts];
+      const initialValue = contactsInitial[key as keyof typeof contactsInitial];
+      if (currentValue && currentValue !== initialValue) {
+        filledContacts[key] = currentValue;
       }
-    }
-    for (let key in values) {
-      if (!contactsStatuses[key as keyof typeof contactsStatuses]) {
+    })
+    const filledValues = getObjectWithoutNullProps(values);
+    filledValues.contacts = filledContacts;
+    for (let key in filledValues.contacts) {
+      // @ts-ignore
+      if (!contactsStatuses[key]) {
+        // @ts-ignore
         return;
       }
     }
-    dispatch(updateUserProfile(values));
+    dispatch(updateProfile(values));
   }
 
   const handleCancel = () => {
@@ -106,26 +114,33 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
 
   return <Form form={form} initialValues={initialValues} onFinish={handleFinish}>
 
-    <Form.Item name="firstName">
+    <Item name="firstName">
       <Input
         placeholder={intl.formatMessage({ id: "firstName", defaultMessage: "first name" })}
       />
-    </Form.Item>
+    </Item>
 
-    <Form.Item name="lastName">
+    <Item name="lastName">
       <Input
         placeholder={intl.formatMessage({ id: "lastName", defaultMessage: "last name" })}
       />
-    </Form.Item>
+    </Item>
 
-    <Form.Item name="about">
+    <Item name="about">
       <Input
         placeholder={intl.formatMessage({ id: "about", defaultMessage: "about" })}
       />
-    </Form.Item>
+    </Item>
+
+    <Divider plain orientation="right">
+      <FormattedMessage
+        id="contacts"
+        defaultMessage="contacts"
+      />
+    </Divider>
 
     {
-      contactsArray.map(key => <Form.Item name={["contacts", key]}
+      contactsArray.map((key, index) => <Item key={index} name={["contacts", key]}
         validateStatus={contactsStatuses[key as keyof typeof contactsStatuses]
           ? "success"
           : "error"
@@ -138,21 +153,19 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
               : null
           }
         />
-      </Form.Item>
+      </Item>
       )
     }
 
-    <Form.Item>
+    <Item>
       <Button type="primary" htmlType="submit">
         <FormattedMessage id="buttons.save" defaultMessage="save" />
       </Button>
-    </Form.Item>
+    </Item>
 
-    <Form.Item>
-      <Button onClick={handleCancel}>
-        <FormattedMessage id="buttons.cancel" defaultMessage="cancel" />
-      </Button>
-    </Form.Item>
+    <Button onClick={handleCancel}>
+      <FormattedMessage id="buttons.cancel" defaultMessage="cancel" />
+    </Button>
 
   </Form>
 }

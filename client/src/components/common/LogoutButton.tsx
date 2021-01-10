@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Button } from "antd";
-import { logout } from "../../redux/thunks/users";
+import { signOut } from "../../redux/thunks/users";
 import { selectIsAuthorized } from "../../redux/selectors/users";
 
 const LogoutButton: React.FC = () => {
@@ -13,7 +13,7 @@ const LogoutButton: React.FC = () => {
 
   const handleOnClick = () => {
     setSubmitting(true);
-    dispatch(logout());
+    dispatch(signOut());
   }
 
   useEffect(() => {

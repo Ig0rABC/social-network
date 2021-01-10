@@ -1,122 +1,150 @@
-import { Thunk } from "../../types/flux";
-import actions, { Action } from "../actions/public";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Category } from "../../types/models";
 import { Filter } from "../reducers/public";
-import commentsAPI from "../../api/comments";
 import postsAPI from "../../api/posts";
+import commentsAPI from "../../api/comments";
 import repliesAPI from "../../api/replies";
+import { addPendingComments, addPendingLikeComment, addPendingLikePost, addPendingLikeReply, addPendingReplies } from "../actions/public";
 
-export const requestPosts = (filter: Filter): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setIsFetching(true));
-  const data = await postsAPI.getPosts(filter);
-  dispatch(actions.setPosts(data.posts));
-  dispatch(actions.setTotalPostsCount(data.totalCount));
-  dispatch(actions.setIsFetching(false));
-}
-
-export const toggleIsLikedPost = (postId: number, isLiked: boolean): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setLikePostInProgress(postId, true));
-  if (isLiked) {
-    await postsAPI.unlikePost(postId);
-  } else {
-    await postsAPI.likePost(postId);
+export const fetchPosts = createAsyncThunk(
+  "public/FETCH-POSTS",
+  async (filter: Filter) => {
+    return await postsAPI.getPosts(filter);
   }
-  dispatch(actions.toggleIsLikedPost(postId));
-  dispatch(actions.setLikePostInProgress(postId, false));
-}
+)
 
-export const createPost = (category: Category, content: string): Thunk<Action> => async (dispatch) => {
-  const data = await postsAPI.createPost(category, content);
-  dispatch(actions.addNewPost(data));
-}
-
-export const deletePost = (postId: number): Thunk<Action> => async (dispatch) => {
-  await postsAPI.deletePost(postId);
-  dispatch(actions.deletePost(postId));
-}
-
-export const requestShiftedPost = (filter: Filter): Thunk<Action> => async (dispatch) => {
-  const newFilter = {
-    ...filter,
-    page: (filter.page * filter.pageSize),
-    pageSize: 1
-  };
-  const data = await postsAPI.getPosts(newFilter);
-  dispatch(actions.addShiftedPost(data.posts[0]));
-}
-
-export const updatePost = (postId: number, category: Category, content: string): Thunk<Action> => async (dispatch) => {
-  await postsAPI.updatePost(postId, category, content);
-  dispatch(actions.updatePost(postId, category, content));
-  dispatch(actions.resetEditingPostId());
-}
-
-export const requestComments = (postId: number, authorId = null as number | null): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setOpenPostCommentsInProgress(postId, true));
-  const data = await commentsAPI.getComments(postId, authorId);
-  dispatch(actions.addComments(data.comments));
-  dispatch(actions.setOpenPostCommentsInProgress(postId, false));
-  dispatch(actions.addPostWithOpenedComments(postId));
-}
-
-export const createComment = (postId: number, content: string): Thunk<Action> => async (dispatch) => {
-  const data = await commentsAPI.createComment(postId, content);
-  dispatch(actions.addNewComment(data));
-}
-
-export const deleteComment = (commentId: number): Thunk<Action> => async (dispatch) => {
-  await commentsAPI.deleteComment(commentId);
-  dispatch(actions.deleteComment(commentId));
-}
-
-export const updateComment = (commentId: number, content: string): Thunk<Action> => async (dispatch) => {
-  await commentsAPI.updateComment(commentId, content);
-  dispatch(actions.updateComment(commentId, content));
-  dispatch(actions.resetEditingCommentId());
-}
-
-export const toggleIsLikedComment = (commentId: number, isLiked: boolean): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setLikeCommentInProgress(commentId, true));
-  if (isLiked) {
-    await commentsAPI.unlikeComment(commentId);
-  } else {
-    await commentsAPI.likeComment(commentId);
+export const setIsLikedPost = createAsyncThunk(
+  "public/SET-IS-LIKED-POST",
+  async ({ postId, isLiked }: { postId: number, isLiked: boolean }, { dispatch }) => {
+    dispatch(addPendingLikePost(postId));
+    if (isLiked) {
+      await postsAPI.unlikePost(postId);
+    } else {
+      await postsAPI.likePost(postId);
+    }
+    return { postId, isLiked };
   }
-  dispatch(actions.toggleIsLikedComment(commentId));
-  dispatch(actions.setLikeCommentInProgress(commentId, false));
-}
+)
 
-export const requestReplies = (commentId: number): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setOpenCommentRepliesInProgress(commentId, true));
-  const data = await repliesAPI.getReplies(commentId);
-  dispatch(actions.addReplies(data.replies));
-  dispatch(actions.setOpenCommentRepliesInProgress(commentId, false));
-  dispatch(actions.addCommentWithOpenedReplies(commentId));
-}
-
-export const createReply = (commentId: number, content: string): Thunk<Action> => async (dispatch) => {
-  const data = await repliesAPI.createReply(commentId, content);
-  dispatch(actions.addNewReply(data));
-}
-
-export const updateReply = (replyId: number, content: string): Thunk<Action> => async (dispatch) => {
-  await repliesAPI.updateReply(replyId, content);
-  dispatch(actions.updateReply(replyId, content));
-  dispatch(actions.resetEitingReplyId());
-}
-
-export const deleteReply = (replyId: number): Thunk<Action> => async (dispatch) => {
-  await repliesAPI.deleteReply(replyId);
-  dispatch(actions.deleteReply(replyId));
-}
-
-export const toggleIsLikedReply = (replyId: number, isLiked: boolean): Thunk<Action> => async (dispatch) => {
-  dispatch(actions.setLikeReplyInProgress(replyId, true));
-  if (isLiked) {
-    await repliesAPI.unlikeReply(replyId);
-  } else {
-    await repliesAPI.likeReply(replyId);
+export const createPost = createAsyncThunk(
+  "public/CREATE-POST",
+  async ({ category, content }: { category: Category, content: string }) => {
+    return await postsAPI.createPost(category, content);
   }
-  dispatch(actions.toggleIsLikedReply(replyId));
-  dispatch(actions.setLikeReplyInProgress(replyId, false));
-}
+)
+
+export const deletePost = createAsyncThunk(
+  "public/DELETE-POST",
+  async (postId: number) => {
+    await postsAPI.deletePost(postId);
+    return postId;
+  }
+)
+
+export const fetchShiftedPost = createAsyncThunk(
+  "public/FETCH-SHIFTED-POST",
+  async (filter: Filter) => {
+    const newFilter = {
+      ...filter,
+      page: (filter.page * filter.pageSize),
+      pageSize: 1
+    };
+    return await postsAPI.getPosts(newFilter);
+  }
+)
+
+export const updatePost = createAsyncThunk(
+  "public/UPDATE-POST",
+  async ({ postId, category, content }: { postId: number, category: Category, content: string }) => {
+    await postsAPI.updatePost(postId, category, content);
+    return { postId, category, content };
+  }
+)
+
+export const fetchComments = createAsyncThunk(
+  "public/FETCH-COMMENTS",
+  async ({ postId, authorId }: { postId: number, authorId: number | null }, { dispatch }) => {
+    dispatch(addPendingComments(postId));
+    return await commentsAPI.getComments(postId, authorId);
+  }
+)
+
+export const createComment = createAsyncThunk(
+  "public/CREATE-COMMENT",
+  async ({ postId, content }: { postId: number, content: string }) => {
+    return await commentsAPI.createComment(postId, content);
+  }
+)
+
+export const deleteComment = createAsyncThunk(
+  "public/DELETE-COMMENT",
+  async (commentId: number): Promise<number> => {
+    await commentsAPI.deleteComment(commentId);
+    return commentId;
+  }
+)
+
+export const updateComment = createAsyncThunk(
+  "public/UPDATE-COMMENT",
+  async ({ commentId, content }: { commentId: number, content: string }) => {
+    await commentsAPI.updateComment(commentId, content);
+    return { commentId, content };
+  }
+)
+
+export const setIsLikedComment = createAsyncThunk(
+  "public/SET-IS-LIKED-COMMENT",
+  async ({ commentId, isLiked }: { commentId: number, isLiked: boolean }, { dispatch }) => {
+    dispatch(addPendingLikeComment(commentId));
+    if (isLiked) {
+      await commentsAPI.unlikeComment(commentId);
+    } else {
+      await commentsAPI.likeComment(commentId);
+    }
+    return { commentId, isLiked };
+  }
+)
+
+export const fetchReplies = createAsyncThunk(
+  "public/FETCH-REPLIES",
+  async (commentId: number, { dispatch }) => {
+    dispatch(addPendingReplies(commentId));
+    return await repliesAPI.getReplies(commentId);
+  }
+)
+
+export const createReply = createAsyncThunk(
+  "public/CREATE-REPLY",
+  async ({ commentId, content }: { commentId: number, content: string }) => {
+    return await repliesAPI.createReply(commentId, content);
+  }
+)
+
+export const updateReply = createAsyncThunk(
+  "public/UPDATE-REPLY",
+  async ({ replyId, content }: { replyId: number, content: string }) => {
+    await repliesAPI.updateReply(replyId, content);
+    return { replyId, content };
+  }
+)
+
+export const deleteReply = createAsyncThunk(
+  "public/DELETE-REPLY",
+  async (replyId: number) => {
+    await repliesAPI.deleteReply(replyId);
+    return replyId;
+  }
+)
+
+export const setIsLikedReply = createAsyncThunk(
+  "public/SET-IS-LIKED-REPLY",
+  async ({ replyId, isLiked }: { replyId: number, isLiked: boolean }, { dispatch }) => {
+    dispatch(addPendingLikeReply(replyId));
+    if (isLiked) {
+      await repliesAPI.unlikeReply(replyId);
+    } else {
+      await repliesAPI.likeReply(replyId);
+    }
+    return { replyId, isLiked };
+  }
+)

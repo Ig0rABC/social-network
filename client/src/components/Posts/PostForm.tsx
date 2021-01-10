@@ -4,7 +4,7 @@ import { FormattedMessage } from "react-intl";
 import { Form, Input, Button, Select } from 'antd';
 import { TagOutlined } from "@ant-design/icons";
 import { Category } from "../../types/models";
-import { selectIsFetching } from "../../redux/selectors/public";
+import { selectPendingPosts } from "../../redux/selectors/public";
 
 export type PostFormValues = {
   category: Category,
@@ -40,7 +40,7 @@ const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no c
 
   const [form] = Form.useForm();
   const [selectedItems, setSelectedItems] = useState([]);
-  const isFetcing = useSelector(selectIsFetching);
+  const pendingPosts = useSelector(selectPendingPosts);
   // @ts-ignore
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
 
@@ -82,7 +82,7 @@ const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no c
     </Form.Item>
 
     <Form.Item {...tailLayout}>
-      <Button type="primary" htmlType="submit" disabled={isFetcing}>
+      <Button type="primary" htmlType="submit" disabled={pendingPosts}>
         <FormattedMessage id="buttons.post" defaultMessage="post" />
       </Button>
     </Form.Item>

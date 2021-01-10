@@ -1,21 +1,13 @@
+// import { Language, Theme } from "../../types/app";
+// import { InferActions } from "../../types/flux";
+
+import { createAction, PrepareAction } from "@reduxjs/toolkit";
 import { Language, Theme } from "../../types/app";
-import { InferActions } from "../../types/flux";
 
-const actions = {
-  setIsInitialized: (isInitialized: boolean) => ({
-    type: "app/SET-IS-INITIALIZED",
-    payload: isInitialized
-  } as const),
-  switchLanguage: (language: Language) => ({
-    type: "app/SWITCH-LANGUAGE",
-    payload: language
-  } as const),
-  switchTheme: (theme: Theme) => ({
-    type: "app/SWITCH-THEME",
-    payload: theme
-  } as const)
-}
+export const setLanguage = createAction<PrepareAction<Language>, "app/SET-LANGUAGE">("app/SET-LANGUAGE", language => ({
+  payload: language
+}));
 
-export type Action = InferActions<typeof actions>;
-
-export default actions;
+export const setTheme = createAction<PrepareAction<Theme>, "app/SET-THEME">("app/SET-THEME", theme => ({
+  payload: theme
+}));

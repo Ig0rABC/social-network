@@ -1,18 +1,17 @@
 import React from "react";
 import { Comment } from "antd";
 import { Post, Comment as CommentType, Reply } from "../../types/models";
-import actions from "../../redux/actions/public";
 import PostForm, { PostFormValues } from "./PostForm";
-import { CommentFormValues } from "./Comments/CommentForm";
+import { CommentFormValues } from "../Comments/CommentForm";
 import AuthorAvatar from "../common/AuthorAvatar";
 import UserLink from "../common/UserLink";
-import Comments from "./Comments/Comments";
+import Comments from "../Comments/Comments";
 import ToggleLikeButton from "../common/ToggleLikeButton";
 import ViewItemsButton from "../common/ViewItemsButton";
 import EditButton from "../common/EditButton";
 import DeleteButton from "../common/DeleteButton";
 import EditCancelButton from "../common/EditCancelButton";
-import { ReplyFormValues } from "./Comments/Replies/ReplyForm";
+import { ReplyFormValues } from "../Replies/ReplyForm";
 
 type Props = {
   post: Post,
@@ -20,34 +19,37 @@ type Props = {
   currentUserId: number,
   editMode: boolean,
   comments: CommentType[],
-  likeInProgress: boolean,
-  likeCommentsInProgress: number[],
+  pendingLike: boolean,
+  pendingLikeComments: number[],
   editingCommentId: number,
   openedComments: boolean,
-  commentsWithOpenedReplies: number[],
+  openedReplies: number[],
   replies: Reply[],
   editingReplyId: number,
-  likeRepliesInProgress: number[],
+  pendingLikeReplies: number[],
   handlers: {
     posts: {
       onLikeClick: () => void,
-      onEditClick: () => void,
       onDeleteClick: () => void,
+      onEditClick: () => void,
+      onCancelEditingClick: () => void,
       onViewCommentsClick: () => void,
-      onFinishUpdating: (values: PostFormValues) => void,
+      onFinishUpdating: (values: PostFormValues) => void
     },
     comments: {
       onLikeClick: (commentId: number, isLiked: boolean) => () => void
-      onEditClick: (commentId: number) => () => void,
       onDeleteClick: (commentId: number) => () => void,
+      onEditClick: (commentId: number) => () => void,
+      onCancelEditingClick: () => void,
       onFinishCreating: (postId: number) => (values: CommentFormValues) => void,
       onFinishUpdating: (commentId: number) => (values: CommentFormValues) => void
       onViewRepliesClick: (commentId: number) => () => void
     },
     replies: {
       onLikeClick: (replyId: number, isLiked: boolean) => () => void
-      onEditClick: (replyId: number) => () => void,
       onDeleteClick: (replyId: number) => () => void,
+      onEditClick: (replyId: number) => () => void,
+      onCancelEditingClick: () => void,
       onFinishCreating: (commentId: number) =>(values: ReplyFormValues) => void,
       onFinishUpdating: (replyId: number) => (values: ReplyFormValues) => void
     },
@@ -59,14 +61,14 @@ type Props = {
 
 const PostComponent: React.FC<Props> = (props) => {
 
-  const { post, handlers, editMode, likeInProgress, ...restProps } = props;
+  const { post, handlers, editMode, pendingLike, ...restProps } = props;
   const isOwn = props.currentUserId === post.author.id;
 
   if (editMode) return (
     <PostForm key={post.id}
       onFinish={handlers.posts.onFinishUpdating}
       initialValues={{ category: post.category, content: post.content }}
-      extraElements={[<EditCancelButton onClick={actions.resetEditingPostId} />]}
+      extraElements={[<EditCancelButton onClick={handlers.comments.onCancelEditingClick} />]}
     />
   )
 
@@ -77,7 +79,7 @@ const PostComponent: React.FC<Props> = (props) => {
           isAuthorized={props.isAuthorized}
           isLiked={post.isLiked}
           likesCount={post.likesCount}
-          disabled={likeInProgress}
+          disabled={pendingLike}
           onClick={handlers.posts.onLikeClick}
           onUnauthorizedClick={handlers.common.onUnauthorizedClick}
         />,

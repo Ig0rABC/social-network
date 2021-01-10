@@ -1,6 +1,6 @@
 import React from "react";
 import { List } from "antd";
-import { Reply as ReplyType } from "../../../../types/models";
+import { Reply as ReplyType } from "../../types/models";
 import Reply from "./Reply";
 import ReplyForm, { ReplyFormValues } from "./ReplyForm";
 
@@ -9,13 +9,14 @@ type Props = {
   currentUserId: number,
   replies: ReplyType[],
   editingReplyId: number,
-  likeRepliesInProgress: number[],
+  pendingLikeReplies: number[],
   openedReplies: boolean,
   handlers: {
     replies: {
       onLikeClick: (replyId: number, isLiked: boolean) => () => void
-      onEditClick: (replyId: number) => () => void,
       onDeleteClick: (replyId: number) => () => void,
+      onEditClick: (replyId: number) => () => void,
+      onCancelEditingClick: () => void,
       onFinishCreating: (values: ReplyFormValues) => void,
       onFinishUpdating: (replyId: number) => (values: ReplyFormValues) => void
     },
@@ -27,7 +28,7 @@ type Props = {
 
 const Replies: React.FC<Props> = (props) => {
 
-  const { replies, handlers, openedReplies, likeRepliesInProgress, ...restProps } = props;
+  const { replies, handlers, openedReplies, pendingLikeReplies, ...restProps } = props;
   const isEmpty = replies.length === 0;
 
   return <div>
@@ -43,12 +44,13 @@ const Replies: React.FC<Props> = (props) => {
       renderItem={reply => (
         <Reply reply={reply} {...restProps}
           editMode={reply.id === props.editingReplyId}
-          likeInProgress={likeRepliesInProgress.includes(reply.id)}
+          pendingLike={pendingLikeReplies.includes(reply.id)}
           handlers={{
             replies: {
               onLikeClick: handlers.replies.onLikeClick(reply.id, reply.isLiked),
-              onEditClick: handlers.replies.onEditClick(reply.id),
               onDeleteClick: handlers.replies.onDeleteClick(reply.id),
+              onEditClick: handlers.replies.onEditClick(reply.id),
+              onCancelEditingClick: handlers.replies.onCancelEditingClick,
               onFinishUpdating: handlers.replies.onFinishUpdating(reply.id)
             },
             common: {

@@ -1,14 +1,31 @@
+import { createReducer } from "@reduxjs/toolkit";
 import { Post, Comment, Category, Reply } from "../../types/models";
-import { Action } from "../actions/public";
+import {
+  addPendingComments,
+  addPendingLikeComment,
+  addPendingLikePost,
+  addPendingLikeReply,
+  addPendingReplies,
+  openComments,
+  openReplies,
+  resetEditingCommentId, resetEditingPostId, resetEditingReplyId,
+  setEditingCommentId, setEditingPostId, setEditingReplyId, setFilter
+} from "../actions/public";
+import {
+  createComment, createPost, createReply, deleteComment, deletePost,
+  deleteReply, fetchComments, fetchPosts, fetchReplies, fetchShiftedPost,
+  setIsLikedComment, setIsLikedPost, setIsLikedReply, updateComment,
+  updatePost, updateReply
+} from "../thunks/public";
 
 const initialState = {
-  isFetching: false,
+  pendingPosts: false,
   posts: [] as Post[],
-  totalPostsCount: null as number | null,
-  likePostsInProgress: [] as number[],
+  totalPostsCount: 0,
+  pendingLikePosts: [] as number[],
   editingPostId: null as number | null,
-  openPostCommentsInProgress: [] as number[],
-  postsWithOpenedComments: [] as number[], // This is needed for show creation comment form to posts
+  pendingComments: [] as number[],
+  openedComments: [] as number[],
   filter: {
     authorId: null as number | null,
     category: null as Category | null,
@@ -17,136 +34,120 @@ const initialState = {
     pageSize: 4
   },
   comments: [] as Comment[],
-  likeCommentsInProgress: [] as number[],
+  pendingLikeComments: [] as number[],
   editingCommentId: null as number | null,
-  openCommentRepliesInProgress: [] as number[],
-  commentsWithOpenedReplies: [] as number[],
+  pendingReplies: [] as number[],
+  openedReplies: [] as number[],
   replies: [] as Reply[],
-  likeRepliesInProgress: [] as number[],
+  pendingLikeReplies: [] as number[],
   editingReplyId: null as number | null
 }
 
-type InitialState = typeof initialState;
 export type Filter = typeof initialState.filter;
 
-const publicReducer = (state = initialState, action: Action): InitialState => {
-  switch (action.type) {
-    case "public/SET-IS-FETCHING":
+const publicReducer = createReducer(initialState, builder =>
+  builder
+    .addCase(fetchPosts.pending, (state) => ({
+      ...state,
+      pendingPosts: true
+    }))
+    .addCase(fetchPosts.fulfilled, (state, { payload }) => ({
+      ...state,
+      pendingPosts: false,
+      posts: payload.posts,
+      totalPostsCount: payload.totalCount
+    }))
+    .addCase(createPost.fulfilled, (state, { payload }) => ({
+      ...state,
+      posts: state.posts.concat(payload)
+    }))
+    .addCase(deletePost.fulfilled, (state, { payload }) => ({
+      ...state,
+      posts: state.posts.filter(post => post.id !== payload),
+      totalPostsCount: state.totalPostsCount - 1
+    }))
+    .addCase(fetchShiftedPost.fulfilled, (state, { payload }) => ({
+      ...state,
+      posts: state.posts.concat(payload)
+    }))
+    .addCase(updatePost.fulfilled, (state, { payload }) => ({
+      ...state,
+      editingPostId: null,
+      posts: state.posts
+        .map(post => post.id === payload.postId
+          ? {
+            ...post,
+            category: payload.category,
+            content: payload.content
+          } : post
+        )
+    }))
+    .addCase(setEditingPostId, (state, { payload }) => ({
+      ...state,
+      editingPostId: payload
+    }))
+    .addCase(resetEditingPostId, (state) => ({
+      ...state,
+      editingPostId: null
+    }))
+    .addCase(addPendingLikePost, (state, { payload }) => ({
+      ...state,
+      pendingLikePosts: state.pendingLikePosts.concat(payload)
+    }))
+    .addCase(setIsLikedPost.fulfilled, (state, { payload }) => ({
+      ...state,
+      posts: state.posts
+        .map(post => post.id === payload.postId
+          ? {
+            ...post,
+            likesCount: payload.isLiked
+              ? post.likesCount + 1
+              : post.likesCount - 1,
+            isLiked: payload.isLiked,
+          } : post
+        ),
+      pendingLikePosts: state.pendingLikePosts
+        .filter(id => id !== payload.postId)
+    }))
+    .addCase(setFilter, (state, { payload }) => ({
+      ...state,
+      filter: payload
+    }))
+    .addCase(addPendingComments, (state, { payload }) => ({
+      ...state,
+      pendingComments: state.pendingComments.concat(payload)
+    }))
+    .addCase(openComments, (state, { payload }) => ({
+      ...state,
+      openedComments: state.openedComments.concat(payload)
+    }))
+    .addCase(fetchComments.fulfilled, (state, { payload }) => {
+      const postId = payload[0].postId;
       return {
         ...state,
-        isFetching: action.payload
+        pendingComments: state.pendingComments.filter(id => id !== postId),
+        comments: state.comments.concat(payload),
+        openedComments: state.openedComments.concat(postId)
       }
-    case "public/SET-POSTS":
+    })
+    .addCase(createComment.fulfilled, (state, { payload }) => ({
+      ...state,
+      comments: state.comments.concat(payload),
+      posts: state.posts
+        .map(post => post.id === payload.postId
+          ? {
+            ...post,
+            commentsCount: post.commentsCount + 1
+          } : post
+        )
+    }))
+    .addCase(deleteComment.fulfilled, (state, { payload }) => {
+      const postId = state.comments
+        .find(comment => comment.id === payload)
+        ?.postId;
       return {
         ...state,
-        posts: action.payload
-      }
-    case "public/SET-TOTAL-POSTS-COUNT":
-      return {
-        ...state,
-        totalPostsCount: action.payload
-      }
-    case "public/ADD-NEW-POST":
-      return {
-        ...state,
-        posts: [action.payload, ...state.posts],
-        totalPostsCount: state.totalPostsCount as number + 1
-      }
-    case "public/ADD-SHIFTED-POST":
-      return {
-        ...state,
-        posts: [...state.posts, action.payload]
-      }
-    case "public/DELETE-POST":
-      return {
-        ...state,
-        posts: state.posts.filter(post => post.id !== action.payload),
-        totalPostsCount: state.totalPostsCount as number - 1
-      }
-    case "public/UPDATE-POST":
-      return {
-        ...state,
-        posts: state.posts
-          .map(post => post.id === action.payload.postId
-            ? {
-              ...post,
-              category: action.payload.category,
-              content: action.payload.content
-            } : post
-          )
-      }
-    case "public/SET-EDITING-POST-ID":
-      return {
-        ...state,
-        editingPostId: action.payload
-      }
-    case "public/RESET-EDITING-POST-ID":
-      return {
-        ...state,
-        editingPostId: initialState.editingPostId
-      }
-    case "public/TOGGLE-IS-LIKED-POST":
-      return {
-        ...state,
-        posts: state.posts
-          .map(post => post.id === action.payload
-            ? {
-              ...post,
-              likesCount: post.isLiked
-                ? post.likesCount - 1
-                : post.likesCount + 1,
-              isLiked: !post.isLiked,
-            } : post
-          )
-      }
-    case "public/SET-LIKE-POST-IN-PROGRESS":
-      return {
-        ...state,
-        likePostsInProgress: action.payload.isFetching
-          ? [...state.likePostsInProgress, action.payload.postId]
-          : state.likePostsInProgress
-            .filter(postId => postId !== action.payload.postId)
-      }
-    case "public/SET-FILTER":
-      return {
-        ...state,
-        filter: action.payload
-      }
-    case "public/SET-OPEN-POST-COMMENTS-IN-PROGRESS":
-      return {
-        ...state,
-        openPostCommentsInProgress: action.payload.isFetching
-          ? [...state.openPostCommentsInProgress, action.payload.postId]
-          : state.openCommentRepliesInProgress
-            .filter(postId => postId !== action.payload.postId)
-      }
-    case "public/ADD-POST-WITH-OPENED-COMMENTS":
-      return {
-        ...state,
-        postsWithOpenedComments: [...state.postsWithOpenedComments, action.payload]
-      }
-    case "public/ADD-COMMENTS":
-      return {
-        ...state,
-        comments: [...state.comments, ...action.payload]
-      }
-    case "public/ADD-NEW-COMMENT":
-      return {
-        ...state,
-        comments: [...state.comments, action.payload],
-        posts: state.posts
-          .map(post => post.id === action.payload.postId
-            ? {
-              ...post, commentsCount: post.commentsCount + 1
-            } : post
-          )
-      }
-    case "public/DELETE-COMMENT":
-      const comment = state.comments.find(comment => comment.id === action.payload);
-      const postId = comment?.postId;
-      return {
-        ...state,
-        comments: state.comments.filter(comment => comment.id !== action.payload),
+        comments: state.comments.filter(comment => comment.id !== payload),
         posts: state.posts
           .map(post => post.id === postId
             ? {
@@ -155,95 +156,79 @@ const publicReducer = (state = initialState, action: Action): InitialState => {
             } : post
           )
       }
-    case "public/UPDATE-COMMENT":
+    })
+    .addCase(updateComment.fulfilled, (state, { payload }) => ({
+      ...state,
+      comments: state.comments
+        .map(comment => comment.id === payload.commentId
+          ? {
+            ...comment,
+            content: payload.content
+          } : comment
+        )
+    }))
+    .addCase(setEditingCommentId, (state, { payload }) => ({
+      ...state,
+      editingCommentId: payload
+    }))
+    .addCase(resetEditingCommentId, (state) => ({
+      ...state,
+      editingCommentId: null
+    }))
+    .addCase(addPendingLikeComment, (state, { payload }) => ({
+      ...state,
+      pendingLikeComments: state.pendingLikeComments.concat(payload)
+    }))
+    .addCase(setIsLikedComment.fulfilled, (state, { payload }) => ({
+      ...state,
+      comments: state.comments
+        .map(comment => comment.id === payload.commentId
+          ? {
+            ...comment,
+            likesCount: payload.isLiked
+              ? comment.likesCount + 1
+              : comment.likesCount - 1,
+            isLiked: payload.isLiked,
+          } : comment
+        ),
+      pendingLikeComments: state.pendingLikeComments
+        .filter(id => id !== payload.commentId)
+    }))
+    .addCase(addPendingReplies, (state, { payload }) => ({
+      ...state,
+      pendingReplies: state.pendingReplies.concat(payload)
+    }))
+    .addCase(openReplies, (state, { payload }) => ({
+      ...state,
+      openedReplies: state.openedReplies.concat(payload)
+    }))
+    .addCase(fetchReplies.fulfilled, (state, { payload }) => {
+      const commentId = payload[0].commentId;
       return {
         ...state,
-        comments: state.comments
-          .map(comment => comment.id === action.payload.commentId
-            ? {
-              ...comment,
-              content: action.payload.content
-            } : comment
-          )
+        pendingReplies: state.pendingReplies.filter(id => id !== commentId),
+        replies: state.replies.concat(payload),
+        openedReplies: state.openedReplies.concat(commentId)
       }
-    case "public/SET-EDITING-COMMENT-ID":
+    })
+    .addCase(createReply.fulfilled, (state, { payload }) => ({
+      ...state,
+      replies: state.replies.concat(payload),
+      comments: state.comments
+        .map(comment => comment.id === payload.commentId
+          ? {
+            ...comment,
+            repliesCount: comment.repliesCount + 1
+          } : comment
+        )
+    }))
+    .addCase(deleteReply.fulfilled, (state, { payload }) => {
+      const commentId = state.replies
+        .find(reply => reply.id === payload)
+        ?.commentId;
       return {
         ...state,
-        editingCommentId: action.payload
-      }
-    case "public/RESET-EDITING-COMMENT-ID":
-      return {
-        ...state,
-        editingCommentId: initialState.editingCommentId
-      }
-    case "public/TOGGLE-IS-LIKED-COMMENT":
-      return {
-        ...state,
-        comments: state.comments
-          .map(comment => comment.id === action.payload
-            ? {
-              ...comment,
-              likesCount: comment.isLiked
-                ? comment.likesCount - 1
-                : comment.likesCount + 1,
-              isLiked: !comment.isLiked,
-            } : comment
-          )
-      }
-    case "public/SET-LIKE-COMMENT-IN-PROGRESS":
-      return {
-        ...state,
-        likeCommentsInProgress: action.payload.isFetching
-          ? [...state.likeCommentsInProgress, action.payload.commentId]
-          : state.likeCommentsInProgress
-            .filter(commentId => commentId !== action.payload.commentId)
-      }
-    case "public/SET-OPEN-COMMENT-REPLIES-IN-PROGRESS":
-      return {
-        ...state,
-        openPostCommentsInProgress: action.payload.isFetching
-          ? [...state.openPostCommentsInProgress, action.payload.commentId]
-          : state.openPostCommentsInProgress
-            .filter(commentId => commentId !== action.payload.commentId)
-      }
-    case "public/ADD-COMMENT-WITH-OPENED-REPLIES":
-      return {
-        ...state,
-        commentsWithOpenedReplies: [...state.commentsWithOpenedReplies, action.payload]
-      }
-    case "public/ADD-REPLIES":
-      return {
-        ...state,
-        replies: [...state.replies, ...action.payload]
-      }
-    case "public/ADD-NEW-REPLY":
-      return {
-        ...state,
-        replies: [...state.replies, action.payload],
-        comments: state.comments
-          .map(comment => comment.id === action.payload.commentId
-            ? {
-              ...comment, repliesCount: comment.repliesCount + 1
-            } : comment
-          )
-      }
-    case "public/UPDATE-REPLY":
-      return {
-        ...state,
-        replies: state.replies
-          .map(reply => reply.id === action.payload.replyId
-            ? {
-              ...reply,
-              content: action.payload.content
-            } : reply
-          )
-      }
-    case "public/DELETE-REPLY":
-      const reply = state.replies.find(reply => reply.id === action.payload);
-      const commentId = reply?.commentId;
-      return {
-        ...state,
-        replies: state.replies.filter(reply => reply.id !== action.payload),
+        replies: state.replies.filter(reply => reply.id !== payload),
         comments: state.comments
           .map(comment => comment.id === commentId
             ? {
@@ -252,41 +237,44 @@ const publicReducer = (state = initialState, action: Action): InitialState => {
             } : comment
           )
       }
-    case "public/SET-EDITING-REPLY-ID":
-      return {
-        ...state,
-        editingReplyId: action.payload
-      }
-    case "public/RESET-EDITING-REPLY-ID":
-      return {
-        ...state,
-        editingReplyId: initialState.editingReplyId
-      }
-    case "public/TOGGLE-IS-LIKED-REPLY":
-      return {
-        ...state,
-        replies: state.replies
-          .map(reply => reply.id === action.payload
-            ? {
-              ...reply,
-              likesCount: reply.isLiked
-                ? reply.likesCount - 1
-                : reply.likesCount + 1,
-              isLiked: !reply.isLiked,
-            } : reply
-          )
-      }
-    case "public/SET-LIKE-REPLY-IN-PROGRESS":
-      return {
-        ...state,
-        likeRepliesInProgress: action.payload.isFetching
-          ? [...state.likeRepliesInProgress, action.payload.replyId]
-          : state.likeRepliesInProgress
-            .filter(commentId => commentId !== action.payload.replyId)
-      }
-    default:
-      return state;
-  }
-}
+    })
+    .addCase(updateReply.fulfilled, (state, { payload }) => ({
+      ...state,
+      replies: state.replies
+        .map(reply => reply.id === payload.replyId
+          ? {
+            ...reply,
+            content: payload.content
+          } : reply
+        )
+    }))
+    .addCase(setEditingReplyId, (state, { payload }) => ({
+      ...state,
+      editingReplyId: payload
+    }))
+    .addCase(resetEditingReplyId, (state) => ({
+      ...state,
+      editingReplyId: null
+    }))
+    .addCase(addPendingLikeReply, (state, { payload }) => ({
+      ...state,
+      pendingLikeReplies: state.pendingLikeReplies.concat(payload)
+    }))
+    .addCase(setIsLikedReply.fulfilled, (state, { payload }) => ({
+      ...state,
+      replies: state.replies
+        .map(reply => reply.id === payload.replyId
+          ? {
+            ...reply,
+            likesCount: payload.isLiked
+              ? reply.likesCount + 1
+              : reply.likesCount - 1,
+            isLiked: payload.isLiked,
+          } : reply
+        ),
+      pendingLikeReplies: state.pendingLikeReplies
+        .filter(id => id !== payload.replyId)
+    }))
+)
 
 export default publicReducer;

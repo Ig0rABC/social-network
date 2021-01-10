@@ -4,8 +4,8 @@ import { useHistory } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import { Form, Input, Select } from 'antd';
 import { Category } from "../../types/models";
+import { setFilter } from "../../redux/actions/public";
 import { selectFilter } from "../../redux/selectors/public";
-import actions from "../../redux/actions/public";
 import { buildQueryString } from "../../utils";
 
 const layout = {
@@ -36,10 +36,9 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
   const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
 
   useEffect(() => {
-    console.log("[]");
     const search = history.location.search;
     const newFilter = Object.fromEntries(new URLSearchParams(search));
-    dispatch(actions.setFilter({ ...filter, ...newFilter }));
+    dispatch(setFilter({ ...filter, ...newFilter }));
   }, [])
 
   useEffect(() => {
@@ -59,11 +58,11 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
     if (search === "") {
       search = null;
     }
-    dispatch(actions.setFilter({ ...filter, search }));
+    dispatch(setFilter({ ...filter, search }));
   };
 
   const handleSelect = (category: Category) => {
-    dispatch(actions.setFilter({ ...filter, category }));
+    dispatch(setFilter({ ...filter, category }));
   };
 
   return <Form {...layout}

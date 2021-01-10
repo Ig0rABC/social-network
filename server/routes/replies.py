@@ -27,7 +27,7 @@ def create_reply():
             cursor.execute(Users.get_user_id(), cookies)
             record = cursor.fetchone()
             author_id = record['user_id']
-            cursor.execute(Reply.create(), {'author_id': author_id, **payload})
+            cursor.execute(Replies.create(), {'author_id': author_id, **payload})
             reply = cursor.fetchone()
     put_out_author(reply)
     return jsonify(converts_keys(reply, case='camel')), 201
@@ -35,13 +35,14 @@ def create_reply():
 @app.route('/replies', methods=['GET'])
 def get_replies():
     params = converts_keys(request.args.to_dict(), case='snake')
-    set_filter_params(DEFAULT_reply_LIMIT, MAX_reply_LIMIT, params)
+    set_filter_params(DEFAULT_REPLY_LIMIT, MAX_REPLY_LIMIT, params)
     cookies = request.cookies
     if 'token' in cookies:
         with connect(DSN) as connection:
             with connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(Users.get_user_id(), cookies)
                 record = cursor.fetchone()
+                user_id = record['user_id']
     else:
         user_id = 0
     with connect(DSN) as connection:

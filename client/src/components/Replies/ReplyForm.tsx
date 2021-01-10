@@ -2,7 +2,7 @@ import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
-import { selectIsFetching } from "../../../../redux/selectors/public";
+import { selectPendingPosts } from "../../redux/selectors/public";
 
 const layout = {
   labelCol: { span: 8 },
@@ -25,7 +25,7 @@ type Props = {
 const ReplyForm: React.FC<Props> = ({ onFinish, initialValues = { content: "" }, extraElements = [] }) => {
 
   const [form] = Form.useForm();
-  const isFetcing = useSelector(selectIsFetching);
+  const pending = useSelector(selectPendingPosts);
 
   return <Form form={form}
     {...layout}
@@ -48,7 +48,7 @@ const ReplyForm: React.FC<Props> = ({ onFinish, initialValues = { content: "" },
     </Form.Item>
 
     <Form.Item {...tailLayout}>
-      <Button type="primary" htmlType="submit" disabled={isFetcing}>
+      <Button type="primary" htmlType="submit" disabled={pending}>
         <FormattedMessage id="buttons.reply" defaultMessage="reply" />
       </Button>
     </Form.Item>

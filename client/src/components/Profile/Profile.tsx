@@ -3,16 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import { Divider } from "antd";
-import { selectCurrentUser, selectIsFollowedOnSelectedUser, selectSelectedProfile } from "../../redux/selectors/users";
-import { requestProfile } from "../../redux/thunks/users";
+import { selectCurrentUser, selectIsFollowedOnSelectedUser, selectProfile } from "../../redux/selectors/users";
+import { fetchProfile } from "../../redux/thunks/users";
 import { Profile as ProfileType } from "../../types/models";
 import { convertProfileToUser } from "../../types/conversions";
 import Posts from "../Posts/Posts";
 import ProfileAvatar from "./ProfileAvatar";
 import UserInfo from "./UserInfo/UserInfo";
-import ToggleFollowButton from "./ToggleFollowButton";
+import FollowButton from "./FollowButton";
 import FollowersCount from "./FollowersCount";
 import Followings from "../Followings/Followings";
+import Preloader from "../Preloader/Preloader";
 
 type Params = {
   userId: string
@@ -23,20 +24,23 @@ const Profile: React.FC = () => {
   const dispatch = useDispatch();
   const { userId } = useParams<Params>();
   const currentUser = useSelector(selectCurrentUser);
-  const selectedProfile = useSelector(selectSelectedProfile);
+  const profile = useSelector(selectProfile);
   const isFollowed = useSelector(selectIsFollowedOnSelectedUser);
   const selectedUserId = Number(userId);
 
   useEffect(() => {
-    dispatch(requestProfile(selectedUserId))
+    dispatch(fetchProfile(selectedUserId))
   }, [selectedUserId])
 
   if (isNaN(selectedUserId)) {
-    return <Redirect to={"/users/" + currentUser.id} />
+    return <Redirect to={"/users/" + currentUser?.id} />
   }
-  const isOwnProfile = selectedUserId === currentUser.id;
+  const isOwnProfile = selectedUserId === currentUser?.id;
 
-  const { photoUrl, firstName, lastName, login } = selectedProfile;
+  if (profile === null) {
+    return <Preloader />
+  }
+  const { photoUrl, firstName, lastName, login } = profile;
   const username = firstName || lastName
     ? `${login}, ${firstName} ${lastName}`
     : login
@@ -48,18 +52,18 @@ const Profile: React.FC = () => {
       />
       <span>{username}</span>
       {!isOwnProfile
-        && <ToggleFollowButton
-          user={convertProfileToUser(selectedProfile as ProfileType)}
+        && <FollowButton
+          user={convertProfileToUser(profile)}
           isFollowed={isFollowed}
         />
       }
       <FollowersCount
-        followersCount={selectedProfile.followersCount}
+        followersCount={profile?.followersCount || 0}
       />
     </div>
     <UserInfo
       isOwn={isOwnProfile}
-      profile={selectedProfile as ProfileType}
+      profile={profile as ProfileType}
     />
     {isOwnProfile
       && <Followings />

@@ -18,7 +18,7 @@ const LoginForm: React.FC = () => {
 
   const onFinish = (values: RegisterFormValues) => {
     setSubmitting(true);
-    dispatch(register(values.login, values.password));
+    dispatch(register(values));
   };
 
   const loginPlaceholder = intl.formatMessage({

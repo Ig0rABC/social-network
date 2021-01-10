@@ -13,12 +13,16 @@ const style = {
 const CurrentUserAvatar: React.FC = () => {
 
   const currentUser = useSelector(selectCurrentUser);
+  if (currentUser === null) {
+    return <Avatar size={48} icon={<UserOutlined />} style={style} />
+  }
+  const { id, login, photoUrl } = currentUser;
 
   return (
-    <NavLink to={"users/" + currentUser.id}>
+    <NavLink to={"users/" + id}>
       <Space>
-        {currentUser.login}
-        <Avatar size={48} src={currentUser.photoUrl} icon={<UserOutlined />} style={style} />
+        {login}
+        <Avatar size={48} src={photoUrl} />
       </Space>
     </NavLink>
   )

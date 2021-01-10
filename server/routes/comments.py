@@ -42,6 +42,7 @@ def get_comments():
             with connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(Users.get_user_id(), cookies)
                 record = cursor.fetchone()
+                user_id = record['user_id']
     else:
         user_id = 0
     with connect(DSN) as connection:

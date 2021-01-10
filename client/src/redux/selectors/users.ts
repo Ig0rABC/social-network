@@ -5,15 +5,15 @@ export const selectCurrentUser = (state: RootState) => {
 }
 
 export const selectIsAuthorized = (state: RootState) => {
-  return state.users.isAuthorized;
+  return state.users.currentUser !== null;
 }
 
-export const selectSelectedProfile = (state: RootState) => {
-  return state.users.selectedProfile;
+export const selectProfile = (state: RootState) => {
+  return state.users.profile;
 }
 
-export const selectFollowingInProgress = (state: RootState) => {
-  return state.users.followingInProgress;
+export const selectPendingFollowing = (state: RootState) => {
+  return state.users.pendingFollowing;
 }
 
 export const selectProfileEditMode = (state: RootState) => {
@@ -25,9 +25,9 @@ export const selectFollowings = (state: RootState) => {
 }
 
 export const selectIsFollowedOnSelectedUser = (state: RootState) => {
-  const selectedProfile = selectSelectedProfile(state);
+  const profile = selectProfile(state);
   const followings = selectFollowings(state);
   return followings
     .map(user => user.id)
-    .includes(selectedProfile.userId as number);
+    .includes(profile?.userId as number);
 }

@@ -1,40 +1,41 @@
 import React from "react";
 import { Comment as AntdComment } from "antd";
-import { Comment as CommentType, Reply } from "../../../types/models";
-import actions from "../../../redux/actions/public";
+import { Comment as CommentType, Reply } from "../../types/models";
 import CommentForm, { CommentFormValues } from "./CommentForm";
-import UserLink from "../../common/UserLink";
-import AuthorAvatar from "../../common/AuthorAvatar";
-import ToggleLikeButton from "../../common/ToggleLikeButton";
-import ViewItemsButton from "../../common/ViewItemsButton";
-import EditButton from "../../common/EditButton";
-import DeleteButton from "../../common/DeleteButton";
-import EditCancelButton from "../../common/EditCancelButton";
-import Replies from "./Replies/Replies";
-import { ReplyFormValues } from "./Replies/ReplyForm";
+import UserLink from "../common/UserLink";
+import AuthorAvatar from "../common/AuthorAvatar";
+import ToggleLikeButton from "../common/ToggleLikeButton";
+import ViewItemsButton from "../common/ViewItemsButton";
+import EditButton from "../common/EditButton";
+import DeleteButton from "../common/DeleteButton";
+import EditCancelButton from "../common/EditCancelButton";
+import Replies from "../Replies/Replies";
+import { ReplyFormValues } from "../Replies/ReplyForm";
 
 type Props = {
   comment: CommentType,
   isAuthorized: boolean,
   currentUserId: number,
   editMode: boolean,
-  likeInProgress: boolean,
+  pendingLike: boolean,
   replies: Reply[],
   editingReplyId: number,
-  likeRepliesInProgress: number[],
+  pendingLikeReplies: number[],
   openedReplies: boolean,
   handlers: {
     comments: {
       onLikeClick: () => void
-      onEditClick: () => void,
       onDeleteClick: () => void,
+      onEditClick: () => void,
+      onCancelEditingClick: () => void,
       onFinishUpdating: (values: CommentFormValues) => void,
       onViewRepliesClick: () => void
     },
     replies: {
       onLikeClick: (replyId: number, isLiked: boolean) => () => void
-      onEditClick: (replyId: number) => () => void,
       onDeleteClick: (replyId: number) => () => void,
+      onEditClick: (replyId: number) => () => void,
+      onCancelEditingClick: () => void,
       onFinishCreating: (commentId: number) => (values: ReplyFormValues) => void,
       onFinishUpdating: (replyId: number) => (values: ReplyFormValues) => void
     },
@@ -46,14 +47,14 @@ type Props = {
 
 const Comment: React.FC<Props> = (props) => {
 
-  const { comment, handlers, editMode, likeInProgress, ...restProps } = props;
+  const { comment, handlers, editMode, pendingLike, ...restProps } = props;
   const isOwn = props.currentUserId === comment.author.id;
 
   if (editMode) return (
     <CommentForm
       onFinish={handlers.comments.onFinishUpdating}
       initialValues={{ content: comment.content }}
-      extraElements={[<EditCancelButton onClick={actions.resetEditingCommentId} />]}
+      extraElements={[<EditCancelButton onClick={handlers.comments.onCancelEditingClick} />]}
     />
   )
 
@@ -64,7 +65,7 @@ const Comment: React.FC<Props> = (props) => {
           isAuthorized={props.isAuthorized}
           isLiked={comment.isLiked}
           likesCount={comment.likesCount}
-          disabled={likeInProgress}
+          disabled={pendingLike}
           onClick={handlers.comments.onLikeClick}
           onUnauthorizedClick={handlers.common.onUnauthorizedClick}
         />,

@@ -22,7 +22,7 @@ const LoginForm: React.FC = () => {
 
   const onFinish = (values: LoginFormValues) => {
     setSubmitting(true);
-    dispatch(signIn(values.login, values.password, values.rememberMe));
+    dispatch(signIn(values));
   };
 
   useEffect(() => {

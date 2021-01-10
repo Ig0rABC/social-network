@@ -1,5 +1,7 @@
+import { createReducer } from "@reduxjs/toolkit";
 import { Language, Theme } from "../../types/app";
-import { Action } from "../actions/app";
+import { setLanguage, setTheme } from "../actions/app";
+import { initialize } from "../thunks/app";
 
 const initialState = {
   isInitialized: false,
@@ -7,28 +9,24 @@ const initialState = {
   language: "en" as Language
 }
 
-type InitialState = typeof initialState;
-
-const appReducer = (state = initialState, action: Action): InitialState => {
-  switch (action.type) {
-    case "app/SET-IS-INITIALIZED":
-      return {
-        ...state,
-        isInitialized: action.payload
-      }
-    case "app/SWITCH-LANGUAGE":
-      return {
-        ...state,
-        language: action.payload
-      }
-    case "app/SWITCH-THEME":
-      return {
-        ...state,
-        theme: action.payload
-      }
-    default:
-      return state;
-  }
-}
+const appReducer = createReducer(initialState, builder =>
+  builder
+    .addCase(setLanguage, (state, { payload }) => ({
+      ...state,
+      language: payload
+    }))
+    .addCase(setTheme, (state, { payload }) => ({
+      ...state,
+      theme: payload
+    }))
+    .addCase(initialize.fulfilled, (state) => ({
+      ...state,
+      isInitialized: true
+    }))
+    .addCase(initialize.rejected, (state) => ({
+      ...state,
+      isInitialized: true
+    }))
+)
 
 export default appReducer;

@@ -5,8 +5,8 @@ import { Button, Descriptions, Divider } from 'antd';
 import { EditOutlined } from "@ant-design/icons";
 import { Profile } from "../../../types/models";
 import { selectProfileEditMode } from "../../../redux/selectors/users";
+import { setProfileEditMode } from "../../../redux/actions/users";
 import UserInfoForm from "./UserInfoForm";
-import actions from "../../../redux/actions/users";
 import Contacts from "./Contacts/Contacts";
 
 const { Item } = Descriptions;
@@ -28,7 +28,7 @@ const UserInfo: React.FC<Props> = ({ profile, isOwn }) => {
   const { contacts, about } = profile;
 
   const handleEditClick = () => {
-    dispatch(actions.setProfileEditMode(true));
+    dispatch(setProfileEditMode(true));
   }
 
   const editButton = (

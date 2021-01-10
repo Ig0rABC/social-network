@@ -1,7 +1,7 @@
 import { RootState } from "../store";
 
-export const selectIsFetching = (state: RootState) => {
-  return state.public.isFetching;
+export const selectPendingPosts = (state: RootState) => {
+  return state.public.pendingPosts;
 }
 
 export const selectFilter = (state: RootState) => {
@@ -16,8 +16,8 @@ export const selectTotalPostsCount = (state: RootState) => {
   return state.public.totalPostsCount;
 }
 
-export const selectLikePostsInProgress = (state: RootState) => {
-  return state.public.likePostsInProgress;
+export const selectPendingLikePosts = (state: RootState) => {
+  return state.public.pendingLikePosts;
 }
 
 export const selectEditingPostId = (state: RootState) => {
@@ -28,28 +28,28 @@ export const selectComments = (state: RootState) => {
   return state.public.comments;
 }
 
-export const selectLikeCommentsInProgress = (state: RootState) => {
-  return state.public.likeCommentsInProgress;
+export const selectPendingLikeComments = (state: RootState) => {
+  return state.public.pendingLikeComments;
 }
 
 export const selectEditingCommentId = (state: RootState) => {
   return state.public.editingCommentId;
 }
 
-export const selectPostsWithOpenedComments = (state: RootState) => {
-  return state.public.postsWithOpenedComments;
+export const selectOpenedComments = (state: RootState) => {
+  return state.public.openedComments;
 }
 
-export const selectCommentsWithOpenedReplies = (state: RootState) => {
-  return state.public.commentsWithOpenedReplies;
+export const selectOpenedReplies = (state: RootState) => {
+  return state.public.openedReplies;
 }
 
 export const selectReplies = (state: RootState) => {
   return state.public.replies;
 }
 
-export const selectLikeRepliesInProgress = (state: RootState) => {
-  return state.public.likeRepliesInProgress;
+export const selectPendingLikeReplies = (state: RootState) => {
+  return state.public.pendingLikeReplies;
 }
 
 export const selectEditingReplyId = (state: RootState) => {

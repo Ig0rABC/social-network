@@ -1,12 +1,16 @@
 import React, { ChangeEvent, useState } from "react";
+import { useDispatch } from "react-redux";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Button, Divider, Form, Input } from "antd";
-import { GithubOutlined, InstagramOutlined, MailOutlined, SendOutlined, FacebookOutlined, TwitterOutlined, PhoneOutlined } from "@ant-design/icons";
-import { Contacts, Profile } from "../../../types/models";
-import { useDispatch } from "react-redux";
-import { updateProfile } from "../../../redux/thunks/users";
-import actions from "../../../redux/actions/users";
 import { useForm } from "antd/lib/form/Form";
+import {
+  GithubOutlined, InstagramOutlined, MailOutlined,
+  SendOutlined, FacebookOutlined, TwitterOutlined,
+  PhoneOutlined
+} from "@ant-design/icons";
+import { Contacts, Profile } from "../../../types/models";
+import { updateProfile } from "../../../redux/thunks/users";
+import { setProfileEditMode } from "../../../redux/actions/users";
 import { getObjectWithoutNullProps } from "../../../utils";
 
 const { Item } = Form;
@@ -101,7 +105,7 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
   }
 
   const handleCancel = () => {
-    dispatch(actions.setProfileEditMode(false));
+    dispatch(setProfileEditMode(false));
   }
 
   const handleChangeContact = (event: ChangeEvent<HTMLInputElement>) => {

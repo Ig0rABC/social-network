@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Menu, Dropdown } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
-import actions from "../../redux/actions/app";
+import { setTheme } from "../../redux/actions/app";
 
 const { Item } = Menu;
 
@@ -12,7 +12,7 @@ const ThemeSwitcher: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleMenuClick = (event: any) => {
-    dispatch(actions.switchTheme(event.key));
+    dispatch(setTheme(event.key));
   }
 
   const menu = (

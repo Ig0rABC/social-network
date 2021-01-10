@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import { Menu, Dropdown } from "antd";
 import { TranslationOutlined } from "@ant-design/icons";
-import actions from "../../redux/actions/app";
+import { setLanguage } from "../../redux/actions/app";
 
 const { Item } = Menu;
 
@@ -12,7 +12,7 @@ const LanguageSwitcher: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleMenuClick = (event: any) => {
-    dispatch(actions.switchLanguage(event.key));
+    dispatch(setLanguage(event.key));
   }
 
   const menu = (

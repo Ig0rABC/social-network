@@ -1,13 +1,13 @@
 import React, { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
-import { Button, Descriptions, Divider } from 'antd';
+import { Button, Descriptions, Divider } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { Profile } from "../../../types/models";
 import { selectProfileEditMode } from "../../../redux/selectors/users";
 import { setProfileEditMode } from "../../../redux/actions/users";
 import UserInfoForm from "./UserInfoForm";
-import Contacts from "./Contacts/Contacts";
+import Contacts from "./Contacts";
 
 const { Item } = Descriptions;
 

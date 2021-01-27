@@ -22,13 +22,15 @@
   "messages": "Сообщения",
   "post-by": "Пост",
   "user-posts": "Записи",
+  "first-name": "Имя",
+  "last-name": "Фамилия",
   "about": "О себе",
   "contacts": "Контакты",
   "phone-number": "Номер телефона",
   "no-data": "Пусто",
   "total-posts-count": "{0}-{1} Из {total} Постов",
-  "followings-count": "Кол-во подписок: {count}",
-  "followers-count": "{count} Подписчиков",
+  "followings-count": "Подписок: {count}",
+  "followers-count": "Подписчиков: {count}",
   "themes": {
     "dark": "Темная",
     "light": "Светлая",
@@ -67,11 +69,11 @@
     },
     "404": {
       "title": "Не найдено",
-      "description": "Извините, похоже, страница, на которую вы хотите перейти, не существует"
+      "description": "Cтраница, на которую вы хотите перейти, не существует"
     },
     "500": {
       "title": "Ошибка сервера",
-      "description": "Приносим свои извенения, на сервере произошла ошибка"
+      "description": "Приносим свои извинения, на сервере произошла ошибка"
     }
   },
   "categories": {

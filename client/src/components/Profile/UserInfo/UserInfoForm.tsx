@@ -109,8 +109,8 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
   }
 
   const handleChangeContact = (event: ChangeEvent<HTMLInputElement>) => {
-    const contact_id = event.target.id;
-    const key = contact_id.replace("contacts_", "");
+    const contactId = event.target.id;
+    const key = contactId.replace("contacts_", "");
     const value = form.getFieldValue(['contacts', key]);
     const match = contactsPatterns[key as keyof typeof contactsPatterns].test(value);
     setContactsStatuses({ ...contactsStatuses, [key]: match })
@@ -120,19 +120,19 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
 
     <Item name="firstName">
       <Input
-        placeholder={intl.formatMessage({ id: "firstName", defaultMessage: "first name" })}
+        placeholder={intl.formatMessage({ id: "first-name" })}
       />
     </Item>
 
     <Item name="lastName">
       <Input
-        placeholder={intl.formatMessage({ id: "lastName", defaultMessage: "last name" })}
+        placeholder={intl.formatMessage({ id: "last-name" })}
       />
     </Item>
 
     <Item name="about">
       <Input
-        placeholder={intl.formatMessage({ id: "about", defaultMessage: "about" })}
+        placeholder={intl.formatMessage({ id: "about" })}
       />
     </Item>
 

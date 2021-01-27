@@ -13,7 +13,7 @@ const NavBar: React.FC = () => {
 
   const currentUser = useSelector(selectCurrentUser);
 
-  return <Menu theme="dark" mode="horizontal"
+  return <Menu theme="dark" mode="horizontal" selectable={false}
     style={{ userSelect: "none" }}
   >
     <Item key="1">

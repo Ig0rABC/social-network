@@ -68,14 +68,14 @@ const Profile: React.FC = () => {
       <FollowersCount
         followersCount={profile?.followersCount || 0}
       />
+      {isOwnProfile
+        && <Followings />
+      }
     </div>
     <UserInfo
       isOwn={isOwnProfile}
       profile={profile as ProfileType}
     />
-    {isOwnProfile
-      && <Followings />
-    }
     <Divider plain orientation="right">
       <FormattedMessage id="user-posts" />
     </Divider>

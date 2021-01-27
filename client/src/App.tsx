@@ -11,6 +11,7 @@ import MainLayout from "./components/Layouts/MainLayout";
 import Home from "./components/Home/Home";
 import Profile from "./components/Profile/Profile";
 import { withLayout } from "./components/HOCs/withLayout";
+import Feed from "./components/Feed/Feed";
 
 const UnauthorizedLayout = lazy(() => import("./components/Layouts/UnauthorizedLayout"));
 const Login = lazy(() => import("./components/Login/Login"));
@@ -43,6 +44,7 @@ const App: React.FC = () => {
           <Switch>
             <Route exact path="/register" component={withLayout(Register, UnauthorizedLayout)} />
             <Route exact path="/login" component={withLayout(Login, UnauthorizedLayout)} />
+            <Route exact path="/feed" component={withLayout(Feed, MainLayout)} />
             <Route path="/users/:userId?" component={withLayout(Profile, MainLayout)} />
             <Route exact path="/" component={withLayout(Home, MainLayout)} />
             <Route exact path="/*" component={withLayout(NotFound, MainLayout)} />

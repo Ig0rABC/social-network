@@ -5,7 +5,7 @@ import { FormattedMessage } from "react-intl";
 import { Divider } from "antd";
 import { selectCurrentUser, selectIsFollowedOnSelectedUser, selectProfile } from "../../redux/selectors/users";
 import { fetchProfile } from "../../redux/thunks/users";
-import { createPost } from "../../redux/thunks/public";
+import { createPost, fetchPosts } from "../../redux/thunks/public";
 import { Profile as ProfileType } from "../../types/models";
 import { convertProfileToUser } from "../../types/conversions";
 import { PostFormValues } from "../Posts/PostForm";
@@ -17,6 +17,7 @@ import FollowersCount from "./FollowersCount";
 import Followings from "../Followings/Followings";
 import Preloader from "../common/Preloader";
 import PostForm from "../Posts/PostForm";
+import { selectFilter } from "../../redux/selectors/public";
 
 type Params = {
   userId: string
@@ -29,7 +30,13 @@ const Profile: React.FC = () => {
   const currentUser = useSelector(selectCurrentUser);
   const profile = useSelector(selectProfile);
   const isFollowed = useSelector(selectIsFollowedOnSelectedUser);
+  const filter = useSelector(selectFilter);
+
   const selectedUserId = Number(userId);
+
+  useEffect(() => {
+    dispatch(fetchPosts({...filter, authorId: selectedUserId}))
+  }, [])
 
   useEffect(() => {
     dispatch(fetchProfile(selectedUserId))
@@ -80,7 +87,7 @@ const Profile: React.FC = () => {
       <FormattedMessage id="user-posts" />
     </Divider>
     <PostForm onFinish={onFinishCreatingPost} />
-    <Posts authorId={selectedUserId} />
+    <Posts />
   </Fragment>
 }
 

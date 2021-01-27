@@ -13,19 +13,12 @@ import {
 } from "../actions/public";
 import {
   createComment, createPost, createReply, deleteComment, deletePost,
-  deleteReply, fetchComments, fetchPosts, fetchReplies, fetchShiftedPost,
+  deleteReply, fetchComments, fetchFeed, fetchPosts, fetchReplies, fetchShiftedPost,
   setIsLikedComment, setIsLikedPost, setIsLikedReply, updateComment,
   updatePost, updateReply
 } from "../thunks/public";
 
 const initialState = {
-  pendingPosts: false,
-  posts: [] as Post[],
-  totalPostsCount: 0,
-  pendingLikePosts: [] as number[],
-  editingPostId: null as number | null,
-  pendingComments: [] as number[],
-  openedComments: [] as number[],
   filter: {
     authorId: null as number | null,
     category: null as Category | null,
@@ -33,12 +26,19 @@ const initialState = {
     page: 1,
     pageSize: 4
   },
+  posts: [] as Post[],
+  pendingPosts: false,
+  totalPostsCount: 0,
+  pendingLikePosts: [] as number[],
+  editingPostId: null as number | null,
+  openedComments: [] as number[],
   comments: [] as Comment[],
+  pendingComments: [] as number[],
   pendingLikeComments: [] as number[],
   editingCommentId: null as number | null,
-  pendingReplies: [] as number[],
   openedReplies: [] as number[],
   replies: [] as Reply[],
+  pendingReplies: [] as number[],
   pendingLikeReplies: [] as number[],
   editingReplyId: null as number | null
 }
@@ -52,6 +52,16 @@ const publicReducer = createReducer(initialState, builder =>
       pendingPosts: true
     }))
     .addCase(fetchPosts.fulfilled, (state, { payload }) => ({
+      ...state,
+      pendingPosts: false,
+      posts: payload.posts,
+      totalPostsCount: payload.totalCount
+    }))
+    .addCase(fetchFeed.pending, (state) => ({
+      ...state,
+      pendingPosts: true
+    }))
+    .addCase(fetchFeed.fulfilled, (state, { payload }) => ({
       ...state,
       pendingPosts: false,
       posts: payload.posts,

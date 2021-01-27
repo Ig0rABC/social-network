@@ -53,7 +53,7 @@ def unfollow(user_id):
 
 @app.route('/feed', methods=['GET'])
 def feed():
-    cookies = request.cookies()
+    cookies = request.cookies
     if 'token' not in cookies:
         return jsonify(), 401
     params = converts_keys(request.args.to_dict(), case='snake')

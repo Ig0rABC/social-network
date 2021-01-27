@@ -5,11 +5,19 @@ import postsAPI from "../../api/posts";
 import commentsAPI from "../../api/comments";
 import repliesAPI from "../../api/replies";
 import { addPendingComments, addPendingLikeComment, addPendingLikePost, addPendingLikeReply, addPendingReplies } from "../actions/public";
+import followAPI from "../../api/follow";
 
 export const fetchPosts = createAsyncThunk(
   "public/FETCH-POSTS",
   async (filter: Filter) => {
     return await postsAPI.getPosts(filter);
+  }
+)
+
+export const fetchFeed = createAsyncThunk(
+  "public/FETCH-FEED",
+  async () => {
+    return await followAPI.getFeed();
   }
 )
 

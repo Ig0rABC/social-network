@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage, FormattedNumber } from "react-intl";
-import { List } from 'antd';
+import { List } from "antd";
 import {
   selectComments, selectOpenedComments,
   selectEditingCommentId, selectEditingPostId,
@@ -14,7 +15,7 @@ import {
 import {
   createComment, createReply,
   deleteComment, deletePost, deleteReply,
-  fetchComments, fetchPosts, fetchReplies,
+  fetchComments,  fetchReplies,
   fetchShiftedPost, setIsLikedComment,
   setIsLikedPost, setIsLikedReply,
   updateComment, updatePost, updateReply
@@ -32,13 +33,8 @@ import { PostFormValues } from "./PostForm";
 import { CommentFormValues } from "../Comments/CommentForm";
 import { ReplyFormValues } from "../Replies/ReplyForm";
 import EmptyList from "../common/Empty";
-import { useHistory } from "react-router-dom";
 
-type Props = {
-  authorId?: number
-}
-
-const Posts: React.FC<Props> = ({ authorId }) => {
+const Posts: React.FC = () => {
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -58,21 +54,6 @@ const Posts: React.FC<Props> = ({ authorId }) => {
   const replies = useSelector(selectReplies);
   const pendingLikeReplies = useSelector(selectPendingLikeReplies);
   const editingReplyId = useSelector(selectEditingReplyId);
-
-  useEffect(() => {
-    if (authorId) {
-      dispatch(setFilter({ ...filter, authorId }));
-    }
-    return () => {
-      if (authorId) {
-        dispatch(setFilter({ ...filter, authorId: null as number | null }));
-      }
-    }
-  }, [authorId])
-
-  useEffect(() => {
-    dispatch(fetchPosts(filter));
-  }, [filter])
 
   useEffect(() => {
     const pagesCount = Math.ceil(totalPostsCount / filter.pageSize);
@@ -200,15 +181,6 @@ const Posts: React.FC<Props> = ({ authorId }) => {
     current: filter.page,
     pageSize: filter.pageSize,
     disabled: pendingPosts
-  }
-
-  let canPost = false;
-  if (isAuthorized) {
-    if (authorId) {
-      canPost = authorId === currentUser?.id;
-    } else {
-      canPost = true;
-    }
   }
 
   return <div>

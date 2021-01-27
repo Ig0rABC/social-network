@@ -1,13 +1,13 @@
 import React from "react";
 import { Comment } from "antd";
 import { Reply as ReplyType } from "../../types/models";
-import ToggleLikeButton from "../common/ToggleLikeButton";
-import EditButton from "../common/EditButton";
-import DeleteButton from "../common/DeleteButton";
+import ToggleLikeButton from "../common/buttons/ToggleLikeButton";
+import EditButton from "../common/buttons/EditButton";
+import DeleteButton from "../common/buttons/DeleteButton";
 import UserLink from "../common/UserLink";
 import AuthorAvatar from "../common/AuthorAvatar";
 import ReplyForm, { ReplyFormValues } from "./ReplyForm";
-import EditCancelButton from "../common/EditCancelButton";
+import EditCancelButton from "../common/buttons/EditCancelButton";
 
 type Props = {
   isAuthorized: boolean,

@@ -25,12 +25,12 @@ const usersReducer = createReducer(initialState, builder =>
     }))
     .addCase(fetchProfile.fulfilled, (state, { payload }) => ({
       ...state,
-      selectedProfile: payload
+      profile: payload
     }))
     .addCase(updateProfile.fulfilled, (state, { payload }) => ({
       ...state,
       profileEditMode: false,
-      selectedProfile: {
+      profile: {
         ...state.profile,
         ...getObjectWithoutNullProps(payload)
       }
@@ -42,7 +42,7 @@ const usersReducer = createReducer(initialState, builder =>
     .addCase(setIsFollowed.fulfilled, (state, { payload }) => ({
       ...state,
       pendingFollowing: false,
-      selectedProfile: state.profile && {
+      profile: state.profile && {
         ...state.profile,
         followersCount: payload.isFollowed
           ? state.profile.followersCount as number + 1

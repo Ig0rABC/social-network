@@ -5,8 +5,10 @@ import { FormattedMessage } from "react-intl";
 import { Divider } from "antd";
 import { selectCurrentUser, selectIsFollowedOnSelectedUser, selectProfile } from "../../redux/selectors/users";
 import { fetchProfile } from "../../redux/thunks/users";
+import { createPost } from "../../redux/thunks/public";
 import { Profile as ProfileType } from "../../types/models";
 import { convertProfileToUser } from "../../types/conversions";
+import { PostFormValues } from "../Posts/PostForm";
 import Posts from "../Posts/Posts";
 import ProfileAvatar from "./ProfileAvatar";
 import UserInfo from "./UserInfo/UserInfo";
@@ -14,6 +16,7 @@ import FollowButton from "./FollowButton";
 import FollowersCount from "./FollowersCount";
 import Followings from "../Followings/Followings";
 import Preloader from "../Preloader/Preloader";
+import PostForm from "../Posts/PostForm";
 
 type Params = {
   userId: string
@@ -45,6 +48,11 @@ const Profile: React.FC = () => {
     ? `${login}, ${firstName} ${lastName}`
     : login
 
+
+  const onFinishCreatingPost = (values: PostFormValues) => {
+    dispatch(createPost(values));
+  }
+
   return <Fragment>
     <div>
       <ProfileAvatar
@@ -71,6 +79,7 @@ const Profile: React.FC = () => {
     <Divider plain orientation="right">
       <FormattedMessage id="user-posts" />
     </Divider>
+    <PostForm onFinish={onFinishCreatingPost} />
     <Posts authorId={selectedUserId} />
   </Fragment>
 }

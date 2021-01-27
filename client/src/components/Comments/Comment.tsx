@@ -4,11 +4,11 @@ import { Comment as CommentType, Reply } from "../../types/models";
 import CommentForm, { CommentFormValues } from "./CommentForm";
 import UserLink from "../common/UserLink";
 import AuthorAvatar from "../common/AuthorAvatar";
-import ToggleLikeButton from "../common/ToggleLikeButton";
-import ViewItemsButton from "../common/ViewItemsButton";
-import EditButton from "../common/EditButton";
-import DeleteButton from "../common/DeleteButton";
-import EditCancelButton from "../common/EditCancelButton";
+import ToggleLikeButton from "../common/buttons/ToggleLikeButton";
+import ViewItemsButton from "../common/buttons/ViewItemsButton";
+import EditButton from "../common/buttons/EditButton";
+import DeleteButton from "../common/buttons/DeleteButton";
+import EditCancelButton from "../common/buttons/EditCancelButton";
 import Replies from "../Replies/Replies";
 import { ReplyFormValues } from "../Replies/ReplyForm";
 

@@ -11,6 +11,7 @@
   "empty-comment": "Вы не можете оставить пустой комментарий",
   "empty-reply": "Вы не можете прислать пустой ответ",
   "loading": "Загрузка",
+  "settings": "Настройки",
   "choose-language": "Выбрать язык",
   "choose-theme": "Выбрать тему",
   "followings": "Подписки",
@@ -36,6 +37,7 @@
   "placeholders": {
     "login": "Логин",
     "password": "Пароль",
+    "category": "Выбрать категорию",
     "search": "Поиск"
   },
   "buttons": {
@@ -94,5 +96,11 @@
     "psychology": "Психология",
     "other": "Другое",
     "no category": "Без Категории"
+  },
+  "credits": {
+    "devoloped-by": "Разработано",
+    "my-name": "Григорьевым Игорем",
+    "in": "на",
+    "used-libraries": "Используемые библиотеки"
   }
 }

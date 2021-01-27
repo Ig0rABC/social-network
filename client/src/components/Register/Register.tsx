@@ -1,20 +1,11 @@
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import React from "react";
 import { FormattedMessage } from "react-intl";
-import { selectIsAuthorized } from "../../redux/selectors/users";
+import useAuthorized from "../../hooks/useAuthorized";
 import RegisterForm from "./RegisterForm";
 
 const Register: React.FC = () => {
 
-  const isAuthorized = useSelector(selectIsAuthorized);
-  const history = useHistory();
-
-  useEffect(() => {
-    if (isAuthorized) {
-      history.push("/");
-    }
-  }, [isAuthorized])
+  useAuthorized();
 
   return <div>
     <FormattedMessage

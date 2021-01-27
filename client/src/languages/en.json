@@ -4,13 +4,14 @@
   "authorization": "Authorization",
   "authorization-required": "Authorization Required",
   "register-now": "register now",
-  "remember-me": "Remember Me",
+  "remember-me": "Remember me",
   "empty-login": "Please, enter your login",
   "empty-password": "Please, enter your password",
   "empty-post": "Sorry, you can't publish an empty post",
   "empty-comment": "Sorry, you can't add an empty comment",
   "empty-reply": "Sorry, you can't send an empty reply",
   "loading": "Loading",
+  "settings": "Settings",
   "choose-language": "Choose Language",
   "choose-theme": "Choose Theme",
   "followings": "Followings",
@@ -36,12 +37,13 @@
   "placeholders": {
     "login": "Login",
     "password": "Password",
+    "category": "Select category",
     "search": "Search"
   },
   "buttons": {
     "sign-up": "Sign Up",
     "sign-in": "Sign In",
-    "sign-out": "Sign Out",
+    "sign-out": "Sign out",
     "edit": "Edit",
     "save": "Save",
     "send": "Send",
@@ -94,5 +96,11 @@
     "psychology": "Psychology",
     "other": "Other",
     "no category": "No Category"
+  },
+  "credits": {
+    "devoloped-by": "Devoloped by",
+    "my-name": "Grigorev Igor",
+    "in": "in",
+    "used-libraries": "Used Libraries"
   }
 }

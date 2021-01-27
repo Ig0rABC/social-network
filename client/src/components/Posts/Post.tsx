@@ -6,11 +6,11 @@ import { CommentFormValues } from "../Comments/CommentForm";
 import AuthorAvatar from "../common/AuthorAvatar";
 import UserLink from "../common/UserLink";
 import Comments from "../Comments/Comments";
-import ToggleLikeButton from "../common/ToggleLikeButton";
-import ViewItemsButton from "../common/ViewItemsButton";
-import EditButton from "../common/EditButton";
-import DeleteButton from "../common/DeleteButton";
-import EditCancelButton from "../common/EditCancelButton";
+import ToggleLikeButton from "../common/buttons/ToggleLikeButton";
+import ViewItemsButton from "../common/buttons/ViewItemsButton";
+import EditButton from "../common/buttons/EditButton";
+import DeleteButton from "../common/buttons/DeleteButton";
+import EditCancelButton from "../common/buttons/EditCancelButton";
 import { ReplyFormValues } from "../Replies/ReplyForm";
 
 type Props = {

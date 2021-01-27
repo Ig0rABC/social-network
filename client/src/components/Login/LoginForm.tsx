@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Form, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { signIn } from "../../redux/thunks/users";
-import { selectIsAuthorized } from "../../redux/selectors/users";
 import { NavLink } from "react-router-dom";
 
 type LoginFormValues = {
@@ -17,19 +16,12 @@ const LoginForm: React.FC = () => {
 
   const intl = useIntl();
   const dispatch = useDispatch();
-  let [isSubmitting, setSubmitting] = useState(false);
-  const isAuthorized = useSelector(selectIsAuthorized);
+  const [isSubmitting, setSubmitting] = useState(false);
 
   const onFinish = (values: LoginFormValues) => {
     setSubmitting(true);
     dispatch(signIn(values));
   };
-
-  useEffect(() => {
-    if (isAuthorized) {
-      setSubmitting(false);
-    }
-  }, [isAuthorized])
 
   const loginPlaceholder = intl.formatMessage({
     id: "placeholders.login",

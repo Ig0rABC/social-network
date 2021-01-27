@@ -1,5 +1,5 @@
 import React from "react";
-import IconCount from "./IconCount";
+import IconCount from "../IconCount";
 import { LikeOutlined, LikeFilled } from '@ant-design/icons';
 
 type Props = {

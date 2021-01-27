@@ -6,19 +6,21 @@ import { TagOutlined } from "@ant-design/icons";
 import { Category } from "../../types/models";
 import { selectPendingPosts } from "../../redux/selectors/public";
 
+const { Item } = Form;
+const { Option } = Select;
+const { TextArea } = Input;
+
 export type PostFormValues = {
   category: Category,
   content: string
 }
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { offset: 3, span: 16 },
+  wrapperCol: { offset: 8, span: 7 }
 };
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+  wrapperCol: { offset: 11 }
 };
-
 const OPTIONS = [
   "programming", "travels", "countries",
   "languages", "politics", "news", "blog", "stories",
@@ -57,20 +59,20 @@ const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no c
     }}
   >
 
-    <Form.Item name="category">
+    <Item name="category">
       <Select value={selectedItems}
         onChange={handleChange}
         suffixIcon={<TagOutlined />}
       >
         {filteredOptions.map(item => (
-          <Select.Option key={item} value={item} >
+          <Option key={item} value={item} >
             <FormattedMessage id={"categories." + item} defaultMessage={item} />
-          </Select.Option>
+          </Option>
         ))}
       </Select>
-    </Form.Item>
+    </Item>
 
-    <Form.Item name="content"
+    <Item name="content"
       rules={[
         {
           required: true,
@@ -78,14 +80,14 @@ const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no c
         }
       ]}
     >
-      <Input.TextArea showCount maxLength={1000} minLength={10} />
-    </Form.Item>
+      <TextArea showCount maxLength={1000} minLength={10} />
+    </Item>
 
-    <Form.Item {...tailLayout}>
+    <Item {...tailLayout}>
       <Button type="primary" htmlType="submit" disabled={pendingPosts}>
         <FormattedMessage id="buttons.post" defaultMessage="post" />
       </Button>
-    </Form.Item>
+    </Item>
 
     {extraElements}
 

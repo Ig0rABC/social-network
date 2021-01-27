@@ -8,11 +8,6 @@ import { setFilter } from "../../redux/actions/public";
 import { selectFilter } from "../../redux/selectors/public";
 import { buildQueryString } from "../../utils";
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { offset: 3, span: 16 },
-};
-
 const OPTIONS: Category[] = [
   "programming", "travels", "countries",
   "languages", "politics", "news", "blog", "stories",
@@ -45,6 +40,9 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
     const newFilter: any = { ...filter };
     delete newFilter.authorId;
     delete newFilter.pageSize;
+    if (newFilter.page === 1) {
+      delete newFilter.page;
+    }
     history.push({
       search: buildQueryString(newFilter)
     })
@@ -65,7 +63,7 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
     dispatch(setFilter({ ...filter, category }));
   };
 
-  return <Form {...layout}
+  return <Form layout="inline"
     initialValues={{ ...filter }}
   >
 
@@ -75,6 +73,10 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
         onSelect={handleSelect}
         loading={isSubmitting}
         disabled={isSubmitting}
+        placeholder={<FormattedMessage id="placeholders.category" />}
+        style={{
+          minWidth: "10rem"
+        }}
       >
         {filteredOptions.map(item => (
           <Select.Option key={item} value={item}>

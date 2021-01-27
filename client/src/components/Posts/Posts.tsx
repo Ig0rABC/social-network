@@ -12,7 +12,7 @@ import {
   selectTotalPostsCount
 } from "../../redux/selectors/public";
 import {
-  createComment, createPost, createReply,
+  createComment, createReply,
   deleteComment, deletePost, deleteReply,
   fetchComments, fetchPosts, fetchReplies,
   fetchShiftedPost, setIsLikedComment,
@@ -28,10 +28,11 @@ import {
 import { selectCurrentUser, selectIsAuthorized } from "../../redux/selectors/users";
 import Post from "./Post";
 import PostsSearchForm from "./PostsSearchForm";
-import PostForm, { PostFormValues } from "./PostForm";
+import { PostFormValues } from "./PostForm";
 import { CommentFormValues } from "../Comments/CommentForm";
 import { ReplyFormValues } from "../Replies/ReplyForm";
 import EmptyList from "../common/Empty";
+import { useHistory } from "react-router-dom";
 
 type Props = {
   authorId?: number
@@ -40,6 +41,7 @@ type Props = {
 const Posts: React.FC<Props> = ({ authorId }) => {
 
   const dispatch = useDispatch();
+  const history = useHistory();
   const isAuthorized = useSelector(selectIsAuthorized);
   const currentUser = useSelector(selectCurrentUser);
   const pendingPosts = useSelector(selectPendingPosts);
@@ -128,11 +130,7 @@ const Posts: React.FC<Props> = ({ authorId }) => {
   }
 
   const onUnauthorizedClick = () => {
-    console.log("ANUTHORIZED");
-  }
-
-  const onFinishCreatingPost = (values: PostFormValues) => {
-    dispatch(createPost(values));
+    history.push("/login");
   }
 
   const onFinishUpdatingPost = (postId: number) => (values: PostFormValues) => {
@@ -201,8 +199,7 @@ const Posts: React.FC<Props> = ({ authorId }) => {
     total: totalPostsCount,
     current: filter.page,
     pageSize: filter.pageSize,
-    disabled: pendingPosts,
-    position: "both" as "both" | "top" | "bottom"
+    disabled: pendingPosts
   }
 
   let canPost = false;
@@ -215,7 +212,6 @@ const Posts: React.FC<Props> = ({ authorId }) => {
   }
 
   return <div>
-    {canPost && <PostForm onFinish={onFinishCreatingPost} />}
     <PostsSearchForm isSubmitting={pendingPosts} />
     <List
       locale={{

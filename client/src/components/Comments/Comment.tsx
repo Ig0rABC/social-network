@@ -8,7 +8,7 @@ import ToggleLikeButton from "../common/buttons/ToggleLikeButton";
 import ViewItemsButton from "../common/buttons/ViewItemsButton";
 import EditButton from "../common/buttons/EditButton";
 import DeleteButton from "../common/buttons/DeleteButton";
-import EditCancelButton from "../common/buttons/EditCancelButton";
+import CancelButton from "../common/buttons/CancelButton";
 import Replies from "../Replies/Replies";
 import { ReplyFormValues } from "../Replies/ReplyForm";
 
@@ -54,7 +54,7 @@ const Comment: React.FC<Props> = (props) => {
     <CommentForm
       onFinish={handlers.comments.onFinishUpdating}
       initialValues={{ content: comment.content }}
-      extraElements={[<EditCancelButton onClick={handlers.comments.onCancelEditingClick} />]}
+      extraElements={[<CancelButton onClick={handlers.comments.onCancelEditingClick} />]}
     />
   )
 

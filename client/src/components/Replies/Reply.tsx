@@ -7,7 +7,7 @@ import DeleteButton from "../common/buttons/DeleteButton";
 import UserLink from "../common/UserLink";
 import AuthorAvatar from "../common/AuthorAvatar";
 import ReplyForm, { ReplyFormValues } from "./ReplyForm";
-import EditCancelButton from "../common/buttons/EditCancelButton";
+import CancelButton from "../common/buttons/CancelButton";
 
 type Props = {
   isAuthorized: boolean,
@@ -37,7 +37,7 @@ const Reply: React.FC<Props> = ({ isAuthorized, reply, handlers, pendingLike, cu
     <ReplyForm
       onFinish={handlers.replies.onFinishUpdating}
       initialValues={{ content: reply.content }}
-      extraElements={[<EditCancelButton onClick={handlers.replies.onCancelEditingClick} />]}
+      extraElements={[<CancelButton onClick={handlers.replies.onCancelEditingClick} />]}
     />
   )
 

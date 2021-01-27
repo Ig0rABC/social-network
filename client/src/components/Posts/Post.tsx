@@ -10,7 +10,7 @@ import ToggleLikeButton from "../common/buttons/ToggleLikeButton";
 import ViewItemsButton from "../common/buttons/ViewItemsButton";
 import EditButton from "../common/buttons/EditButton";
 import DeleteButton from "../common/buttons/DeleteButton";
-import EditCancelButton from "../common/buttons/EditCancelButton";
+import CancelButton from "../common/buttons/CancelButton";
 import { ReplyFormValues } from "../Replies/ReplyForm";
 
 type Props = {
@@ -68,7 +68,7 @@ const PostComponent: React.FC<Props> = (props) => {
     <PostForm key={post.id}
       onFinish={handlers.posts.onFinishUpdating}
       initialValues={{ category: post.category, content: post.content }}
-      extraElements={[<EditCancelButton onClick={handlers.comments.onCancelEditingClick} />]}
+      extraElements={[<CancelButton onClick={handlers.posts.onCancelEditingClick} />]}
     />
   )
 

@@ -7,10 +7,10 @@ type Props = {
   type?: "text" | "link" | "ghost" | "default" | "primary" | "dashed"
 }
 
-const DeleteButton: React.FC<Props> = ({ onClick, type = "text" }) => {
-  return <Button danger onClick={onClick} type={type}>
-    <FormattedMessage id="buttons.delete" />
+const CancelButton: React.FC<Props> = ({ onClick, type = "default" }) => {
+  return <Button onClick={onClick} type={type}>
+    <FormattedMessage id="buttons.cancel" />
   </Button>
 }
 
-export default DeleteButton;
+export default CancelButton;

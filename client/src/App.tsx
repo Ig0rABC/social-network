@@ -6,7 +6,7 @@ import "antd/dist/antd.css";
 import languages from "./languages";
 import { initialize } from "./redux/thunks/app";
 import { selectIsInitizialied, selectLanguage } from "./redux/selectors/app";
-import Preloader from "./components/Preloader/Preloader";
+import Preloader from "./components/common/Preloader";
 import MainLayout from "./components/Layouts/MainLayout";
 import Home from "./components/Home/Home";
 import Profile from "./components/Profile/Profile";

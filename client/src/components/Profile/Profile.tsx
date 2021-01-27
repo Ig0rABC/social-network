@@ -15,7 +15,7 @@ import UserInfo from "./UserInfo/UserInfo";
 import FollowButton from "./FollowButton";
 import FollowersCount from "./FollowersCount";
 import Followings from "../Followings/Followings";
-import Preloader from "../Preloader/Preloader";
+import Preloader from "../common/Preloader";
 import PostForm from "../Posts/PostForm";
 
 type Params = {

@@ -1,18 +1,16 @@
 import React from "react";
-import { Layout } from "antd";
-import MyFooter from "./Footer";
-
-const { Content, Footer } = Layout;
+import { Grid } from "@material-ui/core";
+import Footer from "./Footer";
 
 const UnauthorizedLayout: React.FC = ({ children }) => {
-  return <Layout style={{ minHeight: "100vh" }}>
-    <Content style={{ marginTop: "2em", marginLeft: "2em" }}>
+  return <Grid container direction="column" justify="space-between" alignItems="center" style={{ height: "95vh" }}>
+    <Grid item>
       {children}
-    </Content>
-    <Footer>
-      <MyFooter />
-    </Footer>
-  </Layout>
+    </Grid>
+    <Grid item>
+      <Footer />
+    </Grid>
+  </Grid>
 }
 
 export default UnauthorizedLayout;

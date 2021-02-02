@@ -1,15 +1,12 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
-import { Button, Descriptions, Divider } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import { Profile } from "../../../types/models";
 import { selectProfileEditMode } from "../../../redux/selectors/users";
 import { setProfileEditMode } from "../../../redux/actions/users";
 import UserInfoForm from "./UserInfoForm";
 import Contacts from "./Contacts";
-
-const { Item } = Descriptions;
+import { Button } from "@material-ui/core";
 
 type Props = {
   profile: Profile,
@@ -32,37 +29,20 @@ const UserInfo: React.FC<Props> = ({ profile, isOwn }) => {
   }
 
   const editButton = (
-    <Button
-      onClick={handleEditClick}
-      icon={<EditOutlined />}
-    >
-      <FormattedMessage
-        id="buttons.edit"
-        defaultMessage="edit"
-      />
+    <Button onClick={handleEditClick}>
+      <FormattedMessage id="buttons.edit" />
     </Button>
   )
 
-  return <Fragment>
-    <Descriptions
-      extra={isOwn && editButton}>
-      <Item span={3}
-        label={<FormattedMessage
-          id="about"
-          defaultMessage="about"
-        />}
-      >{about}</Item>
-    </Descriptions>
+  return <div>
     {contacts
-      && <Divider plain orientation="right">
-        <FormattedMessage
-          id="contacts"
-          defaultMessage="contacts"
-        />
-      </Divider>
+      && <FormattedMessage
+        id="contacts"
+        defaultMessage="contacts"
+      />
     }
     <Contacts contacts={contacts} />
-  </Fragment>
+  </div>
 }
 
 export default UserInfo;

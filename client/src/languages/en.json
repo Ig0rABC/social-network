@@ -4,7 +4,6 @@
   "authorization": "Authorization",
   "authorization-required": "Authorization Required",
   "register-now": "register now",
-  "remember-me": "Remember me",
   "empty-login": "Please, enter your login",
   "empty-password": "Please, enter your password",
   "empty-post": "Sorry, you can't publish an empty post",
@@ -36,9 +35,10 @@
     "light": "Light",
     "compact": "Compact"
   },
-  "placeholders": {
+  "forms": {
     "login": "Login",
     "password": "Password",
+    "remember-me": "Remember me",
     "category": "Select category",
     "search": "Search"
   },

@@ -2,7 +2,6 @@ import React, { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
 import { IntlProvider } from "react-intl";
-import "antd/dist/antd.css";
 import languages from "./languages";
 import { initialize } from "./redux/thunks/app";
 import { selectIsInitizialied, selectLanguage } from "./redux/selectors/app";

@@ -1,99 +1,83 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { FormattedMessage, useIntl } from "react-intl";
-import { Form, Input, Button, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { FormattedMessage } from "react-intl";
+import { Button, ButtonGroup, FormControlLabel, Grid, Switch, TextField } from "@material-ui/core";
 import { signIn } from "../../redux/thunks/users";
-import { NavLink } from "react-router-dom";
-
-type LoginFormValues = {
-  login: string,
-  password: string,
-  rememberMe: boolean
-}
+import { AccountCircle, Lock, LockOpen, LockOpenSharp } from "@material-ui/icons";
 
 const LoginForm: React.FC = () => {
 
-  const intl = useIntl();
   const dispatch = useDispatch();
+  const history = useHistory();
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
 
-  const onFinish = (values: LoginFormValues) => {
+  const handleClick = () => {
     setSubmitting(true);
-    dispatch(signIn(values));
+    dispatch(signIn({ login, password, rememberMe }));
   };
 
-  const loginPlaceholder = intl.formatMessage({
-    id: "placeholders.login",
-    defaultMessage: "login"
-  });
-  const passwordPlaceholder = intl.formatMessage({
-    id: "placeholders.password",
-    defaultMessage: "password"
-  });
+  return <form>
+    <Grid container direction="column" spacing={2}>
 
-  return <Form
-    initialValues={{ rememberMe: true }}
-    onFinish={onFinish}
-  >
+      <Grid item container spacing={2} alignItems="flex-end">
+        <Grid item>
+          <AccountCircle />
+        </Grid>
+        <Grid item>
+          <TextField id="login"
+            label={<FormattedMessage id="forms.login" />}
+            value={login}
+            onChange={({ target }) => setLogin(target.value)}
+            disabled={isSubmitting}
+          />
+        </Grid>
+      </Grid>
 
-    <Form.Item name="login"
-      rules={[
-        {
-          required: true,
-          message: (
-            <FormattedMessage
-              id="empty-login"
-              defaultMessage="empty login"
-            />
-          )
-        }
-      ]}
-    ><Input prefix={<UserOutlined />}
-      placeholder={loginPlaceholder}
-      /></Form.Item>
+      <Grid item container spacing={2} alignItems="flex-end">
+        <Grid item>
+          {isSubmitting
+            ? <LockOpen />
+            : <Lock />
+          }
+        </Grid>
+        <Grid item>
+          <TextField id="password"
+            label={<FormattedMessage id="forms.password" />}
+            value={password}
+            onChange={({ target }) => setPassword(target.value)}
+            disabled={isSubmitting}
+          />
+        </Grid>
+      </Grid>
 
-    <Form.Item name="password"
-      rules={[
-        {
-          required: true,
-          message: (
-            <FormattedMessage
-              id="empty-password"
-              defaultMessage="empty password"
-            />
-          )
-        }
-      ]}
-    ><Input.Password prefix={<LockOutlined />}
-      placeholder={passwordPlaceholder}
-      /></Form.Item>
-
-    <Form.Item name="rememberMe" valuePropName="checked">
-      <Checkbox>
-        <FormattedMessage
-          id="remember-me"
-          defaultMessage="remember me"
+      <Grid item>
+        <FormControlLabel
+          label={<FormattedMessage id="forms.remember-me" />}
+          control={<Switch id="forms.rememberMe"
+            checked={rememberMe}
+            onChange={() => setRememberMe(!rememberMe)}
+            disabled={isSubmitting}
+            color="primary"
+          />}
         />
-      </Checkbox>
-    </Form.Item>
+      </Grid>
 
-    <NavLink to="/register">
-      <FormattedMessage
-        id="register-now"
-        defaultMessage="register now"
-      />
-    </NavLink>
-
-    <Form.Item>
-      <Button type="primary" htmlType="submit" disabled={isSubmitting}>
-        <FormattedMessage
-          id="buttons.sign-in"
-          defaultMessage="sign in"
-        />
-      </Button>
-    </Form.Item>
-  </Form>
+      <Grid item>
+        <ButtonGroup disabled={isSubmitting} size="large" color="primary">
+          <Button onClick={handleClick} variant="contained">
+            <FormattedMessage id="buttons.sign-in" />
+          </Button>
+          <Button onClick={() => history.push("/register")} variant="text">
+            <FormattedMessage id="register-now" />
+          </Button>
+        </ButtonGroup>
+      </Grid>
+    </Grid>
+  </form>
 }
 
-export default React.memo(LoginForm);
+export default LoginForm;

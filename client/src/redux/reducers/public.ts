@@ -78,7 +78,7 @@ const publicReducer = createReducer(initialState, builder =>
     }))
     .addCase(fetchShiftedPost.fulfilled, (state, { payload }) => ({
       ...state,
-      posts: state.posts.concat(payload)
+      posts: state.posts.concat(payload.posts[0])
     }))
     .addCase(updatePost.fulfilled, (state, { payload }) => ({
       ...state,
@@ -132,12 +132,16 @@ const publicReducer = createReducer(initialState, builder =>
       openedComments: state.openedComments.concat(payload)
     }))
     .addCase(fetchComments.fulfilled, (state, { payload }) => {
-      const postId = payload[0].postId;
-      return {
-        ...state,
-        pendingComments: state.pendingComments.filter(id => id !== postId),
-        comments: state.comments.concat(payload),
-        openedComments: state.openedComments.concat(postId)
+      if (payload.length > 0) {
+        const postId = payload[0].postId;
+        return {
+          ...state,
+          pendingComments: state.pendingComments.filter(id => id !== postId),
+          comments: state.comments.concat(payload),
+          openedComments: state.openedComments.concat(postId)
+        }
+      } else {
+        
       }
     })
     .addCase(createComment.fulfilled, (state, { payload }) => ({

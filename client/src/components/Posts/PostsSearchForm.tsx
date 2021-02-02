@@ -1,14 +1,16 @@
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { FormattedMessage } from "react-intl";
-import { Form, Input, Select } from 'antd';
-import { Category } from "../../types/models";
-import { setFilter } from "../../redux/actions/public";
-import { selectFilter } from "../../redux/selectors/public";
+import { useIntl } from "react-intl";
+import { Paper, Select, TextField, IconButton } from "@material-ui/core";
+import { Search } from "@material-ui/icons";
 import { buildQueryString } from "../../utils";
+import { setFilter } from "../../redux/actions/public";
+import { fetchPosts } from "../../redux/thunks/public";
+import { selectFilter, selectPendingPosts } from "../../redux/selectors/public";
+import { Category } from "../../types/models";
 
-const OPTIONS: Category[] = [
+const CATEGORIES: Category[] = [
   "programming", "travels", "countries",
   "languages", "politics", "news", "blog", "stories",
   "music", "education", "science", "films", "cinema",
@@ -16,19 +18,16 @@ const OPTIONS: Category[] = [
   "literature", "psychology", "other", "no category"
 ];
 
-type Props = {
-  isSubmitting: boolean,
-  authorId?: number
-}
-
-const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
+const PostsSearchForm: React.FC = () => {
 
   const dispatch = useDispatch();
-  const filter = useSelector(selectFilter);
-  const [selectedItems, setSelectedItems] = useState([]);
   const history = useHistory();
-  // @ts-ignore
-  const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
+  const intl = useIntl();
+  const filter = useSelector(selectFilter);
+  const pending = useSelector(selectPendingPosts);
+
+  const [category, setCategory] = useState(null as Category | null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const search = history.location.search;
@@ -42,69 +41,45 @@ const PostsSearchForm: React.FC<Props> = ({ isSubmitting }) => {
     delete newFilter.pageSize;
     if (newFilter.page === 1) {
       delete newFilter.page;
-    }
+    };
     history.push({
       search: buildQueryString(newFilter)
-    })
+    });
+    dispatch(fetchPosts(filter));
   }, [filter])
 
-  const handleChange = (selectedItems: SetStateAction<never[]>) => {
-    setSelectedItems(selectedItems);
-  };
+  const options = CATEGORIES
+    .map(
+      c => <option value={c}>
+        {intl.formatMessage({ id: "categories." + c })}
+      </option>
+    )
 
-  const handleSearch = (search: string | null) => {
-    if (search === "") {
-      search = null;
-    }
+  const handleSearch = () => {
     dispatch(setFilter({ ...filter, search }));
   };
 
-  const handleSelect = (category: Category) => {
-    dispatch(setFilter({ ...filter, category }));
-  };
+  const handleChangeCategory = ({ target }: any) => {
+    setCategory(target.value as Category);
+    dispatch(setFilter({ ...filter, category: target.value as Category }));
+  }
 
-  return <Form layout="inline"
-    initialValues={{ ...filter }}
-  >
-
-    <Form.Item name="category">
-      <Select value={selectedItems}
-        onChange={handleChange}
-        onSelect={handleSelect}
-        loading={isSubmitting}
-        disabled={isSubmitting}
-        placeholder={<FormattedMessage id="placeholders.category" />}
-        style={{
-          minWidth: "10rem"
-        }}
-      >
-        {filteredOptions.map(item => (
-          <Select.Option key={item} value={item}>
-            <FormattedMessage
-              id={"categories." + item}
-              defaultMessage={item}
-            />
-          </Select.Option>
-        ))}
+  return <Paper>
+    <form>
+      <Select value={category} onChange={handleChangeCategory}>
+        {options}
       </Select>
-    </Form.Item>
-
-    <Form.Item>
-      <FormattedMessage
-        id="placeholders.search"
-        defaultMessage="search"
-      >
-        {(message: string) => (
-          <Input.Search
-            placeholder={message}
-            onSearch={handleSearch}
-            loading={isSubmitting}
-          />
-        )}
-      </FormattedMessage>
-    </Form.Item>
-
-  </Form>
+      <TextField
+        id="search"
+        value={search}
+        onChange={({ target }) => setSearch(target.value)}
+        disabled={pending}
+      />
+      <IconButton onClick={handleSearch} disabled={pending}>
+        <Search />
+      </IconButton>
+    </form>
+  </Paper>
 }
 
 export default PostsSearchForm;

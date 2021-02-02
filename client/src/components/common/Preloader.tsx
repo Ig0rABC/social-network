@@ -1,19 +1,8 @@
 import React from "react";
-import { useIntl } from "react-intl";
-import { Spin } from "antd";
+import { FormattedMessage } from "react-intl";
 
 const Preloader: React.FC = () => {
-
-  const intl = useIntl();
-
-  return <Spin size="large"
-    tip={intl.formatMessage({ id: "loading" }) + "..."}
-    style={{
-      position: "absolute",
-      top: "50%",
-      left: "50%"
-    }}
-  />;
+  return <FormattedMessage id="loading" />
 }
 
 export default Preloader;

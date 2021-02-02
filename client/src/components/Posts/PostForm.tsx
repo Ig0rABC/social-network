@@ -1,27 +1,14 @@
-import React, { SetStateAction, useState } from "react";
-import { useSelector } from "react-redux";
-import { FormattedMessage } from "react-intl";
-import { Form, Input, Button, Select } from 'antd';
-import { TagOutlined } from "@ant-design/icons";
-import { Category } from "../../types/models";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Select, TextField, Button, IconButton, ButtonGroup, Card, CardContent, CardActions, Tooltip } from "@material-ui/core";
+import { Cancel, Delete, Save } from "@material-ui/icons";
+import { createPost, deletePost, updatePost } from "../../redux/thunks/public";
 import { selectPendingPosts } from "../../redux/selectors/public";
+import { resetEditingPostId } from "../../redux/actions/public";
+import { Category } from "../../types/models";
 
-const { Item } = Form;
-const { Option } = Select;
-const { TextArea } = Input;
-
-export type PostFormValues = {
-  category: Category,
-  content: string
-}
-
-const layout = {
-  wrapperCol: { offset: 8, span: 7 }
-};
-const tailLayout = {
-  wrapperCol: { offset: 11 }
-};
-const OPTIONS = [
+const CATEGORIES: Category[] = [
   "programming", "travels", "countries",
   "languages", "politics", "news", "blog", "stories",
   "music", "education", "science", "films", "cinema",
@@ -30,68 +17,85 @@ const OPTIONS = [
 ];
 
 type Props = {
-  onFinish: (values: PostFormValues) => void,
+  mode: "create" | "edit",
+  postId?: number,
   initialValues?: {
     category: Category,
     content: string
-  },
-  extraElements?: JSX.Element[]
+  }
 }
 
-const PostForm: React.FC<Props> = ({ onFinish, initialValues = { category: "no category", content: "" }, extraElements = [] }) => {
+const PostForm: React.FC<Props> = ({ mode, postId = 0, initialValues = { category: "no category", content: "" } }) => {
 
-  const [form] = Form.useForm();
-  const [selectedItems, setSelectedItems] = useState([]);
+  const dispatch = useDispatch();
+  const intl = useIntl();
   const pendingPosts = useSelector(selectPendingPosts);
-  // @ts-ignore
-  const filteredOptions = OPTIONS.filter(o => !selectedItems.includes(o));
+  const [category, setCategory] = useState(initialValues.category);
+  const [content, setContent] = useState(initialValues.content);
 
-  const handleChange = (selectedItems: SetStateAction<never[]>) => {
-    setSelectedItems(selectedItems);
-  };
+  const handleCreate = () => {
+    dispatch(createPost({ category, content }));
+  }
 
-  return <Form form={form}
-    {...layout}
-    initialValues={initialValues}
-    onFinish={(values) => {
-      onFinish(values);
-      form.resetFields();
-    }}
-  >
+  const handleUpdate = () => {
+    dispatch(updatePost({ postId, category, content }));
+  }
 
-    <Item name="category">
-      <Select value={selectedItems}
-        onChange={handleChange}
-        suffixIcon={<TagOutlined />}
-      >
-        {filteredOptions.map(item => (
-          <Option key={item} value={item} >
-            <FormattedMessage id={"categories." + item} defaultMessage={item} />
-          </Option>
-        ))}
-      </Select>
-    </Item>
+  const handleCancel = () => {
+    dispatch(resetEditingPostId());
+  }
 
-    <Item name="content"
-      rules={[
-        {
-          required: true,
-          message: <FormattedMessage id="empty-post" defaultMessage="empty post" />
-        }
-      ]}
-    >
-      <TextArea showCount maxLength={1000} minLength={10} />
-    </Item>
+  const handleDelete = () => {
+    dispatch(deletePost(postId));
+  }
 
-    <Item {...tailLayout}>
-      <Button type="primary" htmlType="submit" disabled={pendingPosts}>
-        <FormattedMessage id="buttons.post" defaultMessage="post" />
-      </Button>
-    </Item>
+  const options = CATEGORIES
+    .map(
+      c => <option value={c}>
+        {intl.formatMessage({ id: "categories." + c })}
+      </option>
+    )
 
-    {extraElements}
-
-  </Form>
+  return <Card>
+    <CardContent>
+      <form>
+        <Select value={category} onChange={({ target }) => setCategory(target.value as Category)}>
+          {options}
+        </Select>
+        <TextField
+          id="content"
+          value={content}
+          onChange={({ target }) => setContent(target.value)}
+          disabled={pendingPosts}
+        />
+      </form>
+    </CardContent>
+    <CardActions>
+      {
+        mode === "create"
+          ? <Button onClick={handleCreate} color="primary" variant="contained">
+            <FormattedMessage id="buttons.post" />
+          </Button>
+          : <ButtonGroup>
+            <Tooltip arrow placement="top" title={<FormattedMessage id="buttons.save" />}>
+              <IconButton onClick={handleUpdate}>
+                <Save />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow placement="top" title={<FormattedMessage id="buttons.cancel" />}>
+              <IconButton onClick={handleCancel}>
+                <Cancel />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow placement="top" title={<FormattedMessage id="buttons.delete" />}>
+              <IconButton onClick={handleDelete}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          </ButtonGroup>
+      }
+    </CardActions>
+  </Card>
 }
 
-export default React.memo(PostForm);
+export default PostForm;

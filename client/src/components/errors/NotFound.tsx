@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
-import { Button, Result } from "antd";
+import { Button } from "@material-ui/core";
 
 const NotFound: React.FC = () => {
 
@@ -11,11 +11,11 @@ const NotFound: React.FC = () => {
     history.goBack();
   }
 
-  return <Result
-    title={<FormattedMessage id="errors.404.title" />}
-    subTitle={<FormattedMessage id="errors.404.description" />}
-    extra={<Button onClick={handleClick}><FormattedMessage id="buttons.go-back" /></Button>}
-  />
+  return <div>
+    <FormattedMessage id="errors.404.title" />
+    <FormattedMessage id="errors.404.description" />
+    <Button onClick={handleClick}><FormattedMessage id="buttons.go-back" /></Button>
+  </div>
 }
 
 export default NotFound;

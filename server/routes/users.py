@@ -36,7 +36,7 @@ def register():
             data = cursor.fetchone()
             cursor.execute(Profiles.create(), data)
             cursor.execute(Contacts.create(), data)
-    return jsonify(converts_keys(data, case='camel')), 201
+    return jsonify(), 201
 
 @app.route('/users/login', methods=['POST'])
 def login():

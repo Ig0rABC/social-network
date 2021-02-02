@@ -1,6 +1,6 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
-import { NavLink } from "react-router-dom";
+import { Link, Typography } from "@material-ui/core";
 
 const LIBRARIES = [
   "axios",
@@ -8,21 +8,38 @@ const LIBRARIES = [
   "react-router-dom",
   "redux-thunk",
   "react-intl",
-  "redux-devtools-extension"
+  "flat",
+  "redux-devtools-extension",
 ];
 
 const Footer: React.FC = () => {
 
-  const libraries = LIBRARIES.map(lib => <><a target="_blank" href={"https://npmjs.com/package/" + lib}>{lib}</a>  </>);
+  const libraries = LIBRARIES.map(lib => <><Link
+    target="_blank"
+    color="secondary"
+    underline="hover"
+    href={"https://npmjs.com/package/" + lib}
+  >{lib}</Link> </>);
 
-  return <div style={{ textAlign: "center" }}>
-    <div>
-      <FormattedMessage id="credits.devoloped-by" /> <NavLink to="/users/1"><FormattedMessage id="credits.my-name" /></NavLink> <FormattedMessage id="credits.in" /> React, Redux, <a target="_blank" href="https://ant.design">Ant-Design</a>
-    </div>
-    <div>
+  const materialUI = <Link
+    target="_blank"
+    color="secondary"
+    underline="hover"
+    href="https://material-ui.com"
+  >Material-UI</Link>
+
+  const author = <Link href="/users/1" color="primary" underline="hover">
+    <FormattedMessage id="credits.my-name" />
+  </Link>
+
+  return <Typography align="center">
+    <p>
+      <FormattedMessage id="credits.devoloped-by" /> {author} <FormattedMessage id="credits.in" /> React, Redux, TypeScript, {materialUI}
+    </p>
+    <p>
       <FormattedMessage id="credits.used-libraries" />: {libraries}
-    </div>
-  </div>
+    </p>
+  </Typography>
 }
 
 export default Footer;

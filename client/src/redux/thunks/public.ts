@@ -26,9 +26,9 @@ export const setIsLikedPost = createAsyncThunk(
   async ({ postId, isLiked }: { postId: number, isLiked: boolean }, { dispatch }) => {
     dispatch(addPendingLikePost(postId));
     if (isLiked) {
-      await postsAPI.unlikePost(postId);
-    } else {
       await postsAPI.likePost(postId);
+    } else {
+      await postsAPI.unlikePost(postId);
     }
     return { postId, isLiked };
   }
@@ -71,9 +71,9 @@ export const updatePost = createAsyncThunk(
 
 export const fetchComments = createAsyncThunk(
   "public/FETCH-COMMENTS",
-  async ({ postId, authorId }: { postId: number, authorId: number | null }, { dispatch }) => {
+  async ({ postId, authorId }: { postId: number, authorId?: number }, { dispatch }) => {
     dispatch(addPendingComments(postId));
-    return await commentsAPI.getComments(postId, authorId);
+    return await commentsAPI.getComments(postId, authorId || null);
   }
 )
 

@@ -6,7 +6,7 @@ import { initialize } from "../thunks/app";
 const initialState = {
   isInitialized: false,
   theme: "dark" as Theme,
-  language: "en" as Language
+  language: "ru" as Language
 }
 
 const appReducer = createReducer(initialState, builder =>

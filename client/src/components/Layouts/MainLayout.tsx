@@ -1,22 +1,13 @@
 import React from "react";
-import { Layout } from "antd";
-import NavBar from "./NavBar";
-import MyFooter from "./Footer";
-
-const { Header, Content, Footer } = Layout;
+import NavBar from "./Header";
+import Footer from "./Footer";
 
 const MainLayout: React.FC = ({ children }) => {
-  return <Layout style={{ minHeight: "100vh" }}>
-    <Header>
-      <NavBar />
-    </Header>
-    <Content style={{ marginTop: "2em", marginLeft: "2em" }}>
-      {children}
-    </Content>
-    <Footer>
-      <MyFooter />
-    </Footer>
-  </Layout>
+  return <div>
+    <NavBar />
+    {children}
+    <Footer />
+  </div>
 }
 
 export default MainLayout;

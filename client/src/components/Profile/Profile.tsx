@@ -1,14 +1,11 @@
-import React, { Fragment, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useParams } from "react-router-dom";
-import { FormattedMessage } from "react-intl";
-import { Divider } from "antd";
 import { selectCurrentUser, selectIsFollowedOnSelectedUser, selectProfile } from "../../redux/selectors/users";
 import { fetchProfile } from "../../redux/thunks/users";
-import { createPost, fetchPosts } from "../../redux/thunks/public";
+import { fetchPosts } from "../../redux/thunks/public";
 import { Profile as ProfileType } from "../../types/models";
 import { convertProfileToUser } from "../../types/conversions";
-import { PostFormValues } from "../Posts/PostForm";
 import Posts from "../Posts/Posts";
 import ProfileAvatar from "./ProfileAvatar";
 import UserInfo from "./UserInfo/UserInfo";
@@ -35,7 +32,7 @@ const Profile: React.FC = () => {
   const selectedUserId = Number(userId);
 
   useEffect(() => {
-    dispatch(fetchPosts({...filter, authorId: selectedUserId}))
+    dispatch(fetchPosts({ ...filter, authorId: selectedUserId }))
   }, [])
 
   useEffect(() => {
@@ -55,12 +52,7 @@ const Profile: React.FC = () => {
     ? `${login}, ${firstName} ${lastName}`
     : login
 
-
-  const onFinishCreatingPost = (values: PostFormValues) => {
-    dispatch(createPost(values));
-  }
-
-  return <Fragment>
+  return <div>
     <div>
       <ProfileAvatar
         photoUrl={photoUrl}
@@ -83,12 +75,9 @@ const Profile: React.FC = () => {
       isOwn={isOwnProfile}
       profile={profile as ProfileType}
     />
-    <Divider plain orientation="right">
-      <FormattedMessage id="user-posts" />
-    </Divider>
-    <PostForm onFinish={onFinishCreatingPost} />
+    <PostForm mode="create"/>
     <Posts />
-  </Fragment>
+  </div>
 }
 
 export default Profile;

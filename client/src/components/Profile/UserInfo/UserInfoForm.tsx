@@ -1,28 +1,19 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { FormattedMessage, useIntl } from "react-intl";
-import { Button, Divider, Form, Input } from "antd";
-import { useForm } from "antd/lib/form/Form";
-import {
-  GithubOutlined, InstagramOutlined, MailOutlined,
-  SendOutlined, FacebookOutlined, TwitterOutlined,
-  PhoneOutlined
-} from "@ant-design/icons";
+import { useIntl } from "react-intl";
 import { Contacts, Profile } from "../../../types/models";
 import { updateProfile } from "../../../redux/thunks/users";
 import { setProfileEditMode } from "../../../redux/actions/users";
 import { getObjectWithoutNullProps } from "../../../utils";
 
-const { Item } = Form;
-
 const contactsIcons = {
-  github: <GithubOutlined />,
-  telegram: <SendOutlined />,
-  email: <MailOutlined />,
-  facebook: <FacebookOutlined />,
-  twitter: <TwitterOutlined />,
-  instagram: <InstagramOutlined />,
-  phoneNumber: <PhoneOutlined />
+  github: <div />,
+  telegram: <div />,
+  email: <div />,
+  facebook: <div />,
+  twitter: <div />,
+  instagram: <div />,
+  phoneNumber: <div />
 }
 
 const contactsInitial = {
@@ -71,7 +62,6 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
 
   const dispatch = useDispatch();
   const intl = useIntl();
-  const [form] = useForm<UserInfoFormValues>();
   const [contactsStatuses, setContactsStatuses] = useState({
     github: true,
     telegram: true,
@@ -109,69 +99,12 @@ const UserInfoForm: React.FC<Props> = ({ profile }) => {
   }
 
   const handleChangeContact = (event: ChangeEvent<HTMLInputElement>) => {
-    const contactId = event.target.id;
-    const key = contactId.replace("contacts_", "");
-    const value = form.getFieldValue(['contacts', key]);
-    const match = contactsPatterns[key as keyof typeof contactsPatterns].test(value);
-    setContactsStatuses({ ...contactsStatuses, [key]: match })
+  
   }
 
-  return <Form form={form} initialValues={initialValues} onFinish={handleFinish}>
-
-    <Item name="firstName">
-      <Input
-        placeholder={intl.formatMessage({ id: "first-name" })}
-      />
-    </Item>
-
-    <Item name="lastName">
-      <Input
-        placeholder={intl.formatMessage({ id: "last-name" })}
-      />
-    </Item>
-
-    <Item name="about">
-      <Input
-        placeholder={intl.formatMessage({ id: "about" })}
-      />
-    </Item>
-
-    <Divider plain orientation="right">
-      <FormattedMessage
-        id="contacts"
-        defaultMessage="contacts"
-      />
-    </Divider>
-
-    {
-      contactsArray.map((key, index) => <Item key={index} name={["contacts", key]}
-        validateStatus={contactsStatuses[key as keyof typeof contactsStatuses]
-          ? "success"
-          : "error"
-        }>
-        <Input onChange={handleChangeContact}
-          placeholder={key}
-          prefix={
-            contactsIcons.hasOwnProperty(key)
-              ? contactsIcons[key as keyof typeof contactsIcons]
-              : null
-          }
-        />
-      </Item>
-      )
-    }
-
-    <Item>
-      <Button type="primary" htmlType="submit">
-        <FormattedMessage id="buttons.save" defaultMessage="save" />
-      </Button>
-    </Item>
-
-    <Button onClick={handleCancel}>
-      <FormattedMessage id="buttons.cancel" defaultMessage="cancel" />
-    </Button>
-
-  </Form>
+  return <div>
+    USER INFO FORM
+  </div>
 }
 
 export default UserInfoForm;

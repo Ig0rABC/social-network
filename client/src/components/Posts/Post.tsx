@@ -1,112 +1,111 @@
-import React from "react";
-import { Comment } from "antd";
-import { Post, Comment as CommentType, Reply } from "../../types/models";
-import PostForm, { PostFormValues } from "./PostForm";
-import { CommentFormValues } from "../Comments/CommentForm";
-import AuthorAvatar from "../common/AuthorAvatar";
-import UserLink from "../common/UserLink";
+import React, { Fragment } from "react";
+import { useDispatch } from "react-redux";
+import { NavLink } from "react-router-dom";
+import { FormattedMessage } from "react-intl";
+import { Avatar, Card, CardActions, CardContent, CardHeader, IconButton, Tooltip, Typography } from "@material-ui/core";
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { Comment, Delete, Edit, Favorite, FavoriteBorder } from "@material-ui/icons";
+import { setEditingPostId, openComments } from "../../redux/actions/public";
+import { Post as PostType } from "../../types/models";
+import { deletePost, fetchComments, setIsLikedPost } from "../../redux/thunks/public";
+import PostForm from "./PostForm";
 import Comments from "../Comments/Comments";
-import ToggleLikeButton from "../common/buttons/ToggleLikeButton";
-import ViewItemsButton from "../common/buttons/ViewItemsButton";
-import EditButton from "../common/buttons/EditButton";
-import DeleteButton from "../common/buttons/DeleteButton";
-import CancelButton from "../common/buttons/CancelButton";
-import { ReplyFormValues } from "../Replies/ReplyForm";
 
 type Props = {
-  post: Post,
+  post: PostType,
   isAuthorized: boolean,
   currentUserId: number,
   editMode: boolean,
-  comments: CommentType[],
   pendingLike: boolean,
-  pendingLikeComments: number[],
-  editingCommentId: number,
-  openedComments: boolean,
-  openedReplies: number[],
-  replies: Reply[],
-  editingReplyId: number,
-  pendingLikeReplies: number[],
-  handlers: {
-    posts: {
-      onLikeClick: () => void,
-      onDeleteClick: () => void,
-      onEditClick: () => void,
-      onCancelEditingClick: () => void,
-      onViewCommentsClick: () => void,
-      onFinishUpdating: (values: PostFormValues) => void
-    },
-    comments: {
-      onLikeClick: (commentId: number, isLiked: boolean) => () => void
-      onDeleteClick: (commentId: number) => () => void,
-      onEditClick: (commentId: number) => () => void,
-      onCancelEditingClick: () => void,
-      onFinishCreating: (postId: number) => (values: CommentFormValues) => void,
-      onFinishUpdating: (commentId: number) => (values: CommentFormValues) => void
-      onViewRepliesClick: (commentId: number) => () => void
-    },
-    replies: {
-      onLikeClick: (replyId: number, isLiked: boolean) => () => void
-      onDeleteClick: (replyId: number) => () => void,
-      onEditClick: (replyId: number) => () => void,
-      onCancelEditingClick: () => void,
-      onFinishCreating: (commentId: number) =>(values: ReplyFormValues) => void,
-      onFinishUpdating: (replyId: number) => (values: ReplyFormValues) => void
-    },
-    common: {
-      onUnauthorizedClick: () => void,
-    }
-  }
+  openedComments: boolean
 }
 
-const PostComponent: React.FC<Props> = (props) => {
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    largePhoto: {
+      width: theme.spacing(8),
+      height: theme.spacing(8),
+    }
+  })
+)
 
-  const { post, handlers, editMode, pendingLike, ...restProps } = props;
+const Post: React.FC<Props> = ({ post, editMode, openedComments, pendingLike, ...props }) => {
+
+  const dispatch = useDispatch();
+  const styles = useStyles();
+
   const isOwn = props.currentUserId === post.author.id;
 
-  if (editMode) return (
-    <PostForm key={post.id}
-      onFinish={handlers.posts.onFinishUpdating}
-      initialValues={{ category: post.category, content: post.content }}
-      extraElements={[<CancelButton onClick={handlers.posts.onCancelEditingClick} />]}
-    />
-  )
+  const handleLikeClick = () => {
+    dispatch(setIsLikedPost({
+      postId: post.id,
+      isLiked: !post.isLiked
+    }));
+  }
 
-  return (
-    <Comment key={post.id}
-      actions={[
-        <ToggleLikeButton
-          isAuthorized={props.isAuthorized}
-          isLiked={post.isLiked}
-          likesCount={post.likesCount}
-          disabled={pendingLike}
-          onClick={handlers.posts.onLikeClick}
-          onUnauthorizedClick={handlers.common.onUnauthorizedClick}
-        />,
-        <ViewItemsButton
-          itemsName="comments"
-          itemsCount={post.commentsCount}
-          onClick={handlers.posts.onViewCommentsClick}
-        />,
-        isOwn && <EditButton onClick={handlers.posts.onEditClick} />,
-        isOwn && <DeleteButton onClick={handlers.posts.onDeleteClick} />
-      ]}
-      author={<UserLink {...post.author} />}
-      avatar={<AuthorAvatar {...post.author} />}
-      content={post.content}
-      datetime={post.created}
-    >
-      <Comments {...restProps} handlers={{
-        comments: {
-          ...handlers.comments,
-          onFinishCreating: handlers.comments.onFinishCreating(post.id)
-        },
-        replies: handlers.replies,
-        common: handlers.common
-      }}
+  const handleCommentsClick = () => {
+    if (!openedComments) {
+      if (post.commentsCount > 0) {
+        dispatch(fetchComments({ postId: post.id }));
+      } else {
+        dispatch(openComments(post.id));
+      }
+    }
+  }
+
+  const handleEditClick = () => {
+    dispatch(setEditingPostId(post.id));
+  }
+
+  const handleDeleteClick = () => {
+    dispatch(deletePost(post.id));
+  }
+
+  if (editMode) return <PostForm mode="edit" />
+
+  return <div>
+    <Card>
+      <CardHeader
+        avatar={<Avatar className={styles.largePhoto} src={post.author.photoUrl}>{post.author.id}</Avatar>}
+        title={<NavLink to={"/users/" + post.author.id}>{post.author.login}</NavLink>}
+        subheader={post.created}
       />
-    </Comment>
-  )
+      <CardContent>
+        <Typography variant="body2" color="textPrimary" component="p">
+          {post.content}
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Tooltip arrow placement="top" title={<FormattedMessage id={post.isLiked ? "buttons.unlike" : "buttons.like"} />}>
+          <IconButton disabled={pendingLike} onClick={handleLikeClick}>
+            {post.isLiked
+              ? <Favorite color="secondary" />
+              : <FavoriteBorder />
+            }
+          </IconButton>
+        </Tooltip>
+        <Tooltip arrow placement="top" title={<FormattedMessage id="buttons.view-comments" />}>
+          <IconButton onClick={handleCommentsClick}>
+            <Comment />
+          </IconButton>
+        </Tooltip>
+        {isOwn && <Fragment>
+          <Tooltip arrow placement="top" title={<FormattedMessage id="buttons.edit" />}>
+            <IconButton onClick={handleEditClick}>
+              <Edit />
+            </IconButton>
+          </Tooltip>
+          <Tooltip arrow placement="top" title={<FormattedMessage id="buttons.delete" />}>
+            <IconButton onClick={handleDeleteClick}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
+        </Fragment>
+        }
+      </CardActions>
+    </Card>
+    {openedComments && <Comments postId={post.id} {...props} />}
+  </div>
 }
 
-export default PostComponent;
+export default Post;

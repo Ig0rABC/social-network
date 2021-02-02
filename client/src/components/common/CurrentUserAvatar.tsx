@@ -1,27 +1,25 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { Avatar, Space } from 'antd';
+import { Avatar } from "@material-ui/core";
 import { selectCurrentUser } from "../../redux/selectors/users";
-import SignOutButton from "../common/buttons/SignOutButton";
+import SignOutButton from "./SignOutButton";
 
 const CurrentUserAvatar: React.FC = () => {
 
   const currentUser = useSelector(selectCurrentUser);
   if (currentUser === null) {
-    return <Fragment />;
+    return <div />;
   }
   const { id, login, photoUrl } = currentUser;
 
-  return <Fragment>
+  return <div>
     <NavLink to={"users/" + id}>
-      <Space>
-        {login}
-        <Avatar size={48} src={photoUrl} />
-      </Space>
+      {login}
+      <Avatar src={photoUrl} />
     </NavLink>
     <SignOutButton />
-  </Fragment>
+  </div>
 }
 
 export default CurrentUserAvatar;

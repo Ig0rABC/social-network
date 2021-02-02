@@ -1,16 +1,6 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
-import { Button, Form, Input } from "antd";
 import { useSelector } from "react-redux";
 import { selectPendingPosts } from "../../redux/selectors/public";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { offset: 3, span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
 
 export type ReplyFormValues = {
   content: string
@@ -24,38 +14,11 @@ type Props = {
 
 const ReplyForm: React.FC<Props> = ({ onFinish, initialValues = { content: "" }, extraElements = [] }) => {
 
-  const [form] = Form.useForm();
   const pending = useSelector(selectPendingPosts);
 
-  return <Form form={form}
-    {...layout}
-    initialValues={initialValues}
-    onFinish={(values) => {
-      onFinish(values);
-      form.resetFields();
-    }}
-  >
-
-    <Form.Item name="content"
-      rules={[
-        {
-          required: true,
-          message: <FormattedMessage id="empty-reply" defaultMessage="empty reply" />
-        }
-      ]}
-    >
-      <Input.TextArea showCount maxLength={250} minLength={10} />
-    </Form.Item>
-
-    <Form.Item {...tailLayout}>
-      <Button type="primary" htmlType="submit" disabled={pending}>
-        <FormattedMessage id="buttons.reply" defaultMessage="reply" />
-      </Button>
-    </Form.Item>
-
-    {extraElements}
-
-  </Form>
+  return <div>
+    REPLY FORM
+  </div>
 }
 
 export default ReplyForm;

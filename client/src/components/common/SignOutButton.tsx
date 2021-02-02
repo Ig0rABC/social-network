@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FormattedMessage } from "react-intl";
-import { Button } from "antd";
-import { signOut } from "../../../redux/thunks/users";
-import { selectIsAuthorized } from "../../../redux/selectors/users";
+import { Button } from "@material-ui/core";
+import { signOut } from "../../redux/thunks/users";
+import { selectIsAuthorized } from "../../redux/selectors/users";
 
 const LogoutButton: React.FC = () => {
 
@@ -20,7 +20,7 @@ const LogoutButton: React.FC = () => {
     setSubmitting(false);
   }, [isAuthorized])
 
-  return <Button type="link" onClick={handleOnClick} disabled={isSubmitting}>
+  return <Button onClick={handleOnClick} disabled={isSubmitting}>
     <FormattedMessage id="buttons.sign-out" defaultMessage="sign out" />
   </Button>
 }

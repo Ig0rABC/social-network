@@ -24,8 +24,8 @@ export const selectEditingPostId = (state: RootState) => {
   return state.public.editingPostId;
 }
 
-export const selectComments = (state: RootState) => {
-  return state.public.comments;
+export const selectComments = (postId: number) => (state: RootState) => {
+  return state.public.comments.filter(c => c.postId === postId);
 }
 
 export const selectPendingLikeComments = (state: RootState) => {
@@ -44,8 +44,8 @@ export const selectOpenedReplies = (state: RootState) => {
   return state.public.openedReplies;
 }
 
-export const selectReplies = (state: RootState) => {
-  return state.public.replies;
+export const selectReplies = (commentId: number) => (state: RootState) => {
+  return state.public.replies.filter(r => r.commentId === commentId);
 }
 
 export const selectPendingLikeReplies = (state: RootState) => {

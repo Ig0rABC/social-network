@@ -6,10 +6,7 @@ class Replies(AuthorContentTable):
     metadata = {
         'table': 'replies',
         'model': 'reply',
-        'foreign_key': 'comment_id',
-        'searchable': [
-            'content'
-        ]
+        'foreign_key': 'comment_id'
     }
 
     def get():

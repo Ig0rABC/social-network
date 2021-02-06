@@ -5,10 +5,7 @@ class Comments(AuthorContentTable):
     metadata = {
         'table': 'comments',
         'model': 'comment',
-        'foreign_key': 'post_id',
-        'searchable': [
-            'content'
-        ]
+        'foreign_key': 'post_id'
     }
 
     def get():

@@ -12,14 +12,6 @@ class Table:
             for k in kwargs.keys()
         )
 
-    def build_like_condition(**kwargs):
-        if not kwargs:
-            return ''
-        return 'WHERE ' + ' AND '.join(
-            f'LOWER({k}) LIKE LOWER(%({k})s)'
-            for k in kwargs.keys()
-        )
-
     @classmethod
     def build_condition(cls, **kwargs):
         kwargs.pop('limit', None)
@@ -27,13 +19,12 @@ class Table:
         condition = cls.build_equal_condition(**{
             k: v
             for k, v in kwargs.items()
-            if k not in cls.metadata['searchable']
+            if k != 'search'
         })
-        search = cls.build_like_condition(**{
-            k: v
-            for k, v in kwargs.items()
-            if k in cls.metadata['searchable']
-        })
+        if 'search' in kwargs.keys():
+            search = 'WHERE LOWER(content) LIKE LOWER(%(search)s)'
+        else:
+            search = ''
         if not condition:
             if not search:
                 return ''

@@ -5,10 +5,7 @@ class Posts(AuthorContentTable):
     metadata = {
         'table': 'posts',
         'model': 'post',
-        'foreign_key': 'category',
-        'searchable': [
-            'content'
-        ]
+        'foreign_key': 'category'
     }
     
     def get_categories():

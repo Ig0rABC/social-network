@@ -50,6 +50,8 @@ def get_posts():
         user_id = 0
     with connect(DSN) as connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            if 'search' in params:
+                params['search'] = '%' + params['search'] + '%'
             cursor.execute(Posts.filter(**params), {'user_id': user_id, **params})
             posts = cursor.fetchall()
             cursor.execute(Posts.count(**params), params)

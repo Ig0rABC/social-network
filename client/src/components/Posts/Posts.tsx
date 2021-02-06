@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Grid } from "@material-ui/core";
 import {
   selectFilter, selectPendingPosts, selectPosts,
   selectTotalPostsCount, selectPendingLikePosts,
@@ -33,7 +34,7 @@ const Posts: React.FC = () => {
     }
   }, [posts.length])
 
-  return <div>
+  return <Grid container direction="column" spacing={2}>
     <PostsSearchForm />
     {
       posts.map(post => <Post key={post.id} post={post}
@@ -44,7 +45,7 @@ const Posts: React.FC = () => {
         currentUserId={currentUser?.id || 0}
       />)
     }
-  </div>
+  </Grid>
 }
 
 export default Posts;

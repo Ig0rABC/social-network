@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
-import { Avatar, Card, CardActions, CardContent, CardHeader, IconButton, Tooltip, Typography } from "@material-ui/core";
+import { Grid, Avatar, Card, CardActions, CardContent, CardHeader, IconButton, Tooltip, Typography } from "@material-ui/core";
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Comment, Delete, Edit, Favorite, FavoriteBorder } from "@material-ui/icons";
 import { setEditingPostId, openComments } from "../../redux/actions/public";
@@ -61,9 +61,16 @@ const Post: React.FC<Props> = ({ post, editMode, openedComments, pendingLike, ..
     dispatch(deletePost(post.id));
   }
 
-  if (editMode) return <PostForm mode="edit" />
+  if (editMode) return <PostForm
+    mode="edit"
+    postId={post.id}
+    initialValues={{
+      category: post.category,
+      content: post.content
+    }}
+  />
 
-  return <div>
+  return <Grid item>
     <Card>
       <CardHeader
         avatar={<Avatar className={styles.largePhoto} src={post.author.photoUrl}>{post.author.id}</Avatar>}
@@ -105,7 +112,7 @@ const Post: React.FC<Props> = ({ post, editMode, openedComments, pendingLike, ..
       </CardActions>
     </Card>
     {openedComments && <Comments postId={post.id} {...props} />}
-  </div>
+  </Grid>
 }
 
 export default Post;
